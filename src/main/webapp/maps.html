@@ -4,13 +4,14 @@
     <meta charset="UTF-8">
     <title>TravIS: Travel Information System</title>
     <link rel="stylesheet" href="style.css">
-    <script src="script.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCliLCkKyAyNMuo8hUakfjuwu8g1DymUSY"></script>
+    <script src="maps_script.js"></script>
   </head>
-  <body>
+  <body onload="initMap()">
     <div id="content">
       <h1>TravIS: Travel Information System</h1>
       <h2>By Chris, Adam, and Eshika</h2>
-      <a href="maps.html">Map</a>    
+      <div id="routeMap"></div>
     </div>
   </body>
 </html>

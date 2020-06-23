@@ -4,3 +4,10 @@
   width: 650px;
   line-height: 1.1;
 }
+
+#routeMap {
+  border: thin solid black;
+  height: 500px;
+  width: 700px;
+  margin: auto;
+}
