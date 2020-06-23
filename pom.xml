@@ -38,12 +38,6 @@
       <version>1.9.59</version>
     </dependency>
 
-    <dependency>
-      <groupId>com.google.appengine</groupId>
-      <artifactId>appengine-api-1.0-sdk</artifactId>
-      <version>1.9.59</version>
-    </dependency>
-
   </dependencies>
 
   <build>
@@ -56,7 +50,7 @@
         <version>2.2.0</version>
         <configuration>
           <!-- TODO: set project ID. -->
-          <deploy.projectId>step135-2020</deploy.projectId>
+          <deploy.projectId>offroad-pod-step-2020</deploy.projectId>
           <deploy.version>1</deploy.version>
         </configuration>
       </plugin>
