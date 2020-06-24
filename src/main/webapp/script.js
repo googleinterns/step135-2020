@@ -40,6 +40,9 @@ function isSignedIn() {
 
 // Create the necessary elements and display the sign in page.
 function displaySignInPage() {
+  // Set the width of the content container.
+  setContentWidth('650px');
+
   // Add background image to site. (This id is defined in CSS.)
   document.body.id = 'body-background-image';
 
@@ -84,6 +87,9 @@ function displaySignInPage() {
 
 // User is signed in, show the start trip homepage.
 function displayStartTripDesign() {
+  // Set the width of the content container.
+  setContentWidth('800px');
+
   // Remove background image id from body.
   document.body.removeAttribute('id');
 
@@ -91,22 +97,64 @@ function displayStartTripDesign() {
   const indexStartTripBlock = document.getElementById('index-start-trip-block');
   indexStartTripBlock.style.display = 'block';
 
-    // Create form element to allow sign in.
+  // Add the site header.
+  addHeader();
+}
+
+function addHeader() {
+  // Get the content container (add the header to this component).
+  const contentContainer = document.getElementById('content');
+
+  // Create header for site.
+  const header = document.createElement('div');
+  header.id = 'header';
+
+  // Create h1 element as title for TravIS.
+  const titleElement = document.createElement('h3');
+  titleElement.innerText = 'TravIS';
+  titleElement.className = 'header-child float-left';
+  titleElement.id = 'header-title';
+
+  // Create container element to hold the link below.
+  const aContainerElement = document.createElement('div');
+  aContainerElement.className = 'header-child float-right';
+
+  // Create a element to redirect to the "/trips" page.
+  const aElement = document.createElement('a');
+  aElement.innerText = "Trips";
+  aElement.className = 'btn btn-primary';
+  aElement.href = "/trips/";
+
+  // Add a element to container element.
+  aContainerElement.appendChild(aElement);
+
+  // Create form element to allow sign out.
   const formElement = document.createElement('form');
-  formElement.className = 'index-registration-block-child';
+  formElement.className = 'header-child float-right';
   formElement.id = 'sign-out-button-form';
   formElement.action = '/auth';
   formElement.method = 'POST';
 
-  // Create input element to allow sign in within the form element.
+  // Create input element to allow sign out within the form element.
   const inputElement = document.createElement('input');
   inputElement.className = 'btn btn-primary';
   inputElement.type = 'submit';
   inputElement.value = 'Sign out';
 
   // Add input element to the form element.
-  formElement.appendChild(inputElement);
+  formElement.append(inputElement);
 
   // Add above elements to the homepage "start trip" block.
-  indexStartTripBlock.appendChild(formElement);
+  header.appendChild(titleElement);
+  header.appendChild(formElement);
+  header.appendChild(aContainerElement);
+
+  // Add the header as the first child of the content container.
+  contentContainer.prepend(header);
+}
+
+// Set the width of the content container.
+function setContentWidth(width) {
+  const contentContainer = document.getElementById('content');
+  contentContainer.style.width = width;
 }
