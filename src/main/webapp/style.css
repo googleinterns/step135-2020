@@ -1,4 +1,4 @@
-body::after {
+#body-background-image::after {
   content: "";
   background-image: url("images/index_bg.jpg");
   opacity: 0.8;

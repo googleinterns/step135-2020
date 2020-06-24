@@ -40,6 +40,9 @@ function isSignedIn() {
 
 // Create the necessary elements and display the sign in page.
 function displaySignInPage() {
+  // Add background image to site. (This id is defined in CSS.)
+  document.body.id = 'body-background-image';
+
   // Get the homepage "registration" block to and add elements.
   const indexRegistrationBlock = document.getElementById('index-registration-block');
   indexRegistrationBlock.style.display = 'block';
@@ -81,6 +84,9 @@ function displaySignInPage() {
 
 // User is signed in, show the start trip homepage.
 function displayStartTripDesign() {
+  // Remove background image id from body.
+  document.body.removeAttribute('id');
+
   // Get the homepage "start trip" block to and add elements.
   const indexStartTripBlock = document.getElementById('index-start-trip-block');
   indexStartTripBlock.style.display = 'block';
