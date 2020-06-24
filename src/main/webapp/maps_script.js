@@ -13,13 +13,23 @@
 // limitations under the License.
 
 function initMap() {
-  const originCoords = {lat: 0.0, lng: 0.0};
+  // Manhattan coords
+  const coords = {lat: 40.771, lng: -73.974};
 
-  // Create world map
+  // Create map centered on Manhattan
   let map = new google.maps.Map(
       document.getElementById('routeMap'),
-      {center: originCoords, 
-      zoom: 1,
+      {center: coords, 
+      zoom: 13,
       streetViewControl: false,
   });
+
+  // Instantiate a directions service.
+  let directionsService = new google.maps.DirectionsService;
+
+  // Create a renderer for directions and bind it to the map.
+  let directionsRenderer = new google.maps.DirectionsRenderer({map: map});
+
+  // Instantiate an info window to hold step text.
+  let stepDisplay = new google.maps.InfoWindow;
 }
