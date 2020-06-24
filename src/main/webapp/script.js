@@ -15,15 +15,19 @@
 // Triggered upon DOM load.
 $(document).ready(() => {
   isSignedIn().then((signInStatus) => {
+    // Display "sign in" or "sign out" button depending on sign in status.
     if (signInStatus) {
-      console.log('Signed in!');
+      displaySignOutButton();
     } else {
-      console.log('Not signed in.');
+      displaySignInButton();
     }
-  });
+  }).catch((error) => {
+    // If an error occurs, print error to console and do not display button.
+    console.error(error);
+  })
 });
 
-// Returns Promise with the sign in status in a String.
+// Returns Promise with the sign in status in a boolean.
 function isSignedIn() {
   return new Promise((resolve, reject) => {
     fetch('/auth').then(response => response.json()).then((signInStatus) => {
@@ -32,4 +36,14 @@ function isSignedIn() {
       reject(error);
     });
   });
+}
+
+// Show the sign in button.
+function displaySignInButton() {
+  document.getElementById('sign-in-button-form').style.display = 'block';
+}
+
+// Show the sign out button.
+function displaySignOutButton() {
+  document.getElementById('sign-out-button-form').style.display = 'block';
 }

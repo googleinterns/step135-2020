@@ -40,3 +40,7 @@ body::after {
 .index-registration-block-child {
   margin: 10px 0;
 }
+
+#sign-in-button-form, #sign-out-button-form {
+  display: none;
+}

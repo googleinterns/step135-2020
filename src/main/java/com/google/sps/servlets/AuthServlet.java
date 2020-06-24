@@ -23,6 +23,7 @@ import javax.servlet.http.HttpServletResponse;
 @WebServlet("/auth")
 public class AuthServlet extends HttpServlet {
 
+  // Boolean that holds the current sign in status.
   private boolean signedIn;
 
   @Override
@@ -32,6 +33,7 @@ public class AuthServlet extends HttpServlet {
 
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    // Return the current sign in status.
     response.setContentType("application/json;");
     response.getWriter().println(signedIn);
   }
@@ -40,6 +42,9 @@ public class AuthServlet extends HttpServlet {
   public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
     // Toggle signedIn value; temporary measure to show auth.
     signedIn = !signedIn;
+    
+    // Redirect back to homepage.
+    response.sendRedirect("/");
   }
 
 }
