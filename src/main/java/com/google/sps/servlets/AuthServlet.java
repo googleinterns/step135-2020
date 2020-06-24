@@ -23,10 +23,23 @@ import javax.servlet.http.HttpServletResponse;
 @WebServlet("/auth")
 public class AuthServlet extends HttpServlet {
 
+  private boolean signedIn;
+
+  @Override
+  public void init() {
+    signedIn = false;
+  }
+
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-    response.setContentType("text/html;");
-    response.getWriter().println("<h1>Authorization.</h1>");
+    response.setContentType("application/json;");
+    response.getWriter().println(signedIn);
+  }
+
+  @Override
+  public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    // Toggle signedIn value; temporary measure to show auth.
+    signedIn = !signedIn;
   }
 
 }

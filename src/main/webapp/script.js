@@ -12,3 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Triggered upon DOM load.
+$(document).ready(() => {
+  isSignedIn().then((signInStatus) => {
+    if (signInStatus) {
+      console.log('Signed in!');
+    } else {
+      console.log('Not signed in.');
+    }
+  });
+});
+
+// Returns Promise with the sign in status in a String.
+function isSignedIn() {
+  return new Promise((resolve, reject) => {
+    fetch('/auth').then(response => response.json()).then((signInStatus) => {
+      resolve(signInStatus);
+    }).catch((error) => {
+      reject(error);
+    });
+  });
+}

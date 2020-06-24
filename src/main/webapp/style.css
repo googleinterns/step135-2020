@@ -31,3 +31,12 @@ body::after {
 #index-registration-block:hover {
   box-shadow: 0 1px 7px 0 rgba(0, 0, 0, 0.4);
 }
+
+#index-registration-block-p {
+  font-size: 18px;
+  line-height: 1.4;
+}
+
+.index-registration-block-child {
+  margin: 10px 0;
+}
