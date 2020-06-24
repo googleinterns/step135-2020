@@ -17,9 +17,9 @@ $(document).ready(() => {
   isSignedIn().then((signInStatus) => {
     // Display "sign in" or "sign out" button depending on sign in status.
     if (signInStatus) {
-      displaySignOutButton();
+      displayStartTripDesign();
     } else {
-      displaySignInButton();
+      displaySignInPage();
     }
   }).catch((error) => {
     // If an error occurs, print error to console and do not display button.
@@ -38,12 +38,69 @@ function isSignedIn() {
   });
 }
 
-// Show the sign in button.
-function displaySignInButton() {
-  document.getElementById('sign-in-button-form').style.display = 'block';
+// Create the necessary elements and display the sign in page.
+function displaySignInPage() {
+  // Get the homepage "registration" block to and add elements.
+  const indexRegistrationBlock = document.getElementById('index-registration-block');
+  indexRegistrationBlock.style.display = 'block';
+
+  // Create h1 element as title for TravIS.
+  const titleElement = document.createElement('h1');
+  titleElement.innerText = 'TravIS: Travel Information System';
+  titleElement.className = 'index-registration-block-child';
+
+  // Create p element to describe TravIS.
+  const textElement = document.createElement('p');
+  textElement.innerText = 
+    'TravIS, your personal Travel Information System, allows you to plan ' +
+    'the optimal trip to wherever you want to visit.';
+  textElement.className = 'index-registration-block-child';
+  textElement.id = 'index-registration-block-p';
+
+  // Create form element to allow sign in.
+  const formElement = document.createElement('form');
+  formElement.className = 'index-registration-block-child';
+  formElement.id = 'sign-in-button-form';
+  formElement.action = '/auth';
+  formElement.method = 'POST';
+
+  // Create input element to allow sign in within the form element.
+  const inputElement = document.createElement('input');
+  inputElement.className = 'btn btn-primary';
+  inputElement.type = 'submit';
+  inputElement.value = 'Sign in';
+
+  // Add input element to the form element.
+  formElement.appendChild(inputElement);
+
+  // Add above elements to the homepage "registration" block.
+  indexRegistrationBlock.appendChild(titleElement);
+  indexRegistrationBlock.appendChild(textElement);
+  indexRegistrationBlock.appendChild(formElement);
 }
 
-// Show the sign out button.
-function displaySignOutButton() {
-  document.getElementById('sign-out-button-form').style.display = 'block';
+// User is signed in, show the start trip homepage.
+function displayStartTripDesign() {
+  // Get the homepage "start trip" block to and add elements.
+  const indexStartTripBlock = document.getElementById('index-start-trip-block');
+  indexStartTripBlock.style.display = 'block';
+
+    // Create form element to allow sign in.
+  const formElement = document.createElement('form');
+  formElement.className = 'index-registration-block-child';
+  formElement.id = 'sign-out-button-form';
+  formElement.action = '/auth';
+  formElement.method = 'POST';
+
+  // Create input element to allow sign in within the form element.
+  const inputElement = document.createElement('input');
+  inputElement.className = 'btn btn-primary';
+  inputElement.type = 'submit';
+  inputElement.value = 'Sign out';
+
+  // Add input element to the form element.
+  formElement.appendChild(inputElement);
+
+  // Add above elements to the homepage "start trip" block.
+  indexStartTripBlock.appendChild(formElement);
 }

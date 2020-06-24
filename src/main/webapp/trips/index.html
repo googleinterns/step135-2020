@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>TravIS Trips</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" 
+      integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+    <link rel="stylesheet" href="../style.css">
+    <script src="../script.js"></script>
+  </head>
+  <body>
+    <div id="content">
+      <div id="index-registration-block">
+        <h1 class="index-registration-block-child">TravIS: Travel Information System</h1>
+        <p class="index-registration-block-child" id="index-registration-block-p">
+          TravIS, your personal Travel Information System, allows you to plan 
+          the optimal trip to wherever you want to visit.
+        </p>
+        <form action="/auth" method="POST" class="index-registration-block-child"
+          id="sign-in-button-form">
+          <input value="Sign in" type="submit" class="btn btn-primary" />
+        </form>
+        <form action="/auth" method="POST" class="index-registration-block-child"
+          id="sign-out-button-form">
+          <input value="Sign out" type="submit" class="btn btn-primary" />
+        </form>
+      </div>
+    </div>
+  </body>
+</html>
