@@ -109,7 +109,7 @@ function addHeader() {
   const header = document.createElement('div');
   header.id = 'header';
 
-  // Create h1 element as title for TravIS.
+  // Create h3 element as title for TravIS.
   const titleElement = document.createElement('h3');
   titleElement.innerText = 'TravIS';
   titleElement.className = 'header-child float-left';
