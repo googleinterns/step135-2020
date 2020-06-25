@@ -19,6 +19,7 @@ $(document).ready(() => {
     if (!signInStatus) {
       window.location.replace('/');
     } else {
+      setContentWidth('800px');
       addHeader();
     }
   });
@@ -86,4 +87,10 @@ function addHeader() {
 
   // Add the header as the first child of the content container.
   contentContainer.prepend(header);
+}
+
+// Set the width of the content container.
+function setContentWidth(width) {
+  const contentContainer = document.getElementById('content');
+  contentContainer.style.width = width;
 }

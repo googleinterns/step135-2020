@@ -71,3 +71,12 @@
 .float-right {
   float: right;
 }
+
+#trips-container {
+  margin: 20px 0;
+}
+
+.card {
+  display: inline-block;
+  margin: 10px 15px 10px 0;
+}
