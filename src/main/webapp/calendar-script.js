@@ -22,38 +22,43 @@ document.addEventListener('DOMContentLoaded', function() {
       right: 'dayGridMonth,dayGridWeek, dayGridDay, listWeek'
     },
     initialView: 'dayGridMonth',
-    initialDate: '2018-11-18',
+    initialDate: '2020-6-29',
     eventLimit: true,
     events: [{
-            title: 'Front-End Conference',
-            start: '2018-11-16',
-            end: '2018-11-18',
+            title: 'Golden Gate Bridge',
+            start: '2020-6-29T09:00:00',
+            end: '2020-6-29T10:00:00',
             allDay: false
         },
         {
-            title: 'Hair stylist with Mike',
-            start: '2018-11-20',
-            allDay: true
+            title: 'Fishermans Wharf',
+            start: '2020-6-29T10:30:00',
+            end: '2020-6-29T11:30:00',
+            allDay: false
         },
         {
-            title: 'Car mechanic',
-            start: '2018-11-14T09:00:00',
-            end: '2018-11-14T11:00:00'
+            title: 'Mission District',
+            start: '2020-6-29T12:00:00',
+            end: '2020-6-29T13:00:00',
+            allDay: false
         },
         {
-            title: 'Dinner with Mike',
-            start: '2018-11-21T19:00:00',
-            end: '2018-11-21T22:00:00'
+            title: 'Lunch Time',
+            start: '2020-6-29T13:00:00',
+            end: '2020-6-29T14:00:00',
+            allDay: false
         },
         {
-            title: 'Chillout',
-            start: '2018-11-15',
-            allDay: true
+            title: 'Sutro Tower',
+            start: '2020-6-29T14:30:00',
+            end: '2020-6-29T15:30:00',
+            allDay: false
         },
         {
-            title: 'Vacation',
-            start: '2018-11-23',
-            end: '2018-11-29'
+            title: 'West Portal Neighborhood',
+            start: '2020-6-29T16:00:00',
+            end: '2020-6-29T17:00:00',
+            allDay: false
         },
     ]
   });
