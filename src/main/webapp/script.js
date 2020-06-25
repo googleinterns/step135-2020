@@ -38,7 +38,7 @@ function isSignedIn() {
   });
 }
 
-// Create the necessary elements and display the sign in page.
+// Update the necessary design elements and display the sign in page.
 function displaySignInPage() {
   // Set the width of the content container.
   setContentWidth('650px');
@@ -63,7 +63,7 @@ function displayStartTripDesign() {
   const indexStartTripBlock = document.getElementById('index-start-trip-block');
   indexStartTripBlock.style.display = 'block';
 
-  // Add the site header.
+  // Display the site header.
   displayHeader();
 }
 
