@@ -11,7 +11,25 @@
   </head>
   <body>
     <div id="content">
+      <div id="header">
+        <h3 class="header-child float-left" id="header-title">TravIS</h3>
+        <form class="header-child float-right" id="sign-out-button-form" action="/auth" method="POST">
+          <input class="btn btn-primary" type="submit" value="Sign out">
+        </form>
+        <div class="header-child float-right">
+          <a class="btn btn-primary" href="/trips/">Trips</a>
+        </div>
+      </div>
       <div id="index-registration-block">
+        <h1 class="index-registration-block-child">TravIS: Travel Information System</h1>
+        <p class="index-registration-block-child" id="index-registration-block-p">
+          TravIS, your personal Travel Information System, allows you to plan 	
+          the optimal trip to wherever you want to visit.	
+        </p>	
+        <form action="/auth" method="POST" class="index-registration-block-child"	
+          id="sign-in-button-form">	
+          <input value="Sign in" type="submit" class="btn btn-primary" />	
+        </form>
       </div>
       <div id="index-start-trip-block">
       </div>
