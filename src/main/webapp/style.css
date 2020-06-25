@@ -1,6 +1,46 @@
+body::after {
+  content: "";
+  background-image: url("images/index_bg.jpg");
+  opacity: 0.8;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  position: absolute;
+  z-index: -1;   
+  background-size: cover;
+  background-repeat: none;
+}
+
 #content {
   margin-left: auto;
   margin-right: auto;
-  width: 650px;
   line-height: 1.1;
+  width: 650px;
+}
+
+#index-registration-block {
+  margin-top: 100px;
+  padding: 15px;
+  border-radius: 5px;
+  border: 1px solid black;
+  background: white;
+  box-shadow: 0 1px 5px 0 rgba(0, 0, 0, 0.25);
+}
+
+#index-registration-block:hover {
+  box-shadow: 0 1px 7px 0 rgba(0, 0, 0, 0.4);
+}
+
+#index-registration-block-p {
+  font-size: 18px;
+  line-height: 1.4;
+}
+
+.index-registration-block-child {
+  margin: 10px 0;
+}
+
+#sign-in-button-form, #sign-out-button-form {
+  display: none;
 }
