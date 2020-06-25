@@ -16,48 +16,48 @@
 document.addEventListener('DOMContentLoaded', function() {
   var calendarEl = document.getElementById('calendar');
   var calendar = new FullCalendar.Calendar(calendarEl, {
-    header: {
+    headerToolbar: {
       left: 'prev,next today',
       center: 'title',
-      right: 'dayGridMonth, dayGridWeek, dayGridDay, listWeek'
+      right: 'dayGridMonth, timeGridWeek, timeGridDay, listWeek'
     },
-    initialView: 'dayGridWeek',
-    initialDate: '2020-6-29',
+    initialView: 'timeGridWeek',
+    initialDate: '2020-06-29',
     eventLimit: true,
     events: [{
             title: 'Golden Gate Bridge',
-            start: '2020-6-29T09:00:00',
-            end: '2020-6-29T10:00:00',
+            start: '2020-06-29T09:00:00',
+            end: '2020-06-29T10:00:00',
             allDay: false
         },
         {
             title: 'Fishermans Wharf',
-            start: '2020-6-29T10:30:00',
-            end: '2020-6-29T11:30:00',
+            start: '2020-06-29T10:30:00',
+            end: '2020-06-29T11:30:00',
             allDay: false
         },
         {
             title: 'Mission District',
-            start: '2020-6-29T12:00:00',
-            end: '2020-6-29T13:00:00',
+            start: '2020-06-29T12:00:00',
+            end: '2020-06-29T13:00:00',
             allDay: false
         },
         {
             title: 'Lunch Time',
-            start: '2020-6-29T13:00:00',
-            end: '2020-6-29T14:00:00',
+            start: '2020-06-29T13:00:00',
+            end: '2020-06-29T14:00:00',
             allDay: false
         },
         {
             title: 'Sutro Tower',
-            start: '2020-6-29T14:30:00',
-            end: '2020-6-29T15:30:00',
+            start: '2020-06-29T14:30:00',
+            end: '2020-06-29T15:30:00',
             allDay: false
         },
         {
             title: 'West Portal Neighborhood',
-            start: '2020-6-29T16:00:00',
-            end: '2020-6-29T17:00:00',
+            start: '2020-06-29T16:00:00',
+            end: '2020-06-29T17:00:00',
             allDay: false
         },
     ]
