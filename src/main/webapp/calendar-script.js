@@ -19,9 +19,9 @@ document.addEventListener('DOMContentLoaded', function() {
     header: {
       left: 'prev,next today',
       center: 'title',
-      right: 'dayGridMonth,dayGridWeek, dayGridDay, listWeek'
+      right: 'dayGridMonth, dayGridWeek, dayGridDay, listWeek'
     },
-    initialView: 'dayGridMonth',
+    initialView: 'dayGridWeek',
     initialDate: '2020-6-29',
     eventLimit: true,
     events: [{
