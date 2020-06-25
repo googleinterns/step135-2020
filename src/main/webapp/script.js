@@ -172,124 +172,10 @@ function addStartTripForm() {
   // Create a form container which will encompass the entire frontpage form.
   const startTripForm = document.createElement('form');
 
-  // Create a container for the email and dates.
-  const locationDatesContainer = document.createElement('div');
-  locationDatesContainer.className = 'form-row';
-
-  // Create the location input container and form.
-  const locationInputContainer = document.createElement('div');
-  locationInputContainer.className = 'form-group col-md-3';
-
-  const locationInput = document.createElement('input');
-  locationInput.type = 'text';
-  locationInput.placeholder = 'Destination';
-  locationInput.className= 'form-control';
-  locationInput.id = 'inputDestination';
-
-  locationInputContainer.appendChild(locationInput);
-
-  // Create the start date input container and form.
-  const startDateInputContainer = document.createElement('div');
-  startDateInputContainer.className = 'form-group col-md-3';
-
-  const startDateInput = document.createElement('input');
-  startDateInput.type = 'text';
-  startDateInput.placeholder = 'Start Date';
-  startDateInput.className= 'form-control';
-  startDateInput.id = 'inputStartDate';
-
-  startDateInputContainer.appendChild(startDateInput);
-
-  // Create the end date input container and form.
-  const endDateInputContainer = document.createElement('div');
-  endDateInputContainer.className = 'form-group col-md-3';
-
-  const endDateInput = document.createElement('input');
-  endDateInput.type = 'text';
-  endDateInput.placeholder = 'End Date';
-  endDateInput.className= 'form-control is-valid';
-  endDateInput.id = 'inputEndDate';
-  endDateInput.readOnly = true;
-
-  endDateInputContainer.appendChild(endDateInput);
-
-  // Create the end date input container and form.
-  const nextButtonContainer = document.createElement('div');
-  nextButtonContainer.className = 'form-group';
-
-  const nextButton = document.createElement('button');
-  nextButton.innerText = 'Next';
-  nextButton.type = 'button';
-  nextButton.className= 'btn btn-secondary';
-
-  nextButtonContainer.appendChild(nextButton);
-
-  // Add input containers for location and start / end dates to first form row container.
-  locationDatesContainer.appendChild(locationInputContainer);
-  locationDatesContainer.appendChild(startDateInputContainer);
-  locationDatesContainer.appendChild(endDateInputContainer);
-  locationDatesContainer.appendChild(nextButtonContainer)
-
-  // Create a container for adding POIs.
-  const poiContainer = document.createElement('div');
-  poiContainer.className = 'form-row';
-
-  // Create the POI input container and form.
-  const poiInputContainer = document.createElement('div');
-  poiInputContainer.className = 'form-group col-md-3';
-
-  const poiInput = document.createElement('input');
-  poiInput.type = 'text';
-  poiInput.placeholder = 'Point of Interest';
-  poiInput.className= 'form-control';
-  poiInput.id = 'inputEmail';
-
-  poiInputContainer.appendChild(poiInput);
-
-  // Create the POI add button container and form.
-  const poiAddButtonContainer = document.createElement('div');
-  poiAddButtonContainer.className = 'form-group';
-
-  const poiAddButton = document.createElement('button');
-  poiAddButton.innerText = 'Add POIs';
-  poiAddButton.type = 'button';
-  poiAddButton.className= 'btn btn-primary';
-
-  poiAddButtonContainer.appendChild(poiAddButton);
-
-  // Create a sample (California) added POI container and button.
-  const poiSampleCaliforniaContainer = document.createElement('div');
-  poiSampleCaliforniaContainer.className = 'form-group';
-
-  const poiSampleCalifornia = document.createElement('button');
-  poiSampleCalifornia.innerText = 'California (click to remove)';
-  poiSampleCalifornia.type = 'button';
-  poiSampleCalifornia.className= 'btn btn-secondary';
-
-  poiSampleCaliforniaContainer.appendChild(poiSampleCalifornia);
-
-  // Create a sample (Oregon) added POI container and button.
-  const poiSampleOregonContainer = document.createElement('div');
-  poiSampleOregonContainer.className = 'form-group';
-
-  const poiSampleOregon = document.createElement('button');
-  poiSampleOregon.innerText = 'Oregon (click to remove)';
-  poiSampleOregon.type = 'button';
-  poiSampleOregon.className= 'btn btn-secondary';
-
-  poiSampleOregonContainer.appendChild(poiSampleOregon);
-
-  // Add input containers for POIs to second form row container.
-  poiContainer.appendChild(poiInputContainer);
-  poiContainer.appendChild(poiAddButtonContainer);
-  poiContainer.appendChild(poiSampleCaliforniaContainer);
-  poiContainer.appendChild(poiSampleOregonContainer);
-
-  // Create final "submit" button for the full form.
-  const submitStartTripButton = document.createElement('button');
-  submitStartTripButton.innerText = 'Submit';
-  submitStartTripButton.type = 'submit';
-  submitStartTripButton.className = 'btn btn-success';
+  // Create location-dates and POI containers.
+  const locationDatesContainer = buildLocationDatesContainer();
+  const poiContainer = buildPoiContainer();
+  const submitStartTripButton = buildSubmitStartTripButton();
 
   // Add the form row containers, and the final submit button, to the form.
   startTripForm.appendChild(locationDatesContainer);
@@ -299,4 +185,116 @@ function addStartTripForm() {
   // Add start trip form to the homepage "start trip" block.
   indexStartTripBlock.appendChild(startTripForm);
 
+}
+
+// Build and return the "start trip" button.
+function buildSubmitStartTripButton() {
+  // Create final "submit" button for the full form.
+  const submitStartTripButton = buildButton('Submit', 'submit', 'btn btn-success');
+  return submitStartTripButton;
+}
+
+// Build and return the location-dates container, which allows location and
+// start / end date input to start trips.
+function buildLocationDatesContainer() {
+  // Create a container for the email and dates.
+  const locationDatesContainer = document.createElement('div');
+  locationDatesContainer.className = 'form-row';
+
+  // Create the location input container and form.
+  const locationInputContainer = document.createElement('div');
+  locationInputContainer.className = 'form-group col-md-3';
+  const locationInput = 
+    buildInput('text', 'Destination', 'form-control', 'inputDestination', false);
+  locationInputContainer.appendChild(locationInput);
+
+  // Create the start date input container and form.
+  const startDateInputContainer = document.createElement('div');
+  startDateInputContainer.className = 'form-group col-md-3';
+  const startDateInput = 
+    buildInput('text', 'Start Date', 'form-control', 'inputStartDate', false);
+  startDateInputContainer.appendChild(startDateInput);
+
+  // Create the end date input container and form.
+  const endDateInputContainer = document.createElement('div');
+  endDateInputContainer.className = 'form-group col-md-3';
+  const endDateInput = 
+    buildInput('text', 'End Date', 'form-control is-valid', 'inputEndDate', true);
+  endDateInputContainer.appendChild(endDateInput);
+
+  // Create the end date input container and form.
+  const nextButtonContainer = document.createElement('div');
+  nextButtonContainer.className = 'form-group';
+  const nextButton = buildButton('Next', 'button', 'btn btn-secondary');
+  nextButtonContainer.appendChild(nextButton);
+
+  // Add input containers for location and start / end dates to first form row container.
+  locationDatesContainer.appendChild(locationInputContainer);
+  locationDatesContainer.appendChild(startDateInputContainer);
+  locationDatesContainer.appendChild(endDateInputContainer);
+  locationDatesContainer.appendChild(nextButtonContainer);
+
+  return locationDatesContainer;
+}
+
+// Build and return the POI container, which holds POI input boxes and samples.
+function buildPoiContainer() {
+  // Create a container for adding POIs.
+  const poiContainer = document.createElement('div');
+  poiContainer.className = 'form-row';
+
+  // Create the POI input container and form.
+  const poiInputContainer = document.createElement('div');
+  poiInputContainer.className = 'form-group col-md-3';
+  const poiInput = 
+    buildInput('text', 'Point of Interest', 'form-control', 'inputEmail', false);
+  poiInputContainer.appendChild(poiInput);
+
+  // Create the POI add button container and form.
+  const poiAddButtonContainer = document.createElement('div');
+  poiAddButtonContainer.className = 'form-group';
+  const poiAddButton = buildButton('Add POIs', 'button', 'btn btn-primary');
+  poiAddButtonContainer.appendChild(poiAddButton);
+
+  // Create a sample (California) added POI container and button.
+  const poiSampleCaliforniaContainer = document.createElement('div');
+  poiSampleCaliforniaContainer.className = 'form-group';
+  const poiSampleCalifornia = 
+    buildButton('California (click to remove)', 'button', 'btn btn-secondary');
+  poiSampleCaliforniaContainer.appendChild(poiSampleCalifornia);
+
+  // Create a sample (Oregon) added POI container and button.
+  const poiSampleOregonContainer = document.createElement('div');
+  poiSampleOregonContainer.className = 'form-group';
+  const poiSampleOregon = 
+    buildButton('Oregon (click to remove)', 'button', 'btn btn-secondary');
+  poiSampleOregonContainer.appendChild(poiSampleOregon);
+
+  // Add input containers for POIs to second form row container.
+  poiContainer.appendChild(poiInputContainer);
+  poiContainer.appendChild(poiAddButtonContainer);
+  poiContainer.appendChild(poiSampleCaliforniaContainer);
+  poiContainer.appendChild(poiSampleOregonContainer);
+
+  return poiContainer;
+}
+
+// Build button attribute; has innerText, type, className params.
+function buildButton(innerText, type, className) {
+  const button = document.createElement('button');
+  button.innerText = innerText;
+  button.type = type;
+  button.className = className;
+  return button;
+}
+
+// Build input attribute; has type, placeholder, className, id, readOnly params.
+function buildInput(type, placeholder, className, id, readOnly) {
+  const form = document.createElement('input');
+  form.type = type;
+  form.placeholder = placeholder;
+  form.className = className;
+  form.id = id;
+  form.readOnly = readOnly;
+  return form;
 }
