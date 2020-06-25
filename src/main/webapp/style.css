@@ -45,7 +45,6 @@
 }
 
 #index-start-trip-block {
-  margin-top: 100px;
   padding: 15px;
 }
 
@@ -79,4 +78,8 @@
 .card {
   display: inline-block;
   margin: 10px 15px 10px 0;
+}
+
+.form-group {
+  padding: 0 5px;
 }
