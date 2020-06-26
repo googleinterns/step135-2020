@@ -7,7 +7,36 @@
 
 #routeMap {
   border: thin solid black;
-  height: 500px;
-  width: 700px;
-  margin: auto;
+  height: 300px;
+  width: 500px;
+  display: inline-block;
+  margin-right: 400px;
+}
+
+#rightPanel {
+  font-family: 'Roboto','sans-serif';
+  line-height: 30px;
+  padding-left: 10px;
+  display: inline-block;
+  height: 300px;
+  width: 300px;
+  overflow: auto;
+}
+
+#rightPanel select, #rightPanel input {
+  font-size: 15px;
+}
+
+#rightPanel select {
+  width: 100%;
+}
+
+#rightPanel i {
+  font-size: 12px;
+}
+
+#content {
+  width: 100%;
+  overflow: hidden;
+  text-align: center;
 }
