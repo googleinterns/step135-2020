@@ -31,7 +31,7 @@ public class Event {
   private String strEndTime;
  
   private final static int HALFHOUR_TILL_NEXT_POI = 30;
-  private final static int HOUR_AT_CURRENT_POI = 100;
+  private final static int HOUR_AT_CURRENT_POI = 60;
   private final static int MINUTES_IN_A_DAY = 1440;
   private final static int MIN_POSSIBLE_TIME = 1;
 
@@ -59,7 +59,7 @@ public class Event {
   }
  
   // function that calculates endTime given start and timeSpen
-  private int calculateEndTime(int timeAtLocation) {
+  public int calculateEndTime(int timeAtLocation) {
     return this.startTime + convertToFormat(timeAtLocation);
   }
 
@@ -70,7 +70,7 @@ public class Event {
   }
 
   // function that builds string w correct format for calendar-script.js
-  private String createStrTime(String date, int time) {
+  private static String createStrTime(String date, int time) {
     String output = "";
     output += date + "T" + Integer.toString(time).substring(0, 2) + ":" + 
       Integer.toString(time).substring(2, 4) + ":00";
@@ -78,7 +78,7 @@ public class Event {
   }
 
   // function that converts mintues into hhmm format
-  private int convertToFormat(int timeAtLocation) {
+  private static int convertToFormat(int timeAtLocation) {
     if (timeAtLocation < MIN_POSSIBLE_TIME) {
       throw new IllegalArgumentException("Time cannot be less than 0");
     }
