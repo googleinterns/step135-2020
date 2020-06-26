@@ -15,11 +15,11 @@
 // Triggered upon DOM load.
 $(document).ready(() => {
   isSignedIn().then((signInStatus) => {
-    // Display "sign in" or "sign out" button depending on sign in status.
+    // Display the sign-in page or "start trip" form depending on sign in status.
     if (signInStatus) {
-      displaySignOutButton();
+      displayStartTripDesign();
     } else {
-      displaySignInButton();
+      displaySignInPage();
     }
   }).catch((error) => {
     // If an error occurs, print error to console and do not display button.
@@ -38,12 +38,43 @@ function isSignedIn() {
   });
 }
 
-// Show the sign in button.
-function displaySignInButton() {
-  document.getElementById('sign-in-button-form').style.display = 'block';
+// Update the necessary design elements and display the sign in page.
+function displaySignInPage() {
+  // Set the width of the content container.
+  setContentWidth('650px');
+
+  // Add background image to site. (This id is defined in CSS.)
+  document.body.id = 'body-background-image';
+
+  // Get the homepage "registration" block to and add elements.
+  const indexRegistrationBlock = document.getElementById('index-registration-block');
+  indexRegistrationBlock.style.display = 'block';
 }
 
-// Show the sign out button.
-function displaySignOutButton() {
-  document.getElementById('sign-out-button-form').style.display = 'block';
+// User is signed in, show the start trip homepage.
+function displayStartTripDesign() {
+  // Set the width of the content container.
+  setContentWidth('800px');
+
+  // Remove background image id from body.
+  document.body.removeAttribute('id');
+
+  // Get the homepage "start trip" block to and add elements.
+  const indexStartTripBlock = document.getElementById('index-start-trip-block');
+  indexStartTripBlock.style.display = 'block';
+
+  // Display the site header.
+  displayHeader();
+}
+
+function displayHeader() {
+  // Display header for site.
+  const header = document.getElementById('header');
+  header.style.display = 'block';
+}
+
+// Set the width of the content container.
+function setContentWidth(width) {
+  const contentContainer = document.getElementById('content');
+  contentContainer.style.width = width;
 }
