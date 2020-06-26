@@ -90,6 +90,16 @@ function displayStartTripForm() {
   // Get the homepage "start trip" block and add elements.
   const indexStartTripBlock = document.getElementById('index-start-trip-block');
   indexStartTripBlock.style.display = 'block';
+
+  // Initially make the "Next" button disabled.
+  const nextDestinationDateButton = document.getElementById('next-destination-dates');
+  nextDestinationDateButton.disabled = true;
+
+  // Initially hide the "Add POIs" form and "Submit" button.
+  const addPoiContainer = document.getElementById('add-pois-container');
+  addPoiContainer.style.display = 'none';
+  const startTripSubmitButton = document.getElementById('submit-calculate-trip');
+  startTripSubmitButton.style.display = 'none';
 }
 
 // Set up trigger to add hidden POI elements.
@@ -107,4 +117,64 @@ function addHiddenPoiFormTrigger() {
     });
     return true;
   });
+}
+
+// Checks whether the input is a valid location, and adds the 'is-valid' 
+// Bootstrap class; otherwise, removes the 'is-valid' class if it exists.
+function checkValidLocation(elementId) {
+  const locationInput = document.getElementById(elementId);
+
+  // If an input exists, add 'is-valid' class.
+  if (locationInput.value !== '') {
+    locationInput.classList.add('is-valid');
+  } else if (locationInput.classList.contains('is-valid')) {
+    locationInput.classList.remove('is-valid');
+  }
+}
+
+// Checks whether the input is a valid date, and adds the 'is-valid' 
+// Bootstrap class; otherwise, removes the 'is-valid' class if it exists.
+function checkValidDate(elementId) {
+  const dateInput = document.getElementById(elementId);
+
+  // If an input exists, add 'is-valid' class.
+  if (dateInput.value !== '') {
+    dateInput.classList.add('is-valid');
+  } else if (dateInput.classList.contains('is-valid')) {
+    dateInput.classList.remove('is-valid');
+  }
+}
+
+// Assign the current start date value to the end date value, as the MVP only 
+// allows one-day trips.
+function setEndDateValue() {
+  const startDateInput = document.getElementById('inputStartDate');
+  const endDateInput = document.getElementById('inputEndDate');
+  endDateInput.value = startDateInput.value;
+  checkValidDate('inputEndDate');
+}
+
+// If location and date forms have valid inputs, enable next button; otherwise,
+// disable button.
+function checkNextButton() {
+  const nextDestinationDateButton = document.getElementById('next-destination-dates');
+
+  // Get three input fields.
+  const destinationInput = document.getElementById('inputDestination');
+  const startDateInput = document.getElementById('inputStartDate');
+  const endDateInput = document.getElementById('inputEndDate');
+
+  // Enable next button if all forms have valid input.
+  if (destinationInput.classList.contains('is-valid') && 
+    startDateInput.classList.contains('is-valid') &&
+    endDateInput.classList.contains('is-valid')) {
+      
+    nextDestinationDateButton.disabled = false;
+  } else {
+    nextDestinationDateButton.disabled = true;
+  }
+}
+
+function toggleStartTripInputStage() {
+
 }

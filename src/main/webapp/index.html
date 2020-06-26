@@ -35,22 +35,28 @@
         <form action="/calculate-trip" method="POST" id="startTripForm">
           <div class="form-row">
             <div class="form-group col-md-3">
-              <input type="text" placeholder="Destination" class="form-control" 
-                name="inputDestination" id="inputDestination">
+              <label for="inputDestination">Destination</label>
+              <input type="text" placeholder="Where to?" class="form-control" 
+                name="inputDestination" id="inputDestination" 
+                onchange="checkValidLocation('inputDestination'); checkNextButton()">
             </div>
             <div class="form-group col-md-3">
-              <input type="text" placeholder="Start Date" class="form-control" 
-                name="inputStartDate" id="inputStartDate">
+              <label for="inputStartDate">Start Date</label>
+              <input type="date" class="form-control" name="inputStartDate" 
+                id="inputStartDate" oninput="setEndDateValue()"
+                onchange="checkValidDate('inputStartDate'); checkNextButton()">
             </div>
             <div class="form-group col-md-3">
-              <input type="text" placeholder="End Date" class="form-control is-valid" 
-                name="inputEndDate" id="inputEndDate" readonly>
+              <label for="inputEndDate">End Date</label>
+              <input type="date" class="form-control" name="inputEndDate" 
+                id="inputEndDate" readonly>
             </div>
             <div class="form-group">
-              <button type="button" class="btn btn-secondary">Next</button>
+              <button type="button" class="btn btn-success" id="next-destination-dates"
+                 onclick="toggleStartTripInputStage()">Next</button>
             </div>
           </div>
-          <div class="form-row">
+          <div class="form-row" id="add-pois-container">
             <div class="form-group col-md-3">
               <input type="text" placeholder="Point of Interest" 
                 class="form-control" id="inputPoi">
@@ -67,7 +73,8 @@
                 class="btn btn-secondary poi-input" name="Oregon">
             </div>
           </div>
-          <input type="submit" class="btn btn-success" value="Calculate Trip">
+          <input type="submit" class="btn btn-success" id="submit-calculate-trip" 
+            value="Calculate Trip">
         </form>
       </div>
     </div>
