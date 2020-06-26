@@ -1,0 +1,8 @@
+
+.fc {
+
+  & .fc-sticky {
+    position: sticky;
+  }
+
+}
