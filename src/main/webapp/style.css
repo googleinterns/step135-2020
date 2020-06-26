@@ -49,6 +49,7 @@
 }
 
 #header {
+  display: none;
   overflow: hidden;
   background-color: #333;
 }
