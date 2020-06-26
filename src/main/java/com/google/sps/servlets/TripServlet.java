@@ -25,20 +25,15 @@ import javax.servlet.http.HttpServletResponse;
 public class TripServlet extends HttpServlet {
 
   @Override
-  public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-  }
-
-  @Override
   public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
     response.setContentType("application/json;");
 
-    // Print out params to test input.
+    // Print out params to site to verify retrieval of "start trip" user input.
     Enumeration<String> params = request.getParameterNames(); 
-    while(params.hasMoreElements()){
+    while (params.hasMoreElements()) {
       String paramName = params.nextElement();
       response.getWriter().println(paramName + ": " + request.getParameter(paramName));
     }
-
   }
 
 }

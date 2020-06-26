@@ -18,7 +18,7 @@ $(document).ready(() => {
   addHiddenPoiFormTrigger();
 
   isSignedIn().then((signInStatus) => {
-    // Display "sign in" or "sign out" button depending on sign in status.
+    // Display the sign-in page or "start trip" form depending on sign in status.
     if (signInStatus) {
       displayStartTripDesign();
     } else {
@@ -95,11 +95,12 @@ function displayStartTripForm() {
 // Set up trigger to add hidden POI elements.
 function addHiddenPoiFormTrigger() {
   $('#startTripForm').submit(() => {
+    // Fetch the current POI inputs, and add them to the form.
     const poiInputs = document.getElementsByClassName('poi-input');
     let count = 1;
     Array.prototype.forEach.call(poiInputs, (poiInput) => {
       $('<input>').attr('type', 'hidden')
-      .attr('name', 'location-' + count)
+      .attr('name', 'poi-' + count)
       .attr('value', poiInput.name)
       .appendTo('#startTripForm');
       count++;
