@@ -38,13 +38,15 @@
               <label for="inputDestination">Destination</label>
               <input type="text" placeholder="Where to?" class="form-control" 
                 name="inputDestination" id="inputDestination" 
-                onchange="checkValidLocation('inputDestination'); checkNextButton()">
+                onchange="checkValidLocation('inputDestination'); checkNextButton();
+                  checkSubmitButton()">
             </div>
             <div class="form-group col-md-3">
               <label for="inputStartDate">Start Date</label>
               <input type="date" class="form-control" name="inputStartDate" 
                 id="inputStartDate" oninput="setEndDateValue()"
-                onchange="checkValidDate('inputStartDate'); checkNextButton()">
+                onchange="checkValidDate('inputStartDate'); checkNextButton(); 
+                  checkSubmitButton()">
             </div>
             <div class="form-group col-md-3">
               <label for="inputEndDate">End Date</label>
@@ -62,7 +64,8 @@
                 class="form-control" id="inputPoi">
             </div>
             <div class="form-group">
-              <button type="button" class="btn btn-primary">Add POIs</button>
+              <button type="button" class="btn btn-primary"
+                onclick="checkSubmitButton()">Add POIs</button>
             </div>
             <div class="form-group">
               <input type="button" value="California (click to remove)" 

@@ -100,6 +100,9 @@ function displayStartTripForm() {
   addPoiContainer.style.display = 'none';
   const startTripSubmitButton = document.getElementById('submit-calculate-trip');
   startTripSubmitButton.style.display = 'none';
+
+  // Set "Submit" button to disabled; enable once all forms are filled out.
+  startTripSubmitButton.disabled = true;
 }
 
 // Set up trigger to add hidden POI elements.
@@ -154,24 +157,47 @@ function setEndDateValue() {
   checkValidDate('inputEndDate');
 }
 
-// If location and date forms have valid inputs, enable next button; otherwise,
-// disable button.
-function checkNextButton() {
-  const toggleStartTripStageButton = document.getElementById('toggle-stage-button');
-
+// Returns true if all location and date inputs are valid; otherwise, false;
+function isLocationDateInputValid() {
   // Get three input fields.
   const destinationInput = document.getElementById('inputDestination');
   const startDateInput = document.getElementById('inputStartDate');
   const endDateInput = document.getElementById('inputEndDate');
 
-  // Enable next button if all forms have valid input.
-  if (destinationInput.classList.contains('is-valid') && 
+  return destinationInput.classList.contains('is-valid') && 
     startDateInput.classList.contains('is-valid') &&
-    endDateInput.classList.contains('is-valid')) {
-      
+    endDateInput.classList.contains('is-valid');
+}
+
+// Return true if user has submitted a POI; otherwise, false.
+function isPoiSubmitted() {
+  const poiInputs = document.getElementsByClassName('poi-input');
+  return poiInputs.length !== 0;
+}
+
+// If location and date forms have valid inputs, enable next button; otherwise,
+// disable button.
+function checkNextButton() {
+  const toggleStartTripStageButton = document.getElementById('toggle-stage-button');
+
+  // Enable next button if all forms have valid input.
+  if (isLocationDateInputValid()) {    
     toggleStartTripStageButton.disabled = false;
   } else {
     toggleStartTripStageButton.disabled = true;
+  }
+}
+
+// If location and date forms have valid inputs, and there is at least one POI,
+// enable submit button; otherwise, disable button.
+function checkSubmitButton() {
+  const startTripSubmitButton = document.getElementById('submit-calculate-trip');
+
+  // Enable submit button if all forms have valid input.
+  if (isLocationDateInputValid() && isPoiSubmitted()) {    
+    startTripSubmitButton.disabled = false;
+  } else {
+    startTripSubmitButton.disabled = true;
   }
 }
 
