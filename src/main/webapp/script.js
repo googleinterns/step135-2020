@@ -103,6 +103,10 @@ function displayStartTripForm() {
 
   // Set "Submit" button to disabled; enable once all forms are filled out.
   startTripSubmitButton.disabled = true;
+
+  // Set "Add POIs" button to disabled; enable once text input is valid.
+  const addPoiButton = document.getElementById('addPoiButton');
+  addPoiButton.disabled = true;
 }
 
 // Set up trigger to add hidden POI elements.
@@ -201,6 +205,19 @@ function checkSubmitButton() {
   }
 }
 
+// If POI text input is valid, enable "Add POIs" button; otherwise, disable button.
+function checkAddPoiButton() {
+  const addPoiButton = document.getElementById('addPoiButton');
+  const inputPoi = document.getElementById('inputPoi');
+
+  // Enable submit button if text input POI is valid.
+  if (inputPoi.value !== '') {
+    addPoiButton.disabled = false;
+  } else {
+    addPoiButton.disabled = true;
+  }
+}
+
 /**
  * Toggle the start trip input stage, initiated from click of "Next/Back" button.
  * If toggle "Next/Back" button equals "Next", set location and date inputs to
@@ -242,4 +259,48 @@ function toggleStartTripInputStage() {
     // Change the text of the toggle button to 'Next'.
     toggleStartTripStageButton.value = 'Next';
   }
+}
+
+// Add an HTML button element as a POI to the form. The POI is retrieved from 
+// the current POI input text, which is subsequently reset.
+function addPoi() {
+  const inputPoi = document.getElementById('inputPoi');
+
+  // Add POI input button to the page.
+  const addPoiContainer = document.getElementById('add-pois-container');
+  addPoiContainer.appendChild(buildPoiObject(inputPoi.value));
+
+  // Reset "Add POIs" button to disabled, reset text of POI text input, and
+  // remove 'is-valid' class.
+  const addPoiButton = document.getElementById('addPoiButton');
+  addPoiButton.disabled = true;
+  inputPoi.value = '';
+  inputPoi.classList.remove('is-valid');
+}
+
+// Build and return a user-added POI HTML object.
+function buildPoiObject(poi) {
+  const formGroupContainer = document.createElement('div');
+  formGroupContainer.className = 'form-group';
+
+  // Create poiInputButton, as well as function to remove the container upon 
+  // click. The submit button is also checked.
+  const poiInputButton = buildInput('button', poi + ' (click to remove)', 
+    'btn btn-secondary poi-input', poi);
+  poiInputButton.onclick = 
+    () => { formGroupContainer.remove(); checkSubmitButton() };
+
+  // Add the POI input button to the div container, and return the container.
+  formGroupContainer.appendChild(poiInputButton);
+  return formGroupContainer;
+}
+
+// Build input attribute (for button); has type, value, className, name params.
+function buildInput(type, value, className, name) {
+  const form = document.createElement('input');
+  form.type = type;
+  form.value = value;
+  form.className = className;
+  form.name = name;
+  return form;
 }
