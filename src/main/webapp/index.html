@@ -32,6 +32,43 @@
         </form>
       </div>
       <div id="index-start-trip-block">
+        <form action="/calculate-trip" method="POST" id="startTripForm">
+          <div class="form-row">
+            <div class="form-group col-md-3">
+              <input type="text" placeholder="Destination" class="form-control" 
+                name="inputDestination" id="inputDestination">
+            </div>
+            <div class="form-group col-md-3">
+              <input type="text" placeholder="Start Date" class="form-control" 
+                name="inputStartDate" id="inputStartDate">
+            </div>
+            <div class="form-group col-md-3">
+              <input type="text" placeholder="End Date" class="form-control is-valid" 
+                name="inputEndDate" id="inputEndDate" readonly>
+            </div>
+            <div class="form-group">
+              <button type="button" class="btn btn-secondary">Next</button>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group col-md-3">
+              <input type="text" placeholder="Point of Interest" 
+                class="form-control" id="inputPoi">
+            </div>
+            <div class="form-group">
+              <button type="button" class="btn btn-primary">Add POIs</button>
+            </div>
+            <div class="form-group">
+              <input type="button" value="California (click to remove)" 
+                class="btn btn-secondary poi-input" name="California">
+            </div>
+            <div class="form-group">
+              <input type="button" value="Oregon (click to remove)" 
+                class="btn btn-secondary poi-input" name="Oregon">
+            </div>
+          </div>
+          <input type="submit" class="btn btn-success" value="Calculate Trip">
+        </form>
       </div>
     </div>
   </body>

@@ -14,6 +14,9 @@
 
 // Triggered upon DOM load.
 $(document).ready(() => {
+  // Set up trigger to add hidden POI form elements upon submission.
+  addHiddenPoiFormTrigger();
+
   isSignedIn().then((signInStatus) => {
     // Display the sign-in page or "start trip" form depending on sign in status.
     if (signInStatus) {
@@ -65,6 +68,9 @@ function displayStartTripDesign() {
 
   // Display the site header.
   displayHeader();
+
+  // Display the "start trip" form.
+  displayStartTripForm();
 }
 
 function displayHeader() {
@@ -77,4 +83,28 @@ function displayHeader() {
 function setContentWidth(width) {
   const contentContainer = document.getElementById('content');
   contentContainer.style.width = width;
+}
+
+// Display the start trip input form, with location, dates, and POIs.
+function displayStartTripForm() {
+  // Get the homepage "start trip" block and add elements.
+  const indexStartTripBlock = document.getElementById('index-start-trip-block');
+  indexStartTripBlock.style.display = 'block';
+}
+
+// Set up trigger to add hidden POI elements.
+function addHiddenPoiFormTrigger() {
+  $('#startTripForm').submit(() => {
+    // Fetch the current POI inputs, and add them to the form.
+    const poiInputs = document.getElementsByClassName('poi-input');
+    let count = 1;
+    Array.prototype.forEach.call(poiInputs, (poiInput) => {
+      $('<input>').attr('type', 'hidden')
+      .attr('name', 'poi-' + count)
+      .attr('value', poiInput.name)
+      .appendTo('#startTripForm');
+      count++;
+    });
+    return true;
+  });
 }
