@@ -92,8 +92,8 @@ function displayStartTripForm() {
   indexStartTripBlock.style.display = 'block';
 
   // Initially make the "Next" button disabled.
-  const nextDestinationDateButton = document.getElementById('next-destination-dates');
-  nextDestinationDateButton.disabled = true;
+  const toggleStartTripStageButton = document.getElementById('toggle-stage-button');
+  toggleStartTripStageButton.disabled = true;
 
   // Initially hide the "Add POIs" form and "Submit" button.
   const addPoiContainer = document.getElementById('add-pois-container');
@@ -157,7 +157,7 @@ function setEndDateValue() {
 // If location and date forms have valid inputs, enable next button; otherwise,
 // disable button.
 function checkNextButton() {
-  const nextDestinationDateButton = document.getElementById('next-destination-dates');
+  const toggleStartTripStageButton = document.getElementById('toggle-stage-button');
 
   // Get three input fields.
   const destinationInput = document.getElementById('inputDestination');
@@ -169,12 +169,51 @@ function checkNextButton() {
     startDateInput.classList.contains('is-valid') &&
     endDateInput.classList.contains('is-valid')) {
       
-    nextDestinationDateButton.disabled = false;
+    toggleStartTripStageButton.disabled = false;
   } else {
-    nextDestinationDateButton.disabled = true;
+    toggleStartTripStageButton.disabled = true;
   }
 }
 
+/**
+ * Toggle the start trip input stage, initiated from click of "Next/Back" button.
+ * If toggle "Next/Back" button equals "Next", set location and date inputs to
+ * readonly and show POI input and submit button.
+ * If toggle "Next/Back" button equals "Back", set location and date inputs to 
+ * editable and hide POI input and submit button.
+ */
 function toggleStartTripInputStage() {
+  const toggleStartTripStageButton = document.getElementById('toggle-stage-button');
 
+  if (toggleStartTripStageButton.value === 'Next') {
+    // Display the "Add POIs" form and "Submit" button.
+    const addPoiContainer = document.getElementById('add-pois-container');
+    addPoiContainer.style.display = 'flex';
+    const startTripSubmitButton = document.getElementById('submit-calculate-trip');
+    startTripSubmitButton.style.display = 'inline-block';
+
+    // Change location and date inputs to be readonly.
+    const destinationInput = document.getElementById('inputDestination');
+    destinationInput.readOnly = true;
+    const startDateInput = document.getElementById('inputStartDate');
+    startDateInput.readOnly = true;
+
+    // Change the text of the toggle button to 'Back'.
+    toggleStartTripStageButton.value = 'Back';
+  } else {
+    // Hide the "Add POIs" form and "Submit" button.
+    const addPoiContainer = document.getElementById('add-pois-container');
+    addPoiContainer.style.display = 'none';
+    const startTripSubmitButton = document.getElementById('submit-calculate-trip');
+    startTripSubmitButton.style.display = 'none';
+
+    // Change location and date inputs to be editable.
+    const destinationInput = document.getElementById('inputDestination');
+    destinationInput.readOnly = false;
+    const startDateInput = document.getElementById('inputStartDate');
+    startDateInput.readOnly = false;
+
+    // Change the text of the toggle button to 'Next'.
+    toggleStartTripStageButton.value = 'Next';
+  }
 }
