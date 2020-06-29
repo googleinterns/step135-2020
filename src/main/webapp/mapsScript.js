@@ -33,7 +33,7 @@ window.initMap = function() {
       {center: coords, 
       zoom: 13,
       streetViewControl: false,
-  });
+      });
 
   // Instantiate a directions service.
   directionsService = new google.maps.DirectionsService;
