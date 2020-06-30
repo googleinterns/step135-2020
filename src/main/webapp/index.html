@@ -12,7 +12,7 @@
   <body>
     <div id="content">
       <div id="header">
-        <h3 class="header-child float-left" id="header-title">TravIS</h3>
+        <a href="/"><h3 class="header-child float-left" id="header-title">TravIS</h3></a>
         <form class="header-child float-right" id="sign-out-button-form" action="/auth" method="POST">
           <input class="btn btn-primary" type="submit" value="Sign out">
         </form>
@@ -35,39 +35,34 @@
         <form action="/calculate-trip" method="POST" id="startTripForm">
           <div class="form-row">
             <div class="form-group col-md-3">
-              <input type="text" placeholder="Destination" class="form-control" 
+              <label for="inputDestination">Destination</label>
+              <input type="text" placeholder="Where to?" class="form-control" 
                 name="inputDestination" id="inputDestination">
             </div>
             <div class="form-group col-md-3">
-              <input type="text" placeholder="Start Date" class="form-control" 
-                name="inputStartDate" id="inputStartDate">
-            </div>
-            <div class="form-group col-md-3">
-              <input type="text" placeholder="End Date" class="form-control is-valid" 
-                name="inputEndDate" id="inputEndDate" readonly>
+              <label for="inputDayOfTravel">Day of Travel</label>
+              <input type="date" class="form-control" name="inputDayOfTravel" 
+                id="inputDayOfTravel">
             </div>
             <div class="form-group">
-              <button type="button" class="btn btn-secondary">Next</button>
+              <input type="button" class="btn btn-success" value="Next" 
+                id="toggle-stage-button" onclick="toggleStartTripInputStage()">
             </div>
           </div>
-          <div class="form-row">
+          <div class="form-row" id="add-pois-container">
             <div class="form-group col-md-3">
-              <input type="text" placeholder="Point of Interest" 
-                class="form-control" id="inputPoi">
+              <input type="text" placeholder="Point of Interest" id="inputPoi" 
+                class="form-control">
             </div>
             <div class="form-group">
-              <button type="button" class="btn btn-primary">Add POIs</button>
-            </div>
-            <div class="form-group">
-              <input type="button" value="California (click to remove)" 
-                class="btn btn-secondary poi-input" name="California">
-            </div>
-            <div class="form-group">
-              <input type="button" value="Oregon (click to remove)" 
-                class="btn btn-secondary poi-input" name="Oregon">
+              <button type="button" class="btn btn-primary" id="addPoiButton"
+                onclick="addPoi(); checkSubmitButton()">Add POIs</button>
             </div>
           </div>
-          <input type="submit" class="btn btn-success" value="Calculate Trip">
+          <div class="form-row" id="poi-list-container">
+          </div>
+          <input type="submit" class="btn btn-success" id="submit-calculate-trip" 
+            value="Calculate Trip">
         </form>
       </div>
     </div>
