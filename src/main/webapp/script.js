@@ -107,6 +107,36 @@ function displayStartTripForm() {
   // Set "Add POIs" button to disabled; enable once text input is valid.
   const addPoiButton = document.getElementById('addPoiButton');
   addPoiButton.disabled = true;
+
+  // Add onchange listeners to inputs in "start trip" form.
+  addStartTripOnChangeListeners();
+}
+
+// Add onchange listeners to inputs that call relevant functions in the
+// "start trip" form.
+function addStartTripOnChangeListeners() {
+  // Input destination onchange listeners to check input and next / submit.
+  const inputDestination = document.getElementById('inputDestination');
+  inputDestination.onchange = () => {
+    checkValidInput('inputDestination');
+    checkNextButton();
+    checkSubmitButton();
+  };
+
+  // Input day of travel onchange listeners to check input and and next / submit.
+  const inputDayOfTravel = document.getElementById('inputDayOfTravel');
+  inputDayOfTravel.onchange = () => {
+    checkValidInput('inputDayOfTravel');
+    checkNextButton();
+    checkSubmitButton();
+  };
+
+  // Input POI onchange listeners to check input and enable add POI button.
+  const inputPoi = document.getElementById('inputPoi');
+  inputPoi.onchange = () => {
+    checkValidInput('inputPoi');
+    checkAddPoiButton();
+  };
 }
 
 // Set up trigger to add hidden POI elements.
@@ -139,25 +169,14 @@ function checkValidInput(elementId) {
   }
 }
 
-// Assign the current start date value to the end date value, as the MVP only 
-// allows one-day trips.
-function setEndDateValue() {
-  const startDateInput = document.getElementById('inputStartDate');
-  const endDateInput = document.getElementById('inputEndDate');
-  endDateInput.value = startDateInput.value;
-  checkValidInput('inputEndDate');
-}
-
 // Returns true if all location and date inputs are valid; otherwise, false;
 function isLocationDateInputValid() {
   // Get three input fields.
   const destinationInput = document.getElementById('inputDestination');
-  const startDateInput = document.getElementById('inputStartDate');
-  const endDateInput = document.getElementById('inputEndDate');
+  const dayOfTravelInput = document.getElementById('inputDayOfTravel');
 
   return destinationInput.classList.contains('is-valid') && 
-    startDateInput.classList.contains('is-valid') &&
-    endDateInput.classList.contains('is-valid');
+    dayOfTravelInput.classList.contains('is-valid');
 }
 
 // Return true if user has submitted a POI; otherwise, false.
@@ -225,8 +244,8 @@ function toggleStartTripInputStage() {
     // Change location and date inputs to be readonly.
     const destinationInput = document.getElementById('inputDestination');
     destinationInput.readOnly = true;
-    const startDateInput = document.getElementById('inputStartDate');
-    startDateInput.readOnly = true;
+    const dayOfTravelInput = document.getElementById('inputDayOfTravel');
+    dayOfTravelInput.readOnly = true;
 
     // Change the text of the toggle button to 'Back'.
     toggleStartTripStageButton.value = 'Back';
@@ -240,8 +259,8 @@ function toggleStartTripInputStage() {
     // Change location and date inputs to be editable.
     const destinationInput = document.getElementById('inputDestination');
     destinationInput.readOnly = false;
-    const startDateInput = document.getElementById('inputStartDate');
-    startDateInput.readOnly = false;
+    const dayOfTravelInput = document.getElementById('inputDayOfTravel');
+    dayOfTravelInput.readOnly = false;
 
     // Change the text of the toggle button to 'Next'.
     toggleStartTripStageButton.value = 'Next';

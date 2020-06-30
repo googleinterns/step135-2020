@@ -37,21 +37,12 @@
             <div class="form-group col-md-3">
               <label for="inputDestination">Destination</label>
               <input type="text" placeholder="Where to?" class="form-control" 
-                name="inputDestination" id="inputDestination" 
-                onchange="checkValidInput('inputDestination'); checkNextButton();
-                  checkSubmitButton()">
+                name="inputDestination" id="inputDestination">
             </div>
             <div class="form-group col-md-3">
-              <label for="inputStartDate">Start Date</label>
-              <input type="date" class="form-control" name="inputStartDate" 
-                id="inputStartDate" oninput="setEndDateValue()"
-                onchange="checkValidInput('inputStartDate'); checkNextButton(); 
-                  checkSubmitButton()">
-            </div>
-            <div class="form-group col-md-3">
-              <label for="inputEndDate">End Date</label>
-              <input type="date" class="form-control" name="inputEndDate" 
-                id="inputEndDate" readonly>
+              <label for="inputDayOfTravel">Day of Travel</label>
+              <input type="date" class="form-control" name="inputDayOfTravel" 
+                id="inputDayOfTravel">
             </div>
             <div class="form-group">
               <input type="button" class="btn btn-success" value="Next" 
@@ -61,8 +52,7 @@
           <div class="form-row" id="add-pois-container">
             <div class="form-group col-md-3">
               <input type="text" placeholder="Point of Interest" id="inputPoi" 
-                class="form-control" onchange="checkValidInput('inputPoi'); 
-                  checkAddPoiButton()">
+                class="form-control">
             </div>
             <div class="form-group">
               <button type="button" class="btn btn-primary" id="addPoiButton"
