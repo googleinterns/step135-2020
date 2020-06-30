@@ -95,7 +95,9 @@ function displayStartTripForm() {
   const toggleStartTripStageButton = document.getElementById('toggle-stage-button');
   toggleStartTripStageButton.disabled = true;
 
-  // Initially hide the "Add POIs" form and "Submit" button.
+  // Initially hide the POI list, "Add POIs" form, and "Submit" button.
+  const poiListContainer = document.getElementById('poi-list-container');
+  poiListContainer.style.display = 'none';
   const addPoiContainer = document.getElementById('add-pois-container');
   addPoiContainer.style.display = 'none';
   const startTripSubmitButton = document.getElementById('submit-calculate-trip');
@@ -235,7 +237,9 @@ function toggleStartTripInputStage() {
   const toggleStartTripStageButton = document.getElementById('toggle-stage-button');
 
   if (toggleStartTripStageButton.value === 'Next') {
-    // Display the "Add POIs" form and "Submit" button.
+    // Display the POI list, "Add POIs" form, and "Submit" button.
+    const poiListContainer = document.getElementById('poi-list-container');
+    poiListContainer.style.display = 'block';
     const addPoiContainer = document.getElementById('add-pois-container');
     addPoiContainer.style.display = 'flex';
     const startTripSubmitButton = document.getElementById('submit-calculate-trip');
@@ -250,7 +254,9 @@ function toggleStartTripInputStage() {
     // Change the text of the toggle button to 'Back'.
     toggleStartTripStageButton.value = 'Back';
   } else {
-    // Hide the "Add POIs" form and "Submit" button.
+    // Hide the POI list, "Add POIs" form, and "Submit" button.
+    const poiListContainer = document.getElementById('poi-list-container');
+    poiListContainer.style.display = 'none';
     const addPoiContainer = document.getElementById('add-pois-container');
     addPoiContainer.style.display = 'none';
     const startTripSubmitButton = document.getElementById('submit-calculate-trip');
@@ -273,8 +279,8 @@ function addPoi() {
   const inputPoi = document.getElementById('inputPoi');
 
   // Add POI input button to the page.
-  const addPoiContainer = document.getElementById('add-pois-container');
-  addPoiContainer.appendChild(buildPoiObject(inputPoi.value));
+  const poiListContainer = document.getElementById('poi-list-container');
+  poiListContainer.appendChild(buildPoiObject(inputPoi.value));
 
   // Reset "Add POIs" button to disabled, reset text of POI text input, and
   // remove 'is-valid' class.
@@ -288,6 +294,7 @@ function addPoi() {
 function buildPoiObject(poi) {
   const formGroupContainer = document.createElement('div');
   formGroupContainer.className = 'form-group';
+  formGroupContainer.style.display = 'block';
 
   // Create poiInputButton, as well as function to remove the container upon 
   // click. The submit button is also checked.
