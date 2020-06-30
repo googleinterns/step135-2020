@@ -3,6 +3,7 @@
   <head>
     <meta charset="UTF-8">
     <title>TravIS: Travel Information System</title>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCmQyeeWI_cV0yvh1SuXYGoLej3g_D9NbY&v=3.exp&libraries=places"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" 
       integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
@@ -36,10 +37,9 @@
           <div class="form-row">
             <div class="form-group col-md-3">
               <label for="inputDestination">Destination</label>
-              <input type="text" placeholder="Where to?" class="form-control" 
+              <input type="text" placeholder="Where to?" class="form-control places-autofill" 
                 name="inputDestination" id="inputDestination" 
-                onchange="checkValidLocation('inputDestination'); checkNextButton();
-                  checkSubmitButton()">
+                onchange="checkNextButton(); checkSubmitButton()">
             </div>
             <div class="form-group col-md-3">
               <label for="inputStartDate">Start Date</label>
@@ -61,8 +61,7 @@
           <div class="form-row" id="add-pois-container">
             <div class="form-group col-md-3">
               <input type="text" placeholder="Point of Interest" id="inputPoi" 
-                class="form-control" onchange="checkValidLocation('inputPoi'); 
-                  checkAddPoiButton()">
+                class="form-control places-autofill" onchange="checkAddPoiButton()">
             </div>
             <div class="form-group">
               <button type="button" class="btn btn-primary" id="addPoiButton"

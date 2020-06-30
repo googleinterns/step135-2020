@@ -14,6 +14,9 @@
 
 // Triggered upon DOM load.
 $(document).ready(() => {
+  // Add Google Places location autofill to input fields.
+  addLocationAutofill();
+
   // Set up trigger to add hidden POI form elements upon submission.
   addHiddenPoiFormTrigger();
 
@@ -116,14 +119,21 @@ function addHiddenPoiFormTrigger() {
     const poiInputs = document.getElementsByClassName('poi-input');
     let count = 1;
     Array.prototype.forEach.call(poiInputs, (poiInput) => {
-      $('<input>').attr('type', 'hidden')
-      .attr('name', 'poi-' + count)
-      .attr('value', poiInput.name)
-      .appendTo('#startTripForm');
+      let poiNumber = 'poi-' + count;
+      addHiddenInput(poiNumber, poiNumber, poiInput.name);
       count++;
     });
     return true;
   });
+}
+
+// Add hidden input to the "start trip" form.
+function addHiddenInput(name, id, value) {
+  $('<input>').attr('type', 'hidden')
+    .attr('name', name)
+    .attr('id', id)
+    .attr('value', value)
+    .appendTo('#startTripForm');
 }
 
 // Checks whether the input is a valid location, and adds the 'is-valid' 
@@ -303,4 +313,28 @@ function buildInput(type, value, className, name) {
   form.className = className;
   form.name = name;
   return form;
+}
+
+// Get all location input fields, and add the Google Places autofill.
+function addLocationAutofill() {
+  let locationInputs = document.getElementsByClassName('places-autofill');
+  Array.prototype.forEach.call(locationInputs, (locationInput) => {
+    let locationAutocomplete = new google.maps.places.Autocomplete(locationInput);
+
+    // Any time the input changes through user typing, remove the 'is-valid' class.
+    // This will not be called if the user clicks on Google Place autofill.
+    locationInput.addEventListener('input', () => {
+      locationInput.classList.remove('is-valid');
+    });
+
+    // If the user changes the place (click on Google Place autofill), add 
+    // 'is-valid' class and create hidden input with Place ID to be submitted.
+    locationAutocomplete.addListener('place_changed', () => {
+      locationInput.classList.add('is-valid');
+      
+      // Print place object to the console. (Temporary; this will be replaced 
+      // with adding this as a hidden input.)
+      console.log(locationAutocomplete.getPlace());
+    });
+  });
 }
