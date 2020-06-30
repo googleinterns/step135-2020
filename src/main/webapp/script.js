@@ -126,29 +126,16 @@ function addHiddenPoiFormTrigger() {
   });
 }
 
-// Checks whether the input is a valid location, and adds the 'is-valid' 
+// Checks whether the input is valid (non-empty), and adds the 'is-valid' 
 // Bootstrap class; otherwise, removes the 'is-valid' class if it exists.
-function checkValidLocation(elementId) {
-  const locationInput = document.getElementById(elementId);
+function checkValidInput(elementId) {
+  const input = document.getElementById(elementId);
 
   // If an input exists, add 'is-valid' class.
-  if (locationInput.value !== '') {
-    locationInput.classList.add('is-valid');
-  } else if (locationInput.classList.contains('is-valid')) {
-    locationInput.classList.remove('is-valid');
-  }
-}
-
-// Checks whether the input is a valid date, and adds the 'is-valid' 
-// Bootstrap class; otherwise, removes the 'is-valid' class if it exists.
-function checkValidDate(elementId) {
-  const dateInput = document.getElementById(elementId);
-
-  // If an input exists, add 'is-valid' class.
-  if (dateInput.value !== '') {
-    dateInput.classList.add('is-valid');
-  } else if (dateInput.classList.contains('is-valid')) {
-    dateInput.classList.remove('is-valid');
+  if (input.value !== '') {
+    input.classList.add('is-valid');
+  } else if (input.classList.contains('is-valid')) {
+    input.classList.remove('is-valid');
   }
 }
 
@@ -158,7 +145,7 @@ function setEndDateValue() {
   const startDateInput = document.getElementById('inputStartDate');
   const endDateInput = document.getElementById('inputEndDate');
   endDateInput.value = startDateInput.value;
-  checkValidDate('inputEndDate');
+  checkValidInput('inputEndDate');
 }
 
 // Returns true if all location and date inputs are valid; otherwise, false;
