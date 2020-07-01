@@ -115,6 +115,10 @@ function displayStartTripForm() {
 
   // Add onchange listeners to inputs in "start trip" form.
   addStartTripOnChangeListeners();
+
+  // Add Start Trip onclick listeners to buttons.
+  addStartTripOnClickListeners();
+  
 }
 
 // Add onchange listeners to inputs that call relevant functions in the
@@ -132,6 +136,23 @@ function addStartTripOnChangeListeners() {
   inputDayOfTravel.onchange = () => {
     checkValidInput('inputDayOfTravel');
     checkNextButton();
+  };
+}
+
+// Add onclick listeners to buttons that call relevant functions in the 
+// "start trip" form.
+function addStartTripOnClickListeners() {
+  // Toggle stage button toggles the current "stage" of the "start trip" form.
+  const toggleStartTripStageButton = document.getElementById('toggle-stage-button');
+  toggleStartTripStageButton.onclick = () => {
+    toggleStartTripInputStage();
+  };
+
+  // Add POI Button adds the current POI in text input, and checks submit button.
+  const addPoiButton = document.getElementById('addPoiButton');
+  addPoiButton.onclick = () => {
+    addPoi();
+    checkSubmitButton();
   };
 }
 
