@@ -14,17 +14,17 @@
 
 // Triggered upon DOM load.
 $(document).ready(() => {
-  // Add Google Places location autofill to input fields.
-  addLocationAutofill();
-
-  // Set up trigger to add hidden POI form elements upon submission.
-  addHiddenPoiFormTrigger();
-
-  isSignedIn().then((signInStatus) => {
+  getAuthObject().then((authObject) => {
     // Display the sign-in page or "start trip" form depending on sign in status.
-    if (signInStatus) {
+    if (authObject.loggedIn) {
+      const signOutLink = document.getElementById('sign-out-link');
+      signOutLink.href = authObject.logoutUrl;
+
       displayStartTripDesign();
     } else {
+      const signInLink = document.getElementById('sign-in-link');
+      signInLink.href = authObject.loginUrl;
+
       displaySignInPage();
     }
   }).catch((error) => {
@@ -33,11 +33,11 @@ $(document).ready(() => {
   })
 });
 
-// Returns Promise with the sign in status in a boolean.
-function isSignedIn() {
+// Returns Promise with the auth object, containing login status and information.
+function getAuthObject() {
   return new Promise((resolve, reject) => {
-    fetch('/auth').then(response => response.json()).then((signInStatus) => {
-      resolve(signInStatus);
+    fetch('/auth').then(response => response.json()).then((authObject) => {
+      resolve(authObject);
     }).catch((error) => {
       reject(error);
     });
@@ -64,6 +64,12 @@ function displayStartTripDesign() {
 
   // Remove background image id from body.
   document.body.removeAttribute('id');
+
+  // Add Google Places location autofill to input fields.
+  addLocationAutofill();
+
+  // Set up trigger to add hidden POI form elements upon submission.
+  addHiddenPoiFormTrigger();
 
   // Get the homepage "start trip" block to and add elements.
   const indexStartTripBlock = document.getElementById('index-start-trip-block');

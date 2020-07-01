@@ -14,6 +14,9 @@
 
 package com.google.sps.servlets;
 
+import com.google.appengine.api.users.UserService;
+import com.google.appengine.api.users.UserServiceFactory;
+import com.google.gson.Gson;
 import java.io.IOException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -23,28 +26,86 @@ import javax.servlet.http.HttpServletResponse;
 @WebServlet("/auth")
 public class AuthServlet extends HttpServlet {
 
-  // Boolean that holds the current sign in status.
-  private boolean signedIn;
-
-  @Override
-  public void init() {
-    signedIn = false;
-  }
-
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-    // Return the current sign in status.
-    response.setContentType("application/json;");
-    response.getWriter().println(signedIn);
+    response.setContentType("application/json");
+
+    // Set up user auth objects.
+    UserService userService = UserServiceFactory.getUserService();
+    UserAuth userAuth;
+
+    // Set redirect URL after login / logout as index page.
+    final String redirectUrl = "/";
+
+    // Create UserAuth object with relevant login / logout information.
+    if (userService.isUserLoggedIn()) {
+      String userEmail = userService.getCurrentUser().getEmail();
+      String logoutUrl = userService.createLogoutURL(redirectUrl);
+      String id = userService.getCurrentUser().getUserId();
+
+      // Create UserAuth object to represent logged-in user.
+      userAuth = new UserAuth(logoutUrl, userEmail);
+    } else {
+      String loginUrl = userService.createLoginURL(redirectUrl);
+
+      // Create UserAuth object to represent logged-out user.
+      userAuth = new UserAuth(loginUrl);
+    }
+
+    // Create and send the JSON.
+    String json = convertToJson(userAuth);
+    response.getWriter().println(json);
   }
 
-  @Override
-  public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
-    // Toggle signedIn value; temporary measure to show auth.
-    signedIn = !signedIn;
-    
-    // Redirect back to homepage.
-    response.sendRedirect("/");
+  /**
+   * @return the request parameter, or the default value if the parameter
+   *         was not specified by the client
+   */
+  private String getParameter(HttpServletRequest request, String name, String defaultValue) {
+    String value = request.getParameter(name);
+    if (value == null) {
+      return defaultValue;
+    }
+    return value;
   }
 
+  /**
+  * Converts a UserAuth object into a JSON string using the Gson library.
+  */
+  private String convertToJson(UserAuth userAuth) {
+    Gson gson = new Gson();
+    String json = gson.toJson(userAuth);
+    return json;
+  }
+
+  /**
+   * Inner class that holds relevant login/logout and user information.
+   */
+  class UserAuth {
+    // Fields that hold relevant login data.
+    private boolean loggedIn;
+    private String loginUrl;
+    private String logoutUrl;
+    private String email;
+
+    // Constructor to create UserAuth object with no user logged in.
+    // Null represents no value.
+    private UserAuth(String loginUrl) {
+      this(false, loginUrl, null, null);
+    }
+
+    // Constructor to create UserAuth object with user logged in.
+    private UserAuth(String logoutUrl, String email) {
+      this(true, null, logoutUrl, email);
+    }
+
+    // Full constructor to assign values to all fields.
+    private UserAuth(boolean loggedIn, String loginUrl, String logoutUrl, 
+      String email) {
+        this.loggedIn = loggedIn;
+        this.loginUrl = loginUrl;
+        this.logoutUrl = logoutUrl;
+        this.email = email;
+    }
+  }
 }
