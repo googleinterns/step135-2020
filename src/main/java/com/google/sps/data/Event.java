@@ -25,42 +25,57 @@ public class Event {
   private String date;
   private int startTime;
   private int endTime;
+  private int travelTime;
 
-  // fiels to be saved as json for parsing
+  // fiels to be saved for parsing
   private String strStartTime;
   private String strEndTime;
  
-  private final static int HALFHOUR_TILL_NEXT_POI = 30;
-  private final static int HOUR_AT_CURRENT_POI = 60;
+  private final static int HALFHOUR = 30;
+  private final static int HOUR = 60;
   private final static int MINUTES_IN_A_DAY = 1440;
-  private final static int MIN_POSSIBLE_TIME = 1;
+  private final static int MIN_POSSIBLE_TIME = 0;
 
-  
-  // Constructor that takes in time spent at location
-  public Event(String name, String address, String date, int startTime, int timeAtLocation) {
+  /**
+   * Constructor that takes in time spent at location
+   * 
+   * @param name date from user input travel day. Cannot be null.
+   * @param address time to to start or end event. Must be within bounds
+   * @param date day of travel
+   * @param startTime start of activing
+   * @param travelTime time spent traveling to next location
+   * @param timeAtLocation time spent at POI
+   */
+  public Event(String name, String address, String date, int startTime, 
+              int travelTime, int timeAtLocation) {
     this.name = name;
     this.address = address;
     this.date = date;
     this.startTime = startTime;
+    this.travelTime = travelTime;
     this.endTime = calculateEndTime(timeAtLocation);
 
     createCalendarTimes();
   }
  
-  // Constructor that takes in endTime
-  public Event(String name, String address, String date, int startTime) {
+  /**
+   * Constructor that assume one hour default spent at location
+   * 
+   * @param name date from user input travel day. Cannot be null.
+   * @param address time to to start or end event. Must be within bounds
+   * @param date day of travel
+   * @param startTime start of activing
+   * @param travelTime time spent traveling to next location
+   */
+  public Event(String name, String address, String date, int startTime, int travelTime) {
     this.name = name;
     this.address = address;
     this.date = date;
     this.startTime = startTime;
-    this.endTime = calculateEndTime(HOUR_AT_CURRENT_POI);
+    this.travelTime = travelTime;
+    this.endTime = calculateEndTime(HOUR);
 
     createCalendarTimes();
-  }
- 
-  // function that calculates endTime given start and timeSpen
-  public int calculateEndTime(int timeAtLocation) {
-    return this.startTime + convertToFormat(timeAtLocation);
   }
 
   // function that sets start and end Time with correct string format
@@ -69,30 +84,70 @@ public class Event {
     this.strEndTime = createStrTime(this.date, this.endTime);
   }
 
-  // function that builds string w correct format for calendar-script.js
+  /**
+   * function that builds string w correct format for calendar-script.js
+   * 
+   * @param date date from user input travel day. Cannot be null.
+   * @param time time to to start or end event. Must be within bounds
+   */
   private static String createStrTime(String date, int time) {
+    if (date == null) {
+      throw new NullPointerException("Date cannot be null");
+    }
+
+    if (time < MIN_POSSIBLE_TIME) {
+      throw new IllegalArgumentException("Time cannot be less than 0");
+    }
+
+    if (time >= MINUTES_IN_A_DAY) {
+      throw new IllegalArgumentException("Time cannot be more than a 24hrs");
+    }
+
     String output = "";
     output += date + "T" + Integer.toString(time).substring(0, 2) + ":" + 
       Integer.toString(time).substring(2, 4) + ":00";
     return output;
   }
 
-  // function that converts mintues into hhmm format
-  private static int convertToFormat(int timeAtLocation) {
-    if (timeAtLocation < MIN_POSSIBLE_TIME) {
+  /**
+   * function that calculates endTime given start and timeSpent
+   * 
+   * @param timeAtLocation time that the user spends at a POI
+   */
+  private int calculateEndTime(int timeAtLocation) {
+    return this.startTime + Integer.parseInt(convertToFormat(timeAtLocation));
+  }
+
+  /**
+   * function that converts mintues into hhmm format
+   * 
+   * @param time time in minutes
+   */
+  public static String convertToFormat(int time) {
+    if (time < MIN_POSSIBLE_TIME) {
       throw new IllegalArgumentException("Time cannot be less than 0");
     }
 
-    if (timeAtLocation >= MINUTES_IN_A_DAY) {
+    if (time >= MINUTES_IN_A_DAY) {
       throw new IllegalArgumentException("Time cannot be more than a 24hrs");
     }
 
-    return Integer.parseInt("" + 
-      (timeAtLocation / 60) + (timeAtLocation % 60));
+    String numHours = Integer.toString(time / 60);
+    String numMins = Integer.toString(time % 60);
+
+    // add 0's to front of number if neccessary
+    if (Integer.parseInt(numHours) < 10) {
+      numHours = "0" + numHours;
+    } 
+
+    if (Integer.parseInt(numMins) < 10) {
+      numMins = "0" + numMins;
+    }
+
+    return numHours + numMins;
   }
 
   // getter functions
-
   public String getName() {
     return this.name;
   }
@@ -113,6 +168,10 @@ public class Event {
     return this.endTime;
   }
 
+  public int getTravelTime() {
+    return this.travelTime;
+  }
+
   public String getStrStartTime() {
     return this.strStartTime;
   } 
@@ -120,4 +179,5 @@ public class Event {
   public String getStrEndTime() {
     return this.strEndTime;
   }
+
 }
