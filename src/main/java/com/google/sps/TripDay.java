@@ -17,8 +17,7 @@ package com.google.sps;
 import java.util.ArrayList;
 
 /**
- * Event is the container class for when a specific group of people are meeting and are therefore
- * busy. Events are considered read-only.
+ * TripDay objects store the trip/route information for a single day.
  */
 public class TripDay {
   private String origin;

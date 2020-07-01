@@ -15,15 +15,9 @@
 package com.google.sps;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
- * Event is the container class for when a specific group of people are meeting and are therefore
- * busy. Events are considered read-only.
+ * Trip is the class for storing a single trip (could be multiple days).
  */
 public class Trip {
   private String tripName;
@@ -33,15 +27,15 @@ public class Trip {
   private ArrayList<TripDay> tripDays;
 
   /**
-   * Creates a new event.
+   * Creates a new Trip.
    *
    * @param tripName The human-readable name for the trip. Must be non-null.
    * @param startDate The start date for the trip. Must be non-null.
    * @param endDate The end date for the trip. Must be non-null.
-   * @param numDays The number of days of the trip. Must be non-null.
+   * @param numDays The number of days for the trip. Must be non-null.
    * @param tripDays The list of tripDays. Must be non-null.
    */
-  public Trip(String tripName, String startDate, String endDate, ArrayList<TripDay> tripDays) {
+  public Trip(String tripName, String startDate, String endDate, int numDays, ArrayList<TripDay> tripDays) {
     if (tripName == null) {
       throw new IllegalArgumentException("tripName cannot be null");
     }
@@ -54,6 +48,10 @@ public class Trip {
       throw new IllegalArgumentException("endDate cannot be null");
     }
 
+    if (numDays == null) {
+      throw new IllegalArgumentException("numDays cannot be null");
+    }
+
     if (tripDays == null) {
       throw new IllegalArgumentException("tripDays cannot be null. Use empty array instead.");
     }
@@ -61,48 +59,75 @@ public class Trip {
     this.tripName = tripName;
     this.startDate = startDate;
     this.endDate = endDate;
+    this.numDays = numDays;
     this.tripDays = new ArrayList<>();
     this.tripDays.addAll(tripDays);
   }
 
   /**
-   * Returns the human-readable name for this event.
+   * Creates a new Trip that is only one day by default. 
+   * This constructor will be used for the MVP.
+   * 
+   * @param tripName The human-readable name for the trip. Must be non-null.
+   * @param startDate The start date for the trip. Must be non-null.
+   * @param tripDays The list of tripDays. Must be non-null.
    */
-  public String getTitle() {
-    return title;
+  public Trip(String tripName, String startDate, ArrayList<TripDay> tripDays) {
+    if (tripName == null) {
+      throw new IllegalArgumentException("tripName cannot be null");
+    }
+
+    if (startDate == null) {
+      throw new IllegalArgumentException("startDate cannot be null");
+    }
+
+    if (tripDays == null) {
+      throw new IllegalArgumentException("tripDays cannot be null. Use empty array instead.");
+    }
+
+    this.tripName = tripName;
+    this.startDate = startDate;
+
+    // For MVP: trips will only be one day
+    this.endDate = this.startDate;
+    this.numDays = 1;
+
+    this.tripDays = new ArrayList<>();
+    this.tripDays.addAll(tripDays);
   }
 
   /**
-   * Returns the {@code TimeRange} for when this event occurs.
+   * Returns the human-readable name for this trip.
    */
-  public TimeRange getWhen() {
-    return when;
+  public String getTripName() {
+    return tripName;
   }
 
   /**
-   * Returns a read-only set of required attendees for this event.
+   * Returns the start date for this trip.
    */
-  public Set<String> getAttendees() {
-    // Return the attendees as an unmodifiable set so that the caller can't change our
-    // internal data.
-    return Collections.unmodifiableSet(attendees);
+  public String getStartDate() {
+    return startDate;
   }
 
-  @Override
-  public int hashCode() {
-    // For the hash code, just use the title. Most events "should" have different names and will
-    // mainly be used as a way to skip the costly {@code equals()} call.
-    return title.hashCode();
+  /**
+   * Returns the end date for this trip.
+   */
+  public String getEndDate() {
+    return endDate;
   }
 
-  @Override
-  public boolean equals(Object other) {
-    return other instanceof Event && equals(this, (Event) other);
+  /**
+   * Returns the number of days in this trip.
+   */
+  public int getNumDays() {
+    return numDays;
   }
 
-  private static boolean equals(Event a, Event b) {
-    // {@code attendees} must be a set for equals to work as expected. According to the {@code Set}
-    // interface documentation, equals will check for set-equality across all set implementations.
-    return a.title.equals(b.title) && a.when.equals(b.when) && a.attendees.equals(b.attendees);
+  /**
+   * Returns an ArrayList<String> of TripDays for this trip.
+   */
+  public ArrayList<String> getTripDays() {
+    return tripDays;
   }
 }
