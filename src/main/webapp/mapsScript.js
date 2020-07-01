@@ -21,20 +21,24 @@ script.async = true;
 // Triggered upon DOM load.
 $(document).ready(() => {
   // Redirect to homepage if user is not signed in.
-  isSignedIn().then((signInStatus) => {
-    if (!signInStatus) {
+  getAuthObject().then((authObject) => {
+    if (!authObject.loggedIn) {
       window.location.replace('/');
     } else {
+      // Add the link to the "sign out" a element.
+      const signOutLink = document.getElementById('sign-out-link');
+      signOutLink.href = authObject.logoutUrl;
+
       displayHeader();
     }
   });
 });
 
-// Returns Promise with the sign in status in a boolean.
-function isSignedIn() {
+// Returns Promise with the auth object, containing login status and information.
+function getAuthObject() {
   return new Promise((resolve, reject) => {
-    fetch('/auth').then(response => response.json()).then((signInStatus) => {
-      resolve(signInStatus);
+    fetch('/auth').then(response => response.json()).then((authObject) => {
+      resolve(authObject);
     }).catch((error) => {
       reject(error);
     });
