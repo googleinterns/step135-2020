@@ -27,10 +27,11 @@ public class Event {
   private int endTime;
   private int travelTime;
 
-  // fiels to be saved for parsing
+  // fields to be saved for parsing
   private String strStartTime;
   private String strEndTime;
  
+  // class constants
   private final static int HALFHOUR = 30;
   private final static int HOUR = 60;
   private final static int MINUTES_IN_A_DAY = 1440;
