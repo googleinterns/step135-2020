@@ -41,7 +41,7 @@ public class TripDay {
     }
 
     if (locations == null) {
-      throw new IllegalArgumentException("locations cannot be null. Use empty array instead.")
+      throw new IllegalArgumentException("locations cannot be null. Use empty array instead.");
     }
 
     this.origin = origin;

@@ -32,7 +32,7 @@ public class Trip {
    * @param tripName The human-readable name for the trip. Must be non-null.
    * @param startDate The start date for the trip. Must be non-null.
    * @param endDate The end date for the trip. Must be non-null.
-   * @param numDays The number of days for the trip. Must be non-null.
+   * @param numDays The number of days for the trip. 
    * @param tripDays The list of tripDays. Must be non-null.
    */
   public Trip(String tripName, String startDate, String endDate, int numDays, ArrayList<TripDay> tripDays) {
@@ -46,10 +46,6 @@ public class Trip {
 
     if (endDate == null) {
       throw new IllegalArgumentException("endDate cannot be null");
-    }
-
-    if (numDays == null) {
-      throw new IllegalArgumentException("numDays cannot be null");
     }
 
     if (tripDays == null) {
@@ -125,9 +121,9 @@ public class Trip {
   }
 
   /**
-   * Returns an ArrayList<String> of TripDays for this trip.
+   * Returns an ArrayList<TripDay> of TripDays for this trip.
    */
-  public ArrayList<String> getTripDays() {
+  public ArrayList<TripDay> getTripDays() {
     return tripDays;
   }
 }
