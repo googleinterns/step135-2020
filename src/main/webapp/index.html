@@ -38,20 +38,12 @@
             <div class="form-group col-md-3">
               <label for="inputDestination">Destination</label>
               <input type="text" placeholder="Where to?" class="form-control places-autofill" 
-                name="inputDestination" id="inputDestination" 
-                onchange="checkNextButton(); checkSubmitButton()">
+                name="inputDestination" id="inputDestination">
             </div>
             <div class="form-group col-md-3">
-              <label for="inputStartDate">Start Date</label>
-              <input type="date" class="form-control" name="inputStartDate" 
-                id="inputStartDate" oninput="setEndDateValue()"
-                onchange="checkValidDate('inputStartDate'); checkNextButton(); 
-                  checkSubmitButton()">
-            </div>
-            <div class="form-group col-md-3">
-              <label for="inputEndDate">End Date</label>
-              <input type="date" class="form-control" name="inputEndDate" 
-                id="inputEndDate" readonly>
+              <label for="inputDayOfTravel">Day of Travel</label>
+              <input type="date" class="form-control" name="inputDayOfTravel" 
+                id="inputDayOfTravel">
             </div>
             <div class="form-group">
               <input type="button" class="btn btn-success" value="Next" 
@@ -60,13 +52,15 @@
           </div>
           <div class="form-row" id="add-pois-container">
             <div class="form-group col-md-3">
-              <input type="text" placeholder="Point of Interest" id="inputPoi" 
-                class="form-control places-autofill" onchange="checkAddPoiButton()">
+              <input type="text" placeholder="Point of Interest" id="inputPoi"
+                class="form-control places-autofill">
             </div>
             <div class="form-group">
               <button type="button" class="btn btn-primary" id="addPoiButton"
-                onclick="addPoi(); checkSubmitButton()">Add POIs</button>
+                onclick="addPoi(); checkSubmitButton()">Add POI</button>
             </div>
+          </div>
+          <div class="form-row" id="poi-list-container">
           </div>
           <input type="submit" class="btn btn-success" id="submit-calculate-trip" 
             value="Calculate Trip">
