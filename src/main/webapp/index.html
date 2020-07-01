@@ -36,9 +36,15 @@
         <form action="/calculate-trip" method="POST" id="startTripForm">
           <div class="form-row">
             <div class="form-group col-md-3">
-              <label for="inputDestination">Destination</label>
-              <input type="text" placeholder="Where to?" class="form-control places-autofill" 
-                name="inputDestination" id="inputDestination">
+              <label for="inputDestination">Name of Trip</label>
+              <input type="text" placeholder="Add a trip name" class="form-control" 
+                name="inputTripName" id="inputTripName">
+            </div>
+            <div class="form-group col-md-3">
+              <label for="inputDestination">Destination (Start Point)</label>
+              <input type="text" placeholder="Where will you stay?" 
+                class="form-control places-autofill" id="inputDestination"
+                name="inputDestination">
             </div>
             <div class="form-group col-md-3">
               <label for="inputDayOfTravel">Day of Travel</label>

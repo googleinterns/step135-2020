@@ -120,17 +120,18 @@ function displayStartTripForm() {
 // Add onchange listeners to inputs that call relevant functions in the
 // "start trip" form.
 function addStartTripOnChangeListeners() {
+  // Input trip name onchange listeners to check input and and next / submit.
+  const inputTripName = document.getElementById('inputTripName');
+  inputTripName.oninput = () => {
+    checkValidInput('inputTripName');
+    checkNextButton();
+  };
+
   // Input day of travel onchange listeners to check input and and next / submit.
   const inputDayOfTravel = document.getElementById('inputDayOfTravel');
   inputDayOfTravel.onchange = () => {
     checkValidInput('inputDayOfTravel');
     checkNextButton();
-  };
-
-  // Input POI onchange listeners to check input and enable add POI button.
-  const inputPoi = document.getElementById('inputPoi');
-  inputPoi.onchange = () => {
-    checkAddPoiButton();
   };
 }
 
@@ -171,13 +172,15 @@ function checkValidInput(elementId) {
   }
 }
 
-// Returns true if all location and date inputs are valid; otherwise, false;
-function isLocationDateInputValid() {
+// Returns true if all name, location, and date inputs are valid; otherwise, false;
+function isStartingInputValid() {
   // Get three input fields.
+  const inputTripName = document.getElementById('inputTripName');
   const inputDestination = document.getElementById('inputDestination');
   const inputDayOfTravel = document.getElementById('inputDayOfTravel');
 
-  return inputDestination.classList.contains('is-valid') && 
+  return inputTripName.classList.contains('is-valid') &&
+    inputDestination.classList.contains('is-valid') && 
     inputDayOfTravel.classList.contains('is-valid');
 }
 
@@ -193,7 +196,7 @@ function checkNextButton() {
   const toggleStartTripStageButton = document.getElementById('toggle-stage-button');
 
   // Enable next button if all forms have valid input.
-  if (isLocationDateInputValid()) {    
+  if (isStartingInputValid()) {    
     toggleStartTripStageButton.disabled = false;
   } else {
     toggleStartTripStageButton.disabled = true;
@@ -205,8 +208,8 @@ function checkNextButton() {
 function checkSubmitButton() {
   const startTripSubmitButton = document.getElementById('submit-calculate-trip');
 
-  // Enable submit button if all forms have valid input.
-  if (isLocationDateInputValid() && isPoiSubmitted()) {    
+  // Enable submit button if all starting forms (name/location/date) have valid input.
+  if (isStartingInputValid() && isPoiSubmitted()) {    
     startTripSubmitButton.disabled = false;
   } else {
     startTripSubmitButton.disabled = true;
@@ -245,7 +248,9 @@ function toggleStartTripInputStage() {
     const startTripSubmitButton = document.getElementById('submit-calculate-trip');
     startTripSubmitButton.style.display = 'inline-block';
 
-    // Change location and date inputs to be readonly.
+    // Change name, location, and date inputs to be readonly.
+    const inputTripName = document.getElementById('inputTripName');
+    inputTripName.readOnly = true;
     const inputDestination = document.getElementById('inputDestination');
     inputDestination.readOnly = true;
     const inputDayOfTravel = document.getElementById('inputDayOfTravel');
@@ -262,7 +267,9 @@ function toggleStartTripInputStage() {
     const startTripSubmitButton = document.getElementById('submit-calculate-trip');
     startTripSubmitButton.style.display = 'none';
 
-    // Change location and date inputs to be editable.
+    // Change name, location, and date inputs to be editable.
+    const inputTripName = document.getElementById('inputTripName');
+    inputTripName.readOnly = false;
     const inputDestination = document.getElementById('inputDestination');
     inputDestination.readOnly = false;
     const inputDayOfTravel = document.getElementById('inputDayOfTravel');
@@ -353,4 +360,3 @@ function addLocationAutofill() {
     });
   });
 }
-
