@@ -328,13 +328,9 @@ function addLocationAutofill() {
     });
 
     // If the user changes the place (click on Google Place autofill), add 
-    // 'is-valid' class and create hidden input with Place ID to be submitted.
+    // 'is-valid' class.
     locationAutocomplete.addListener('place_changed', () => {
       locationInput.classList.add('is-valid');
-      
-      // Print place object to the console. (Temporary; this will be replaced 
-      // with adding this as a hidden input.)
-      console.log(locationAutocomplete.getPlace());
     });
   });
 }
