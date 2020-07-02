@@ -23,8 +23,11 @@ public class Event {
   private String name;
   private String address;
   private String date;
+  // format: HHMM
   private int startTime;
   private int endTime;
+
+  //in mins
   private int travelTime;
 
   // fields to be saved for parsing
@@ -32,20 +35,20 @@ public class Event {
   private String strEndTime;
  
   // class constants
-  private final static int HALFHOUR = 30;
-  private final static int HOUR = 60;
-  private final static int MINUTES_IN_A_DAY = 1440;
-  private final static int MIN_POSSIBLE_TIME = 0;
+  private static final int HALFHOUR = 30;
+  private static final int HOUR = 60;
+  private static final int MINUTES_IN_A_DAY = 1440;
+  private static final int MIN_POSSIBLE_TIME = 0;
 
   /**
    * Constructor that takes in time spent at location
    * 
-   * @param name date from user input travel day. Cannot be null.
-   * @param address time to to start or end event. Must be within bounds
-   * @param date day of travel
-   * @param startTime start of activing
-   * @param travelTime time spent traveling to next location
-   * @param timeAtLocation time spent at POI
+   * @param name name of the location (NOT address)
+   * @param address exact address of the POI
+   * @param date date from user input travel day. Cannot be null.
+   * @param startTime start of activity (HHMM format)
+   * @param travelTime time spent traveling to next location (minutes)
+   * @param timeAtLocation time spent at POI (minutes)
    */
   public Event(String name, String address, String date, int startTime, 
               int travelTime, int timeAtLocation) {
@@ -62,11 +65,11 @@ public class Event {
   /**
    * Constructor that assume one hour default spent at location
    * 
-   * @param name date from user input travel day. Cannot be null.
-   * @param address time to to start or end event. Must be within bounds
-   * @param date day of travel
-   * @param startTime start of activing
-   * @param travelTime time spent traveling to next location
+   * @param name name of the location (NOT address)
+   * @param address exact address of the POI
+   * @param date date from user input travel day. Cannot be null.
+   * @param startTime start of activity (HHMM format)
+   * @param travelTime time spent traveling to next location (minutes)
    */
   public Event(String name, String address, String date, int startTime, int travelTime) {
     this.name = name;
@@ -116,11 +119,13 @@ public class Event {
    * @param timeAtLocation time that the user spends at a POI
    */
   private int calculateEndTime(int timeAtLocation) {
-    return this.startTime + Integer.parseInt(convertToFormat(timeAtLocation));
+    int minsStartTime = (this.startTime / 100) * 60 + (this.startTime % 100);
+
+    return Integer.parseInt(convertToFormat(timeAtLocation + minsStartTime));
   }
 
   /**
-   * function that converts mintues into hhmm format
+   * function that converts minutes into hhmm format
    * 
    * @param time time in minutes
    */
