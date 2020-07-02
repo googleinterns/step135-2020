@@ -13,17 +13,25 @@
 // limitations under the License.
 
 /**
- * This script sets the content width of the site. (The header and auth redirect
- * are handled in the authScript.js file.)
+ * This script handles the authorization of all non-index pages.
+ * If the user is not signed in, they are redirected to the index / sign-in
+ * page. If the user is signed in, the basic skeleton of the site is constructed
+ * (this is currently just the header).
  */
 
 // Triggered upon DOM load.
 $(document).ready(() => {
   // Redirect to homepage if user is not signed in.
   getAuthObject().then((authObject) => {
-    if (authObject.loggedIn) {
-      // Set the content width of the site.
-      setContentWidth('800px');
+    if (!authObject.loggedIn) {
+      window.location.replace('/');
+    } else {
+      // Add the link to the "sign out" a element.
+      const signOutLink = document.getElementById('sign-out-link');
+      signOutLink.href = authObject.logoutUrl;
+
+      // Display the site header.
+      displayHeader();
     }
   });
 });
@@ -39,8 +47,8 @@ function getAuthObject() {
   });
 }
 
-// Set the width of the content container.
-function setContentWidth(width) {
-  const contentContainer = document.getElementById('content');
-  contentContainer.style.width = width;
+function displayHeader() {
+  // Display header for site.
+  const header = document.getElementById('header');
+  header.style.display = 'block';
 }

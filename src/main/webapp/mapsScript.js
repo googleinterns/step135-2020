@@ -18,39 +18,6 @@ script.src = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyCmQyeeWI_cV0yvh1
 script.defer = true;
 script.async = true;
 
-// Triggered upon DOM load.
-$(document).ready(() => {
-  // Redirect to homepage if user is not signed in.
-  getAuthObject().then((authObject) => {
-    if (!authObject.loggedIn) {
-      window.location.replace('/');
-    } else {
-      // Add the link to the "sign out" a element.
-      const signOutLink = document.getElementById('sign-out-link');
-      signOutLink.href = authObject.logoutUrl;
-
-      displayHeader();
-    }
-  });
-});
-
-// Returns Promise with the auth object, containing login status and information.
-function getAuthObject() {
-  return new Promise((resolve, reject) => {
-    fetch('/auth').then(response => response.json()).then((authObject) => {
-      resolve(authObject);
-    }).catch((error) => {
-      reject(error);
-    });
-  });
-}
-
-function displayHeader() {
-  // Display header for site.
-  const header = document.getElementById('header');
-  header.style.display = 'block';
-}
-
 var map;
 var directionsService;
 var directionsRenderer;
