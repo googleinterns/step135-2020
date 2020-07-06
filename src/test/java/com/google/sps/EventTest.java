@@ -99,7 +99,7 @@ public final class EventTest {
     Assert.assertEquals(STR_MANUAL_END_TIME, e1.getStrEndTime());
   }
 
-  @Test
+   @Test
   public void testConstructorDefaultTimeSpent() {
     Event e1 = new Event(GOLDENGATEPARK, ADDRESS, DATE, START_TIME, 
                         DEFAULT_TRAVEL_TIME);
@@ -113,17 +113,5 @@ public final class EventTest {
 
     Assert.assertEquals(STR_START_TIME, e1.getStrStartTime());
     Assert.assertEquals(STR_DEF_END_TIME, e1.getStrEndTime());
-  }
-
-  @Test(expected = NullPointerException.class)
-  public void testInvalidConstructorDate() {
-    Event e1 = new Event(GOLDENGATEPARK, ADDRESS, null, START_TIME, 
-                        DEFAULT_TRAVEL_TIME);
-  }
-
-  @Test(expected = IllegalArgumentException.class)
-  public void testInvalidConstructorTime() {
-    Event e1 = new Event(GOLDENGATEPARK, ADDRESS, DATE, -1, 
-                        DEFAULT_TRAVEL_TIME);
   }
 }
