@@ -47,7 +47,8 @@ public class Event {
    * @param address exact address of the POI
    * @param date date from user input travel day. Cannot be null.
    * @param startTime start of activity (HHMM format)
-   * @param travelTime time spent traveling to next location (minutes)
+   * @param travelTime time spent traveling to next location (minutes). 
+   *        Null if last location of the day.
    * @param timeAtLocation time spent at POI (minutes)
    */
   public Event(String name, String address, String date, int startTime, 
@@ -70,16 +71,10 @@ public class Event {
    * @param date date from user input travel day. Cannot be null.
    * @param startTime start of activity (HHMM format)
    * @param travelTime time spent traveling to next location (minutes)
+   *        Null if last location of the day.
    */
   public Event(String name, String address, String date, int startTime, int travelTime) {
-    this.name = name;
-    this.address = address;
-    this.date = date;
-    this.startTime = startTime;
-    this.travelTime = travelTime;
-    this.endTime = calculateEndTime(HOUR);
-
-    createCalendarTimes();
+    this(name, address, date, startTime, travelTime, HOUR);
   }
 
   // function that sets start and end Time with correct string format
@@ -100,11 +95,11 @@ public class Event {
     }
 
     if (time < MIN_POSSIBLE_TIME) {
-      throw new IllegalArgumentException("Time cannot be less than 0");
+      throw new IllegalArgumentException("Time cannot be less than MIN_POSSIBLE_TIME");
     }
 
     if (time >= MINUTES_IN_A_DAY) {
-      throw new IllegalArgumentException("Time cannot be more than a 24hrs");
+      throw new IllegalArgumentException("Time cannot be more than MINUTES_IN_A_DAY");
     }
 
     String output = "";
