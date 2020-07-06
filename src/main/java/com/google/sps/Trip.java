@@ -15,6 +15,7 @@
 package com.google.sps;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Trip is the class for storing a single trip (could be multiple days).
@@ -24,7 +25,7 @@ public class Trip {
   private String startDate;
   private String endDate;
   private int numDays;
-  private ArrayList<TripDay> tripDays;
+  private List<TripDay> tripDays;
 
   /**
    * Creates a new Trip.
@@ -35,7 +36,7 @@ public class Trip {
    * @param numDays The number of days for the trip. 
    * @param tripDays The list of tripDays. Must be non-null.
    */
-  public Trip(String tripName, String startDate, String endDate, int numDays, ArrayList<TripDay> tripDays) {
+  public Trip(String tripName, String startDate, String endDate, int numDays, List<TripDay> tripDays) {
     if (tripName == null) {
       throw new IllegalArgumentException("tripName cannot be null");
     }
@@ -72,7 +73,7 @@ public class Trip {
    * @param startDate The start date for the trip. Must be non-null.
    * @param tripDays The list of tripDays. Must be non-null.
    */
-  public Trip(String tripName, String startDate, ArrayList<TripDay> tripDays) {
+  public Trip(String tripName, String startDate, List<TripDay> tripDays) {
     if (tripName == null) {
       throw new IllegalArgumentException("tripName cannot be null");
     }
@@ -125,9 +126,9 @@ public class Trip {
   }
 
   /**
-   * Returns an ArrayList<TripDay> of TripDays for this trip.
+   * Returns an List<TripDay> of TripDays for this trip.
    */
-  public ArrayList<TripDay> getTripDays() {
+  public List<TripDay> getTripDays() {
     return this.tripDays;
   }
 }

@@ -15,6 +15,7 @@
 package com.google.sps;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * TripDay objects store the trip/route information for a single day.
@@ -22,7 +23,7 @@ import java.util.ArrayList;
 public class TripDay {
   private String origin;
   private String destination;
-  private ArrayList<String> locations;
+  private List<String> locations;
 
   /**
    * Creates a new TripDay.
@@ -31,7 +32,7 @@ public class TripDay {
    * @param destination The final destination for this day. Must be non-null.
    * @param locations The list of POIs that are stopovers for this day. Must be non-null.
    */
-  public TripDay(String origin, String destination, ArrayList<String> locations) {
+  public TripDay(String origin, String destination, List<String> locations) {
     if (origin == null) {
       throw new IllegalArgumentException("origin cannot be null");
     }
@@ -65,9 +66,9 @@ public class TripDay {
   }
 
   /**
-   * Returns an ArrayList<String> of locations for this TripDay.
+   * Returns an List<String> of locations for this TripDay.
    */
-  public ArrayList<String> getLocations() {
+  public List<String> getLocations() {
     return this.locations;
   }
 }
