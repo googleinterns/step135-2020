@@ -52,6 +52,10 @@ public class Trip {
       throw new IllegalArgumentException("tripDays cannot be null. Use empty array instead.");
     }
 
+    if (numDays < 0 || numDays > 31) {
+      throw new IllegalArgumentException("numDays must be an integer between 1 and 31.");
+    }
+
     this.tripName = tripName;
     this.startDate = startDate;
     this.endDate = endDate;
