@@ -159,7 +159,18 @@ function addStartTripOnClickListeners() {
   // Add POI Button adds the current POI in text input, and checks submit button.
   const addPoiButton = document.getElementById('addPoiButton');
   addPoiButton.onclick = () => {
-    addPoi();
+    // Get the text from the text input POI, add that POI, then clear the text input.
+    const inputPoi = document.getElementById('inputPoi');
+    addPoi(inputPoi.value);
+
+    // Reset "Add POI" button to disabled, reset text of POI text input, and
+    // remove 'is-valid' class.
+    const addPoiButton = document.getElementById('addPoiButton');
+    addPoiButton.disabled = true;
+    inputPoi.value = '';
+    inputPoi.classList.remove('is-valid');
+
+    // Check the submit button.
     checkSubmitButton();
   };
 }
@@ -309,21 +320,11 @@ function toggleStartTripInputStage() {
   }
 }
 
-// Add an HTML button element as a POI to the form. The POI is retrieved from 
-// the current POI input text, which is subsequently reset.
-function addPoi() {
-  const inputPoi = document.getElementById('inputPoi');
-
+// Add an HTML button element as a POI to the form.
+function addPoi(poi) {
   // Add POI input button to the page.
   const poiListContainer = document.getElementById('poi-list-container');
-  poiListContainer.appendChild(buildPoiObject(inputPoi.value));
-
-  // Reset "Add POI" button to disabled, reset text of POI text input, and
-  // remove 'is-valid' class.
-  const addPoiButton = document.getElementById('addPoiButton');
-  addPoiButton.disabled = true;
-  inputPoi.value = '';
-  inputPoi.classList.remove('is-valid');
+  poiListContainer.appendChild(buildPoiObject(poi));
 }
 
 // Build and return a user-added POI HTML object.
@@ -414,5 +415,56 @@ getSuggestedLocations('47.5721187,-122.219650', 50000);
 // Add suggested locations for POIs after user has submitted initial "Start 
 // Trip" form details (name of trip, location, and date).
 function addSuggestedLocations() {
+
+}
+
+// Builds an HTML widget of a suggested location.
+function buildSuggestedLocationWidget(name, vicinity, photoSrc, averageRating, numRatings) {
+  // The container that holds the full card.
+  const cardContainer = document.createElement('div');
+  cardContainer.className = 'card';
+  cardContainer.style = 'width: 18rem';
+
+  // Add the photo of this location.
+  const photoElement = document.createElement('img');
+  photoElement.className = 'card-img-top';
+  photoElement.src = photoSrc;
+  photoElement.alt = 'Image of ' + name;
+
+  // Create the body container for the card.
+  const cardBodyContainer = document.createElement('div');
+  cardBodyContainer.className = 'card-body';
+
+  // Create the card title, which is the name of the location.
+  const titleElement = document.createElement('h5');
+  titleElement.className = 'card-title';
+  titleElement.innerText = name;
+
+  // Create the general address / vicinity of the locagtion.
+  const addressText = document.createElement('p');
+  addressText.className = 'card-title';
+  addressText.innerText = vicinity;
+
+  // Add a button that allows you to add this suggested location as a POI.
+  const addSuggestedPoiButton = document.createElement('button');
+  addSuggestedPoiButton.className = 'btn btn-primary';
+  addSuggestedPoiButton.innerText = 'Add this POI';
+  addSuggestedPoiButton.onclick = () => {
+    // Add this POI.
+    // TODO: This may not generate valid addresses -- check with Eshika.
+    addPoi(name);
+
+    // Remove the card from the page.
+    cardContainer.remove();
+  }
+
+  // Add the title, address, and suggested POI button to the card body.
+  cardBodyContainer.appendChild(titleElement);
+  cardBodyContainer.appendChild(addressText);
+  cardBodyContainer.appendChild(addSuggestedPoiButton);
+
+  // Add the photo element and card body to the card container.
+  cardContainer.appendChild(photoElement);
+  cardContainer.appendChild(cardBodyContainer);
 
 }
