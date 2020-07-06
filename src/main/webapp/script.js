@@ -398,12 +398,12 @@ function addLocationAutofill() {
 // radius (meters). All suggested locations are of type "tourist attraction".
 function getSuggestedLocations(centralLocation, radius) {
   let placeRequest = 'https://cors-anywhere.herokuapp.com/' +
-  'https://maps.googleapis.com/maps/api/place/nearbysearch/json?' +
-  'location=' + centralLocation + '&radius=' + radius + '&type=tourist_attraction&' +
-  'key=API_KEY_HERE';
+    'https://maps.googleapis.com/maps/api/place/nearbysearch/json?' +
+    'location=' + centralLocation + '&radius=' + radius + '&type=tourist_attraction&' +
+    'key=API_KEY_HERE';
 
   fetch(placeRequest).then(response => response.json()).then((suggestedLocations) => {
-    console.log(suggestedLocations);
+    addSuggestedLocations(suggestedLocations);
   }).catch((error) => {
     // If an error occurs, print error to console and do not display suggestions.
     console.error(error);
@@ -414,16 +414,34 @@ getSuggestedLocations('47.5721187,-122.219650', 50000);
 
 // Add suggested locations for POIs after user has submitted initial "Start 
 // Trip" form details (name of trip, location, and date).
-function addSuggestedLocations() {
+function addSuggestedLocations(suggestedLocations) {
+  const suggestedLocationBlock = document.getElementById('suggested-location-block');
+
+  // Add all of the suggested locations to the page.
+  suggestedLocations.results.forEach((location) => {
+    const suggestedLocationWidget = buildSuggestedLocationWidget(location.name,
+      location.vicinity, getSrcFromPhotoreference(location.photos[0].photo_reference), 
+      location.rating, location.user_ratings_total);
+    suggestedLocationBlock.appendChild(suggestedLocationWidget);
+  });
 
 }
 
-// Builds an HTML widget of a suggested location.
+// Return the link to get the photo from the photoreference value, as returned
+// from the Google Maps "Nearby Places" API call.
+// See https://developers.google.com/places/web-service/photos for details.
+function getSrcFromPhotoreference(photoreference) {
+  return 'https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&' +
+    'photoreference=' + photoreference + 
+    '&key=API_KEY_HERE';
+}
+
+// Builds and returns an HTML widget of a suggested location.
 function buildSuggestedLocationWidget(name, vicinity, photoSrc, averageRating, numRatings) {
   // The container that holds the full card.
   const cardContainer = document.createElement('div');
   cardContainer.className = 'card';
-  cardContainer.style = 'width: 18rem';
+  cardContainer.style = 'width: 15rem';
 
   // Add the photo of this location.
   const photoElement = document.createElement('img');
@@ -451,7 +469,7 @@ function buildSuggestedLocationWidget(name, vicinity, photoSrc, averageRating, n
   addSuggestedPoiButton.innerText = 'Add this POI';
   addSuggestedPoiButton.onclick = () => {
     // Add this POI.
-    // TODO: This may not generate valid addresses -- check with Eshika.
+    // TODO: This may not generate valid addresses -- check with backend.
     addPoi(name);
 
     // Remove the card from the page.
@@ -466,5 +484,6 @@ function buildSuggestedLocationWidget(name, vicinity, photoSrc, averageRating, n
   // Add the photo element and card body to the card container.
   cardContainer.appendChild(photoElement);
   cardContainer.appendChild(cardBodyContainer);
-
+  
+  return cardContainer;
 }
