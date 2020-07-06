@@ -82,22 +82,6 @@ public class Event {
     createCalendarTimes();
   }
 
-  /**
-   * Constructor that will be used when doGet is called, only holds var needed
-   * for displaying event
-   * 
-   * @param name name of the location (NOT address)
-   * @param address exact address of the POI
-   * @param strStartTime start of activity (YYYY-MM-DDTHH:MM:SS format)
-   * @param strEndTime end of activity(YYYY-MM-DDTHH:MM:SS format)
-   */
-  public Event(String name, String address, String strStartTime, String strEndTime) {
-    this.name = name;
-    this.address = address;
-    this.strStartTime = strStartTime;
-    this.strEndTime = strEndTime;
-  }
-
   // function that sets start and end Time with correct string format
   private void createCalendarTimes() {
     this.strStartTime = createStrTime(this.date, this.startTime);
