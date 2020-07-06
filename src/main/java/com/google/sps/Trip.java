@@ -16,11 +16,16 @@ package com.google.sps;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Date;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 
 /**
  * Trip is the class for storing a single trip (could be multiple days).
  */
 public class Trip {
+  private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+
   private String tripName;
   private String startDate;
   private String endDate;
@@ -36,7 +41,7 @@ public class Trip {
    * @param numDays The number of days for the trip. 
    * @param tripDays The list of tripDays. Must be non-null.
    */
-  public Trip(String tripName, String startDate, String endDate, int numDays, List<TripDay> tripDays) {
+  public Trip(String tripName, String startDate, String endDate, List<TripDay> tripDays) {
     if (tripName == null) {
       throw new IllegalArgumentException("tripName cannot be null");
     }
@@ -57,10 +62,18 @@ public class Trip {
       throw new IllegalArgumentException("numDays must be an integer between 1 and 31.");
     }
 
+    if (!isValidDate(startDate)) {
+      throw new IllegalArgumentException("Invalid startDate format.");
+    }
+
+    if (!isValidDate(endDate)) {
+      throw new IllegalArgumentException("Invalid endDate format.");
+    }
+
     this.tripName = tripName;
     this.startDate = startDate;
     this.endDate = endDate;
-    this.numDays = numDays;
+    this.numDays = calcNumDays(this.startDate, this.endDate);
     this.tripDays = new ArrayList<>();
     this.tripDays.addAll(tripDays);
   }
@@ -130,5 +143,28 @@ public class Trip {
    */
   public List<TripDay> getTripDays() {
     return this.tripDays;
+  }
+
+  private static boolean isValidDate(String inDate) {
+    DATE_FORMAT.setLenient(false);
+    try {
+        DATE_FORMAT.parse(inDate.trim());
+    } catch (ParseException pe) {
+        return false;
+    }
+    return true;
+  }
+
+  private static int calcNumDays(String startDateString, String endDateString) {
+    try {
+	       Date startDate = myFormat.parse(startDateString);
+	       Date endDate = myFormat.parse(endDateString);
+	       long difference = endDate.getTime() - startDate.getTime();
+         // Convert milliseconds to days
+	       float numDays = (difference / (1000*60*60*24));
+	       return numDays;
+	 } catch (Exception e) {
+	       throw new IllegalArgumentException("Invalid startDate or endDate.");
+	 }
   }
 }
