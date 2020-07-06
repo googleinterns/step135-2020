@@ -54,20 +54,20 @@ public class TripDay {
    * Returns the starting point for this TripDay.
    */
   public String getOrigin() {
-    return origin;
+    return this.origin;
   }
 
   /**
    * Returns the final destination for this TripDay.
    */
   public String getDestination() {
-    return destination;
+    return this.destination;
   }
 
   /**
    * Returns an ArrayList<String> of locations for this TripDay.
    */
   public ArrayList<String> getLocations() {
-    return locations;
+    return this.locations;
   }
 }

@@ -100,34 +100,34 @@ public class Trip {
    * Returns the human-readable name for this trip.
    */
   public String getTripName() {
-    return tripName;
+    return this.tripName;
   }
 
   /**
    * Returns the start date for this trip.
    */
   public String getStartDate() {
-    return startDate;
+    return this.startDate;
   }
 
   /**
    * Returns the end date for this trip.
    */
   public String getEndDate() {
-    return endDate;
+    return this.endDate;
   }
 
   /**
    * Returns the number of days in this trip.
    */
   public int getNumDays() {
-    return numDays;
+    return this.numDays;
   }
 
   /**
    * Returns an ArrayList<TripDay> of TripDays for this trip.
    */
   public ArrayList<TripDay> getTripDays() {
-    return tripDays;
+    return this.tripDays;
   }
 }
