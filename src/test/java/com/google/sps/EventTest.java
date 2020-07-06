@@ -33,7 +33,7 @@ public final class EventTest {
   private final static int THREE_HOURS = 180;
 
   // files for event 1
-  private static final String GOLDENGATEPARK = "GGPark";
+  private static final String GOLDEN_GATE_PARK = "GGPark";
   private static final String ADDRESS =  "4265 24th Street San Francisco, CA, 94114";
   private static final String DATE = "2020-06-25";
   private static final int START_TIME = 1000;
@@ -85,10 +85,10 @@ public final class EventTest {
   
   @Test
   public void testConstructorManualTimeSpent() {
-    Event e1 = new Event(GOLDENGATEPARK, ADDRESS, DATE, START_TIME, 
+    Event e1 = new Event(GOLDEN_GATE_PARK , ADDRESS, DATE, START_TIME, 
                         DEFAULT_TRAVEL_TIME, DURATION_IN_MIN);
 
-    Assert.assertEquals(GOLDENGATEPARK, e1.getName());
+    Assert.assertEquals(GOLDEN_GATE_PARK , e1.getName());
     Assert.assertEquals(ADDRESS, e1.getAddress());
     Assert.assertEquals(DATE, e1.getDate());
     Assert.assertEquals(START_TIME, e1.getStartTime());
@@ -101,10 +101,10 @@ public final class EventTest {
 
    @Test
   public void testConstructorDefaultTimeSpent() {
-    Event e1 = new Event(GOLDENGATEPARK, ADDRESS, DATE, START_TIME, 
+    Event e1 = new Event(GOLDEN_GATE_PARK , ADDRESS, DATE, START_TIME, 
                         DEFAULT_TRAVEL_TIME);
 
-    Assert.assertEquals(GOLDENGATEPARK, e1.getName());
+    Assert.assertEquals(GOLDEN_GATE_PARK , e1.getName());
     Assert.assertEquals(ADDRESS, e1.getAddress());
     Assert.assertEquals(DATE, e1.getDate());
     Assert.assertEquals(START_TIME, e1.getStartTime());
