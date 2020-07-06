@@ -378,6 +378,9 @@ function addLocationAutofill() {
     // 'is-valid' class.
     locationAutocomplete.addListener('place_changed', () => {
       locationInput.classList.add('is-valid');
+
+      console.log(locationAutocomplete.getPlace().geometry.location.lat());
+      console.log(locationAutocomplete.getPlace().geometry.location.lng());
       
       // For "input destination" field, check "Next" button; for POI, check 
       // "Add POI" button.
@@ -388,4 +391,28 @@ function addLocationAutofill() {
       }
     });
   });
+}
+
+// Get suggested locations based on a central location (latitude, longitude) and
+// radius (meters). All suggested locations are of type "tourist attraction".
+function getSuggestedLocations(centralLocation, radius) {
+  let placeRequest = 'https://cors-anywhere.herokuapp.com/' +
+  'https://maps.googleapis.com/maps/api/place/nearbysearch/json?' +
+  'location=' + centralLocation + '&radius=' + radius + '&type=tourist_attraction&' +
+  'key=AIzaSyCmQyeeWI_cV0yvh1SuXYGoLej3g_D9NbY';
+
+  fetch(placeRequest).then(response => response.json()).then((suggestedLocations) => {
+    console.log(suggestedLocations);
+  }).catch((error) => {
+    // If an error occurs, print error to console and do not display suggestions.
+    console.error(error);
+  });
+}
+
+getSuggestedLocations('47.5721187,-122.219650', 50000);
+
+// Add suggested locations for POIs after user has submitted initial "Start 
+// Trip" form details (name of trip, location, and date).
+function addSuggestedLocations() {
+
 }
