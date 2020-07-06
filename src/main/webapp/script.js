@@ -399,7 +399,7 @@ function getSuggestedLocations(centralLocation, radius) {
   let placeRequest = 'https://cors-anywhere.herokuapp.com/' +
   'https://maps.googleapis.com/maps/api/place/nearbysearch/json?' +
   'location=' + centralLocation + '&radius=' + radius + '&type=tourist_attraction&' +
-  'key=AIzaSyCmQyeeWI_cV0yvh1SuXYGoLej3g_D9NbY';
+  'key=API_KEY_HERE';
 
   fetch(placeRequest).then(response => response.json()).then((suggestedLocations) => {
     console.log(suggestedLocations);
