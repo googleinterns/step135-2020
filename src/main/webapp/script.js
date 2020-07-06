@@ -106,13 +106,17 @@ function displayStartTripForm() {
   const toggleStartTripStageButton = document.getElementById('toggle-stage-button');
   toggleStartTripStageButton.disabled = true;
 
-  // Initially hide the POI list, "Add POIs" form, and "Submit" button.
+  // Initially hide the POI list, "Add POIs" form, "Submit" button, and suggested POIs.
   const poiListContainer = document.getElementById('poi-list-container');
   poiListContainer.style.display = 'none';
   const addPoiContainer = document.getElementById('add-pois-container');
   addPoiContainer.style.display = 'none';
   const startTripSubmitButton = document.getElementById('submit-calculate-trip');
   startTripSubmitButton.style.display = 'none';
+  const suggestedPoisBlockHeader = document.getElementById('suggested-location-block-header');
+  suggestedPoisBlockHeader.style.display = 'none';
+  const suggestedPoisBlock = document.getElementById('suggested-location-block');
+  suggestedPoisBlock.style.display = 'none';
 
   // Set "Submit" button to disabled; enable once all forms are filled out.
   startTripSubmitButton.disabled = true;
@@ -280,13 +284,17 @@ function toggleStartTripInputStage() {
   const toggleStartTripStageButton = document.getElementById('toggle-stage-button');
 
   if (toggleStartTripStageButton.value === 'Next') {
-    // Display the POI list, "Add POIs" form, and "Submit" button.
+    // Display the POI list, "Add POIs" form, "Submit" button, and suggested POIs.
     const poiListContainer = document.getElementById('poi-list-container');
     poiListContainer.style.display = 'block';
     const addPoiContainer = document.getElementById('add-pois-container');
     addPoiContainer.style.display = 'flex';
     const startTripSubmitButton = document.getElementById('submit-calculate-trip');
     startTripSubmitButton.style.display = 'inline-block';
+    const suggestedPoisBlockHeader = document.getElementById('suggested-location-block-header');
+    suggestedPoisBlockHeader.style.display = 'block';
+    const suggestedPoisBlock = document.getElementById('suggested-location-block');
+    suggestedPoisBlock.style.display = 'block';
 
     // Change name, location, and date inputs to be readonly.
     const inputTripName = document.getElementById('inputTripName');
@@ -299,13 +307,17 @@ function toggleStartTripInputStage() {
     // Change the text of the toggle button to 'Back'.
     toggleStartTripStageButton.value = 'Back';
   } else {
-    // Hide the POI list, "Add POIs" form, and "Submit" button.
+    // Hide the POI list, "Add POIs" form, "Submit" button, and suggested POIs.
     const poiListContainer = document.getElementById('poi-list-container');
     poiListContainer.style.display = 'none';
     const addPoiContainer = document.getElementById('add-pois-container');
     addPoiContainer.style.display = 'none';
     const startTripSubmitButton = document.getElementById('submit-calculate-trip');
     startTripSubmitButton.style.display = 'none';
+    const suggestedPoisBlockHeader = document.getElementById('suggested-location-block-header');
+    suggestedPoisBlockHeader.style.display = 'none';
+    const suggestedPoisBlock = document.getElementById('suggested-location-block');
+    suggestedPoisBlock.style.display = 'none';
 
     // Change name, location, and date inputs to be editable.
     const inputTripName = document.getElementById('inputTripName');
@@ -379,9 +391,13 @@ function addLocationAutofill() {
     // 'is-valid' class.
     locationAutocomplete.addListener('place_changed', () => {
       locationInput.classList.add('is-valid');
-
-      console.log(locationAutocomplete.getPlace().geometry.location.lat());
-      console.log(locationAutocomplete.getPlace().geometry.location.lng());
+      
+      // Remove any current elements, then get and add the suggested locations.
+      removeSuggestedLocations();
+      const radius = 50000;
+      let location = locationAutocomplete.getPlace().geometry.location.lat() + 
+        ',' + locationAutocomplete.getPlace().geometry.location.lng();
+      getSuggestedLocations(location, radius);
       
       // For "input destination" field, check "Next" button; for POI, check 
       // "Add POI" button.
@@ -400,7 +416,7 @@ function getSuggestedLocations(centralLocation, radius) {
   let placeRequest = 'https://cors-anywhere.herokuapp.com/' +
     'https://maps.googleapis.com/maps/api/place/nearbysearch/json?' +
     'location=' + centralLocation + '&radius=' + radius + '&type=tourist_attraction&' +
-    'key=API_KEY_HERE';
+    'key=AIzaSyCmQyeeWI_cV0yvh1SuXYGoLej3g_D9NbY';
 
   fetch(placeRequest).then(response => response.json()).then((suggestedLocations) => {
     addSuggestedLocations(suggestedLocations);
@@ -410,7 +426,11 @@ function getSuggestedLocations(centralLocation, radius) {
   });
 }
 
-getSuggestedLocations('47.5721187,-122.219650', 50000);
+// Removes all of the current suggested locations by setting innerHTML to empty.
+function removeSuggestedLocations() {
+  const suggestedLocationBlock = document.getElementById('suggested-location-block');
+  suggestedLocationBlock.innerHTML = '';
+}
 
 // Add suggested locations for POIs after user has submitted initial "Start 
 // Trip" form details (name of trip, location, and date).
@@ -419,9 +439,16 @@ function addSuggestedLocations(suggestedLocations) {
 
   // Add all of the suggested locations to the page.
   suggestedLocations.results.forEach((location) => {
+    // If photo is present, get the photo source; if not, use placeholder.
+    let photoSrc;
+    if (location.photos !== undefined) {
+      photoSrc = getSrcFromPhotoreference(location.photos[0].photo_reference);
+    } else {
+      photoSrc = 'images/placeholder_image.png';
+    }
+    
     const suggestedLocationWidget = buildSuggestedLocationWidget(location.name,
-      location.vicinity, getSrcFromPhotoreference(location.photos[0].photo_reference), 
-      location.rating, location.user_ratings_total);
+      location.vicinity, photoSrc, location.rating, location.user_ratings_total);
     suggestedLocationBlock.appendChild(suggestedLocationWidget);
   });
 
@@ -433,7 +460,7 @@ function addSuggestedLocations(suggestedLocations) {
 function getSrcFromPhotoreference(photoreference) {
   return 'https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&' +
     'photoreference=' + photoreference + 
-    '&key=API_KEY_HERE';
+    '&key=AIzaSyCmQyeeWI_cV0yvh1SuXYGoLej3g_D9NbY';
 }
 
 // Builds and returns an HTML widget of a suggested location.
@@ -471,6 +498,9 @@ function buildSuggestedLocationWidget(name, vicinity, photoSrc, averageRating, n
     // Add this POI.
     // TODO: This may not generate valid addresses -- check with backend.
     addPoi(name);
+
+    // Check the submit button.
+    checkSubmitButton();
 
     // Remove the card from the page.
     cardContainer.remove();
