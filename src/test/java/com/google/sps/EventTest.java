@@ -35,13 +35,7 @@ public final class EventTest {
   // files for event 1
   private static final String GOLDEN_GATE_PARK = "GGPark";
   private static final String ADDRESS =  "4265 24th Street San Francisco, CA, 94114";
-  private static final String DATE = "2020-06-25";
-  private static final int START_TIME = 1000;
-  private static final int DEFAULT_TRAVEL_TIME = 30;
-  private static final int DURATION_IN_MIN = 80;
-  private static final String STR_START_TIME = "2020-06-25T10:00:00";
-  private static final String STR_MANUAL_END_TIME = "2020-06-25T11:20:00";
-  private static final String STR_DEF_END_TIME = "2020-06-25T11:00:00";
+  
 
   @Test
   public void testMinuteToHHMMFormatOneHour() {
@@ -85,6 +79,13 @@ public final class EventTest {
   
   @Test
   public void testConstructorManualTimeSpent() {
+    // clarifying values
+    String DATE = "2020-06-25";
+    int START_TIME = 1000;
+    int DEFAULT_TRAVEL_TIME = 30;
+    int DURATION_IN_MIN = 80;
+    int END_TIME = 1100;
+
     Event e1 = new Event(GOLDEN_GATE_PARK , ADDRESS, DATE, START_TIME, 
                         DEFAULT_TRAVEL_TIME, DURATION_IN_MIN);
 
@@ -95,12 +96,18 @@ public final class EventTest {
     Assert.assertEquals(DEFAULT_TRAVEL_TIME, e1.getTravelTime());
     Assert.assertEquals(1120, e1.getEndTime());
 
-    Assert.assertEquals(STR_START_TIME, e1.getStrStartTime());
-    Assert.assertEquals(STR_MANUAL_END_TIME, e1.getStrEndTime());
+    Assert.assertEquals("2020-06-25T10:00:00", e1.getStrStartTime());
+    Assert.assertEquals("2020-06-25T11:20:00", e1.getStrEndTime());
   }
 
    @Test
   public void testConstructorDefaultTimeSpent() {
+    // clarifying values
+    String DATE = "2020-06-25";
+    int START_TIME = 1000;
+    int DEFAULT_TRAVEL_TIME = 30;
+    int END_TIME = 1100;
+
     Event e1 = new Event(GOLDEN_GATE_PARK , ADDRESS, DATE, START_TIME, 
                         DEFAULT_TRAVEL_TIME);
 
@@ -109,9 +116,9 @@ public final class EventTest {
     Assert.assertEquals(DATE, e1.getDate());
     Assert.assertEquals(START_TIME, e1.getStartTime());
     Assert.assertEquals(DEFAULT_TRAVEL_TIME, e1.getTravelTime());
-    Assert.assertEquals(1100, e1.getEndTime());
+    Assert.assertEquals(END_TIME, e1.getEndTime());
 
-    Assert.assertEquals(STR_START_TIME, e1.getStrStartTime());
-    Assert.assertEquals(STR_DEF_END_TIME, e1.getStrEndTime());
+    Assert.assertEquals("2020-06-25T10:00:00", e1.getStrStartTime());
+    Assert.assertEquals("2020-06-25T11:00:00", e1.getStrEndTime());
   }
 }
