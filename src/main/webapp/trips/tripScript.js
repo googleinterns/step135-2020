@@ -19,28 +19,11 @@
 
 // Triggered upon DOM load.
 $(document).ready(() => {
-  // Redirect to homepage if user is not signed in.
-  getAuthObject().then((authObject) => {
-    if (authObject.loggedIn) {
-      // Set the content width of the site.
-      setContentWidth('800px');
-    }
-  });
+  // Set the content width of the site.
+  setContentWidth('800px');
 });
-
-// Returns Promise with the auth object, containing login status and information.
-function getAuthObject() {
-  return new Promise((resolve, reject) => {
-    fetch('/auth').then(response => response.json()).then((authObject) => {
-      resolve(authObject);
-    }).catch((error) => {
-      reject(error);
-    });
-  });
-}
 
 // Set the width of the content container.
 function setContentWidth(width) {
-  const contentContainer = document.getElementById('content');
-  contentContainer.style.width = width;
+  document.getElementById('content').style.width = width;
 }
