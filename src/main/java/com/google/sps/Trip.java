@@ -15,16 +15,22 @@
 package com.google.sps;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Date;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 
 /**
  * Trip is the class for storing a single trip (could be multiple days).
  */
 public class Trip {
+  private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+
   private String tripName;
   private String startDate;
   private String endDate;
   private int numDays;
-  private ArrayList<TripDay> tripDays;
+  private List<TripDay> tripDays;
 
   /**
    * Creates a new Trip.
@@ -35,7 +41,7 @@ public class Trip {
    * @param numDays The number of days for the trip. 
    * @param tripDays The list of tripDays. Must be non-null.
    */
-  public Trip(String tripName, String startDate, String endDate, int numDays, ArrayList<TripDay> tripDays) {
+  public Trip(String tripName, String startDate, String endDate, List<TripDay> tripDays) {
     if (tripName == null) {
       throw new IllegalArgumentException("tripName cannot be null");
     }
@@ -52,10 +58,26 @@ public class Trip {
       throw new IllegalArgumentException("tripDays cannot be null. Use empty array instead.");
     }
 
+    if (!isValidDate(startDate)) {
+      throw new IllegalArgumentException("Invalid startDate format.");
+    }
+
+    if (!isValidDate(endDate)) {
+      throw new IllegalArgumentException("Invalid endDate format.");
+    }
+
+    int numDays = calcNumDays(startDate, endDate);
+
+    if (numDays < 0 || numDays > 31) {
+      throw new IllegalArgumentException("numDays must be an integer between 1 and 31.");
+    }
+
     this.tripName = tripName;
     this.startDate = startDate;
     this.endDate = endDate;
     this.numDays = numDays;
+    
+    // Duplicate tripDays to avoid modifying original parameter
     this.tripDays = new ArrayList<>();
     this.tripDays.addAll(tripDays);
   }
@@ -68,7 +90,7 @@ public class Trip {
    * @param startDate The start date for the trip. Must be non-null.
    * @param tripDays The list of tripDays. Must be non-null.
    */
-  public Trip(String tripName, String startDate, ArrayList<TripDay> tripDays) {
+  public Trip(String tripName, String startDate, List<TripDay> tripDays) {
     if (tripName == null) {
       throw new IllegalArgumentException("tripName cannot be null");
     }
@@ -81,6 +103,10 @@ public class Trip {
       throw new IllegalArgumentException("tripDays cannot be null. Use empty array instead.");
     }
 
+    if (!isValidDate(startDate)) {
+      throw new IllegalArgumentException("Invalid startDate format.");
+    }
+
     this.tripName = tripName;
     this.startDate = startDate;
 
@@ -88,6 +114,7 @@ public class Trip {
     this.endDate = this.startDate;
     this.numDays = 1;
 
+    // Duplicate tripDays to avoid modifying original parameter
     this.tripDays = new ArrayList<>();
     this.tripDays.addAll(tripDays);
   }
@@ -96,34 +123,68 @@ public class Trip {
    * Returns the human-readable name for this trip.
    */
   public String getTripName() {
-    return tripName;
+    return this.tripName;
   }
 
   /**
    * Returns the start date for this trip.
    */
   public String getStartDate() {
-    return startDate;
+    return this.startDate;
   }
 
   /**
    * Returns the end date for this trip.
    */
   public String getEndDate() {
-    return endDate;
+    return this.endDate;
   }
 
   /**
    * Returns the number of days in this trip.
    */
   public int getNumDays() {
-    return numDays;
+    return this.numDays;
   }
 
   /**
-   * Returns an ArrayList<TripDay> of TripDays for this trip.
+   * Returns an List<TripDay> of TripDays for this trip.
    */
-  public ArrayList<TripDay> getTripDays() {
-    return tripDays;
+  public List<TripDay> getTripDays() {
+    return this.tripDays;
+  }
+
+  /**
+   * Checks that a String is in the proper yyyy-MM-dd date format.
+   * @param inDate The String date representation.
+   */
+  private static boolean isValidDate(String inDate) {
+    DATE_FORMAT.setLenient(false);
+    try {
+        DATE_FORMAT.parse(inDate.trim());
+    } catch (ParseException pe) {
+        return false;
+    }
+    return true;
+  }
+
+  /**
+   * Calculates number of days between two dates.
+   * @param startDateString The String representation of start date.
+   * @param endDateString The String representation of end date.
+   */
+  private static int calcNumDays(String startDateString, String endDateString) {
+    try {
+      Date startDate = DATE_FORMAT.parse(startDateString);
+      Date endDate = DATE_FORMAT.parse(endDateString);
+      // Difference is in milliseconds
+      long difference = endDate.getTime() - startDate.getTime();
+      // Convert milliseconds to days and add 1 because the number of days 
+      // is 1 more than the difference between the dates.
+      int numDays = Math.round(difference / (1000*60*60*24)) + 1;
+      return numDays;
+    } catch (Exception e) {
+      throw new IllegalArgumentException("Invalid startDate or endDate.");
+    }
   }
 }

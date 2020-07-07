@@ -53,5 +53,4 @@ public final class TripDayTest {
   public void testTripDayConstructorNull() {
     TripDay tripDay = new TripDay(HOTEL_ID, HOTEL_ID, null);
   }
-
 }

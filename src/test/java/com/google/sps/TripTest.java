@@ -23,13 +23,12 @@ import org.junit.runners.JUnit4;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-
 @RunWith(JUnit4.class)
 public final class TripTest {
   private static final String TRIP_NAME = "Trip to California";
-  private static final String START_DATE = "2020-06-25";
-  private static final String END_DATE = "2020-06-28";
-  private static final int NUM_DAYS = 4;
+  private static final String START_DATE = "2020-02-29";
+  private static final String END_DATE = "2020-03-05";
+  private static final int NUM_DAYS = 6;
   
   private ArrayList<TripDay> tripDays;
 
@@ -52,7 +51,7 @@ public final class TripTest {
     tripDays.add(tripDay1);
     tripDays.add(tripDay2);
 
-    Trip trip = new Trip(TRIP_NAME, START_DATE, END_DATE, NUM_DAYS, tripDays);
+    Trip trip = new Trip(TRIP_NAME, START_DATE, END_DATE, tripDays);
 
     Assert.assertEquals(trip.getTripName(), TRIP_NAME);
     Assert.assertEquals(trip.getStartDate(), START_DATE);
@@ -82,7 +81,29 @@ public final class TripTest {
   // Test multiple day constructor with null parameter
   @Test(expected = IllegalArgumentException.class)
   public void testTripConstructorMultiDayNull() {
-    Trip trip = new Trip(TRIP_NAME, START_DATE, END_DATE, NUM_DAYS, null);
+    Trip trip = new Trip(TRIP_NAME, START_DATE, END_DATE, null);
+  }
+
+  // Test multiple day constructor with wrong date format
+  @Test(expected = IllegalArgumentException.class)
+  public void testTripConstructorMultiDayInvalidDate() {
+    TripDay tripDay = new TripDay(HOTEL_ID, HOTEL_ID, locations);
+    
+    tripDays = new ArrayList<>();
+    tripDays.add(tripDay);
+
+    Trip trip = new Trip(TRIP_NAME, "06-28-2020", END_DATE, tripDays);
+  }
+
+  // Test multiple day constructor with over a month
+  @Test(expected = IllegalArgumentException.class)
+  public void testTripConstructorMultiDayLongTrip() {
+    TripDay tripDay = new TripDay(HOTEL_ID, HOTEL_ID, locations);
+    
+    tripDays = new ArrayList<>();
+    tripDays.add(tripDay);
+
+    Trip trip = new Trip(TRIP_NAME, "2020-07-04", "2020-08-09", tripDays);
   }
 
   // Test single day constructor with null parameter
@@ -91,4 +112,14 @@ public final class TripTest {
     Trip trip = new Trip(TRIP_NAME, START_DATE, null);
   }
 
+  // Test single day constructor with invalid date format 
+  @Test(expected = IllegalArgumentException.class)
+  public void testTripConstructorSingleDayInvalidStart() {
+    TripDay tripDay = new TripDay(HOTEL_ID, HOTEL_ID, locations);
+    
+    tripDays = new ArrayList<>();
+    tripDays.add(tripDay);
+
+    Trip trip = new Trip(TRIP_NAME, "Dec 9 2020", tripDays);
+  }
 }
