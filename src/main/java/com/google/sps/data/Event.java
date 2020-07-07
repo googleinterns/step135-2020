@@ -95,11 +95,11 @@ public class Event {
     }
 
     if (time < MIN_POSSIBLE_TIME) {
-      throw new IllegalArgumentException("Time cannot be less than MIN_POSSIBLE_TIME");
+      throw new IllegalArgumentException("Time cannot be less than " + MIN_POSSIBLE_TIME);
     }
 
     if (time >= MINUTES_IN_A_DAY) {
-      throw new IllegalArgumentException("Time cannot be more than MINUTES_IN_A_DAY");
+      throw new IllegalArgumentException("Time cannot be more than " + MINUTES_IN_A_DAY);
     }
 
     String output = "";
@@ -126,11 +126,11 @@ public class Event {
    */
   public static String convertToFormat(int time) {
     if (time < MIN_POSSIBLE_TIME) {
-      throw new IllegalArgumentException("Time cannot be less than 0");
+      throw new IllegalArgumentException("Time cannot be less than " + MIN_POSSIBLE_TIME);
     }
 
     if (time >= MINUTES_IN_A_DAY) {
-      throw new IllegalArgumentException("Time cannot be more than a 24hrs");
+      throw new IllegalArgumentException("Time cannot be more than " + MINUTES_IN_A_DAY);
     }
 
     String numHours = Integer.toString(time / 60);
