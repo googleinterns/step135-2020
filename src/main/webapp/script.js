@@ -392,17 +392,18 @@ function addLocationAutofill() {
     locationAutocomplete.addListener('place_changed', () => {
       locationInput.classList.add('is-valid');
       
-      // Remove any current elements, then get and add the suggested locations.
-      removeSuggestedLocations();
-      const radius = 50000;
-      let location = locationAutocomplete.getPlace().geometry.location.lat() + 
-        ',' + locationAutocomplete.getPlace().geometry.location.lng();
-      getSuggestedLocations(location, radius);
-      
-      // For "input destination" field, check "Next" button; for POI, check 
-      // "Add POI" button.
+      // For "input destination" field, check "Next" button and add suggested 
+      // locations; for POI, check "Add POI" button.
       if (locationInput.id === 'inputDestination') {
         checkNextButton();
+
+        // Remove any current elements, then get and add the suggested locations.
+        removeSuggestedLocations();
+        const radius = 50000;
+        let location = new google.maps.LatLng(locationAutocomplete.getPlace().geometry.location.lat(), 
+          locationAutocomplete.getPlace().geometry.location.lng());
+        getAndAddSuggestedLocations(location, radius);
+
       } else if (locationInput.id === 'inputPoi') {
         checkAddPoiButton();
       }
@@ -412,17 +413,20 @@ function addLocationAutofill() {
 
 // Get suggested locations based on a central location (latitude, longitude) and
 // radius (meters). All suggested locations are of type "tourist attraction".
-function getSuggestedLocations(centralLocation, radius) {
-  let placeRequest = 'https://cors-anywhere.herokuapp.com/' +
-    'https://maps.googleapis.com/maps/api/place/nearbysearch/json?' +
-    'location=' + centralLocation + '&radius=' + radius + '&type=tourist_attraction&' +
-    'key=AIzaSyCmQyeeWI_cV0yvh1SuXYGoLej3g_D9NbY';
+// Then, call addSuggestedLocations function.
+function getAndAddSuggestedLocations(centralLocation, radius) {
+  let googlePlacesObject = new google.maps.places.PlacesService(document.createElement('div'));
 
-  fetch(placeRequest).then(response => response.json()).then((suggestedLocations) => {
-    addSuggestedLocations(suggestedLocations);
-  }).catch((error) => {
-    // If an error occurs, print error to console and do not display suggestions.
-    console.error(error);
+  let placesRequest = {
+    location: centralLocation,
+    radius: radius,
+    type: 'tourist_attraction'
+  };
+
+  googlePlacesObject.nearbySearch(placesRequest, (placesList, placesServiceStatus, _) => {
+    if (placesServiceStatus === google.maps.places.PlacesServiceStatus.OK) {
+      addSuggestedLocations(placesList);
+    }
   });
 }
 
@@ -438,33 +442,24 @@ function addSuggestedLocations(suggestedLocations) {
   const suggestedLocationBlock = document.getElementById('suggested-location-block');
 
   // Add all of the suggested locations to the page.
-  suggestedLocations.results.forEach((location) => {
+  suggestedLocations.forEach((location) => {
     // If photo is present, get the photo source; if not, use placeholder.
     let photoSrc;
     if (location.photos !== undefined) {
-      photoSrc = getSrcFromPhotoreference(location.photos[0].photo_reference);
+      photoSrc = location.photos[0].getUrl();
     } else {
       photoSrc = 'images/placeholder_image.png';
     }
     
     const suggestedLocationWidget = buildSuggestedLocationWidget(location.name,
-      location.vicinity, photoSrc, location.rating, location.user_ratings_total);
+      location.vicinity, photoSrc);
     suggestedLocationBlock.appendChild(suggestedLocationWidget);
   });
 
 }
 
-// Return the link to get the photo from the photoreference value, as returned
-// from the Google Maps "Nearby Places" API call.
-// See https://developers.google.com/places/web-service/photos for details.
-function getSrcFromPhotoreference(photoreference) {
-  return 'https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&' +
-    'photoreference=' + photoreference + 
-    '&key=AIzaSyCmQyeeWI_cV0yvh1SuXYGoLej3g_D9NbY';
-}
-
 // Builds and returns an HTML widget of a suggested location.
-function buildSuggestedLocationWidget(name, vicinity, photoSrc, averageRating, numRatings) {
+function buildSuggestedLocationWidget(name, vicinity, photoSrc) {
   // The container that holds the full card.
   const cardContainer = document.createElement('div');
   cardContainer.className = 'card';
