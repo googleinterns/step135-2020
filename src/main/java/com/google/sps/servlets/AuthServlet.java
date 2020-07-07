@@ -83,25 +83,23 @@ public class AuthServlet extends HttpServlet {
    */
   class UserAuth {
     // Fields that hold relevant login data.
-    private String loginUrl;
-    private String logoutUrl;
+    private String url;
     private String email;
 
     // Constructor to create UserAuth object with no user logged in.
     // Null represents no value.
-    private UserAuth(String loginUrl) {
-      this(loginUrl, null, null);
+    private UserAuth(String url) {
+      this(url, null);
     }
 
     // Constructor to create UserAuth object with user logged in.
-    private UserAuth(String logoutUrl, String email) {
-      this(null, logoutUrl, email);
+    private UserAuth(String url, String email) {
+      this(url, email);
     }
 
     // Full constructor to assign values to all fields.
-    private UserAuth(String loginUrl, String logoutUrl, String email) {
-        this.loginUrl = loginUrl;
-        this.logoutUrl = logoutUrl;
+    private UserAuth(String url, String email) {
+        this.url = url;
         this.email = email;
     }
   }

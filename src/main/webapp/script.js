@@ -26,13 +26,13 @@ $(document).ready(() => {
     if (authObject.email !== null) {
       // Add the link to the "sign out" a element.
       const signOutLink = document.getElementById('sign-out-link');
-      signOutLink.href = authObject.logoutUrl;
+      signOutLink.href = authObject.url;
 
       displayStartTripDesign();
     } else {
       // Add the link to the "sign in" a element.
       const signInLink = document.getElementById('sign-in-link');
-      signInLink.href = authObject.loginUrl;
+      signInLink.href = authObject.url;
 
       displaySignInPage();
     }
