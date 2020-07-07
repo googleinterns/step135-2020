@@ -164,20 +164,16 @@ function addHiddenPoiFormTrigger() {
     let count = 1;
     Array.prototype.forEach.call(poiInputs, (poiInput) => {
       let poiNumber = 'poi-' + count;
-      addHiddenInput(poiNumber, poiNumber, poiInput.name);
+      // Add hidden input to the "start trip" form.
+      $('<input>').attr('type', 'hidden')
+        .attr('name', poiNumber)
+        .attr('id', poiNumber)
+        .attr('value', poiInput.name)
+        .appendTo('#startTripForm');
       count++;
     });
     return true;
   });
-}
-
-// Add hidden input to the "start trip" form.
-function addHiddenInput(name, id, value) {
-  $('<input>').attr('type', 'hidden')
-    .attr('name', name)
-    .attr('id', id)
-    .attr('value', value)
-    .appendTo('#startTripForm');
 }
 
 // Checks whether the input is valid (non-empty), and adds the 'is-valid'
