@@ -38,12 +38,10 @@ function isSignedIn() {
 
 function displayHeader() {
   // Display header for site.
-  const header = document.getElementById('header');
-  header.style.display = 'block';
+  document.getElementById('header').style.display = 'block';
 }
 
 // Set the width of the content container.
 function setContentWidth(width) {
-  const contentContainer = document.getElementById('content');
-  contentContainer.style.width = width;
+  document.getElementById('content').style.width = width;
 }
