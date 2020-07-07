@@ -28,9 +28,10 @@ public class TripDay {
   /**
    * Creates a new TripDay.
    *
-   * @param origin The departure location for this day. Must be non-null.
-   * @param destination The final destination for this day. Must be non-null.
-   * @param locations The list of POIs that are stopovers for this day. Must be non-null.
+   * @param origin The departure location (Google Maps Place ID string) for this day. Must be non-null.
+   * @param destination The final destination (Google Maps Place ID string) for this day. Must be non-null.
+   * @param locations The list of POIs (list of Google Maps Place ID strings) 
+                      that are stopovers for this day. Must be non-null.
    */
   public TripDay(String origin, String destination, List<String> locations) {
     if (origin == null) {
@@ -47,6 +48,8 @@ public class TripDay {
 
     this.origin = origin;
     this.destination = destination;
+
+    // Duplicate locations to not modify original parameter
     this.locations = new ArrayList<>();
     this.locations.addAll(locations);
   }
