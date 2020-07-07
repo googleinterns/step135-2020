@@ -175,16 +175,16 @@ public class Trip {
    */
   private static int calcNumDays(String startDateString, String endDateString) {
     try {
-	       Date startDate = DATE_FORMAT.parse(startDateString);
-	       Date endDate = DATE_FORMAT.parse(endDateString);
-         // Difference is in milliseconds
-	       long difference = endDate.getTime() - startDate.getTime();
-         // Convert milliseconds to days and add 1 because the number of days 
-         // is 1 more than the difference between the dates.
-	       int numDays = Math.round(difference / (1000*60*60*24)) + 1;
-	       return numDays;
+      Date startDate = DATE_FORMAT.parse(startDateString);
+      Date endDate = DATE_FORMAT.parse(endDateString);
+      // Difference is in milliseconds
+      long difference = endDate.getTime() - startDate.getTime();
+      // Convert milliseconds to days and add 1 because the number of days 
+      // is 1 more than the difference between the dates.
+      int numDays = Math.round(difference / (1000*60*60*24)) + 1;
+      return numDays;
 	 } catch (Exception e) {
-	       throw new IllegalArgumentException("Invalid startDate or endDate.");
+      throw new IllegalArgumentException("Invalid startDate or endDate.");
 	 }
   }
 }
