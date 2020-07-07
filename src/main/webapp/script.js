@@ -74,7 +74,8 @@ function displayStartTripDesign() {
   document.body.removeAttribute('id');
 
   // Add Google Places location autofill to input fields.
-  addLocationAutofill();
+  addInputPoiLocationAutofill();
+  addInputDestinationLocationAutofill();
 
   // Set up trigger to add hidden POI form elements upon submission.
   addHiddenPoiFormTrigger();

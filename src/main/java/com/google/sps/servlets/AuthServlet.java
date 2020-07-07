@@ -92,15 +92,10 @@ public class AuthServlet extends HttpServlet {
       this(url, null);
     }
 
-    // Constructor to create UserAuth object with user logged in.
-    private UserAuth(String url, String email) {
-      this(url, email);
-    }
-
     // Full constructor to assign values to all fields.
     private UserAuth(String url, String email) {
-        this.url = url;
-        this.email = email;
+      this.url = url;
+      this.email = email;
     }
   }
 }
