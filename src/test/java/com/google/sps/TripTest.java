@@ -122,5 +122,4 @@ public final class TripTest {
 
     Trip trip = new Trip(TRIP_NAME, "Dec 9 2020", tripDays);
   }
-
 }
