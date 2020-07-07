@@ -53,8 +53,7 @@ function displaySignInPage() {
   document.body.id = 'body-background-image';
 
   // Get the homepage "registration" block to and add elements.
-  const indexRegistrationBlock = document.getElementById('index-registration-block');
-  indexRegistrationBlock.style.display = 'block';
+  document.getElementById('index-registration-block').style.display = 'block';
 }
 
 // User is signed in, show the start trip homepage.
@@ -66,8 +65,7 @@ function displayStartTripDesign() {
   document.body.removeAttribute('id');
 
   // Get the homepage "start trip" block to and add elements.
-  const indexStartTripBlock = document.getElementById('index-start-trip-block');
-  indexStartTripBlock.style.display = 'block';
+  document.getElementById('index-start-trip-block').style.display = 'block';
 
   // Display the site header.
   displayHeader();
@@ -78,40 +76,28 @@ function displayStartTripDesign() {
 
 function displayHeader() {
   // Display header for site.
-  const header = document.getElementById('header');
-  header.style.display = 'block';
+  document.getElementById('header').style.display = 'block';
 }
 
 // Set the width of the content container.
 function setContentWidth(width) {
-  const contentContainer = document.getElementById('content');
-  contentContainer.style.width = width;
+  document.getElementById('content').style.width = width;
 }
 
 // Display the start trip input form, with location, dates, and POIs.
 function displayStartTripForm() {
   // Get the homepage "start trip" block and add elements.
-  const indexStartTripBlock = document.getElementById('index-start-trip-block');
-  indexStartTripBlock.style.display = 'block';
-
-  // Initially make the "Next" button disabled.
-  const toggleStartTripStageButton = document.getElementById('toggle-stage-button');
-  toggleStartTripStageButton.disabled = true;
+  document.getElementById('index-start-trip-block').style.display = 'block';
 
   // Initially hide the POI list, "Add POIs" form, and "Submit" button.
-  const poiListContainer = document.getElementById('poi-list-container');
-  poiListContainer.style.display = 'none';
-  const addPoiContainer = document.getElementById('add-pois-container');
-  addPoiContainer.style.display = 'none';
-  const startTripSubmitButton = document.getElementById('submit-calculate-trip');
-  startTripSubmitButton.style.display = 'none';
+  document.getElementById('poi-list-container').style.display = 'none';
+  document.getElementById('add-pois-container').style.display = 'none';
+  document.getElementById('submit-calculate-trip').style.display = 'none';
 
-  // Set "Submit" button to disabled; enable once all forms are filled out.
-  startTripSubmitButton.disabled = true;
-
-  // Set "Add POI" button to disabled; enable once text input is valid.
-  const addPoiButton = document.getElementById('addPoiButton');
-  addPoiButton.disabled = true;
+  // Initially make the "Next" , "Add POI", and "Submit" button disabled.
+  document.getElementById('toggle-stage-button').disabled = true;
+  document.getElementById('addPoiButton').disabled = true;
+  document.getElementById('submit-calculate-trip').disabled = true;
 
   // Add onchange listeners to inputs in "start trip" form.
   addStartTripOnChangeListeners();
@@ -125,15 +111,13 @@ function displayStartTripForm() {
 // "start trip" form.
 function addStartTripOnChangeListeners() {
   // Input trip name onchange listeners to check input and and next / submit.
-  const inputTripName = document.getElementById('inputTripName');
-  inputTripName.oninput = () => {
+  document.getElementById('inputTripName').oninput = () => {
     checkValidInput('inputTripName');
     checkNextButton();
   };
 
   // Input day of travel onchange listeners to check input and and next / submit.
-  const inputDayOfTravel = document.getElementById('inputDayOfTravel');
-  inputDayOfTravel.onchange = () => {
+  document.getElementById('inputDayOfTravel').onchange = () => {
     checkValidInput('inputDayOfTravel');
     checkNextButton();
   };
@@ -143,14 +127,12 @@ function addStartTripOnChangeListeners() {
 // "start trip" form.
 function addStartTripOnClickListeners() {
   // Toggle stage button toggles the current "stage" of the "start trip" form.
-  const toggleStartTripStageButton = document.getElementById('toggle-stage-button');
-  toggleStartTripStageButton.onclick = () => {
+  document.getElementById('toggle-stage-button').onclick = () => {
     toggleStartTripInputStage();
   };
 
   // Add POI Button adds the current POI in text input, and checks submit button.
-  const addPoiButton = document.getElementById('addPoiButton');
-  addPoiButton.onclick = () => {
+  document.getElementById('addPoiButton').onclick = () => {
     addPoi();
     checkSubmitButton();
   };
@@ -258,39 +240,27 @@ function toggleStartTripInputStage() {
 
   if (toggleStartTripStageButton.value === 'Next') {
     // Display the POI list, "Add POIs" form, and "Submit" button.
-    const poiListContainer = document.getElementById('poi-list-container');
-    poiListContainer.style.display = 'block';
-    const addPoiContainer = document.getElementById('add-pois-container');
-    addPoiContainer.style.display = 'flex';
-    const startTripSubmitButton = document.getElementById('submit-calculate-trip');
-    startTripSubmitButton.style.display = 'inline-block';
+    document.getElementById('poi-list-container').style.display = 'block';
+    document.getElementById('add-pois-container').style.display = 'flex';
+    document.getElementById('submit-calculate-trip').style.display = 'inline-block';
 
     // Change name, location, and date inputs to be readonly.
-    const inputTripName = document.getElementById('inputTripName');
-    inputTripName.readOnly = true;
-    const inputDestination = document.getElementById('inputDestination');
-    inputDestination.readOnly = true;
-    const inputDayOfTravel = document.getElementById('inputDayOfTravel');
-    inputDayOfTravel.readOnly = true;
+    document.getElementById('inputTripName').readOnly = true;
+    document.getElementById('inputDestination').readOnly = true;
+    document.getElementById('inputDayOfTravel').readOnly = true;
 
     // Change the text of the toggle button to 'Back'.
     toggleStartTripStageButton.value = 'Back';
   } else {
     // Hide the POI list, "Add POIs" form, and "Submit" button.
-    const poiListContainer = document.getElementById('poi-list-container');
-    poiListContainer.style.display = 'none';
-    const addPoiContainer = document.getElementById('add-pois-container');
-    addPoiContainer.style.display = 'none';
-    const startTripSubmitButton = document.getElementById('submit-calculate-trip');
-    startTripSubmitButton.style.display = 'none';
+    document.getElementById('poi-list-container').style.display = 'none';
+    document.getElementById('add-pois-container').style.display = 'none';
+    document.getElementById('submit-calculate-trip').style.display = 'none';
 
     // Change name, location, and date inputs to be editable.
-    const inputTripName = document.getElementById('inputTripName');
-    inputTripName.readOnly = false;
-    const inputDestination = document.getElementById('inputDestination');
-    inputDestination.readOnly = false;
-    const inputDayOfTravel = document.getElementById('inputDayOfTravel');
-    inputDayOfTravel.readOnly = false;
+    document.getElementById('inputTripName').readOnly = false;
+    document.getElementById('inputDestination').readOnly = false;
+    document.getElementById('inputDayOfTravel').readOnly = false;
 
     // Change the text of the toggle button to 'Next'.
     toggleStartTripStageButton.value = 'Next';
