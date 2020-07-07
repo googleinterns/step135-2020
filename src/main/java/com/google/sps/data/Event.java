@@ -14,6 +14,9 @@
  
 package com.google.sps.data;
  
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 /**
  * Class that creates an event specific to a POI 
  */
@@ -59,7 +62,7 @@ public class Event {
     this.startTime = startTime;
     this.travelTime = travelTime;
     this.endTime = calculateEndTime(timeAtLocation);
-
+  
     createCalendarTimes();
   }
  
@@ -79,8 +82,12 @@ public class Event {
 
   // function that sets start and end Time with correct string format
   private void createCalendarTimes() {
-    this.strStartTime = createStrTime(this.date, this.startTime);
-    this.strEndTime = createStrTime(this.date, this.endTime);
+    try {
+      this.strStartTime = createStrTime(this.date, this.startTime);
+      this.strEndTime = createStrTime(this.date, this.endTime);
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
   }
 
   /**
@@ -89,7 +96,7 @@ public class Event {
    * @param date date from user input travel day. Cannot be null.
    * @param time time to to start or end event. Must be within bounds
    */
-  private static String createStrTime(String date, int time) {
+  private static String createStrTime(String date, int time) throws Exception {
     if (date == null) {
       throw new NullPointerException("Date cannot be null");
     }
@@ -105,6 +112,14 @@ public class Event {
     String output = "";
     output += date + "T" + Integer.toString(time).substring(0, 2) + ":" + 
       Integer.toString(time).substring(2, 4) + ":00";
+
+    try {
+      SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+      Date d = sdf.parse(output);
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+    
     return output;
   }
 
