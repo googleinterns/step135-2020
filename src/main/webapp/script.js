@@ -15,7 +15,8 @@
 // Triggered upon DOM load.
 $(document).ready(() => {
   // Add Google Places location autofill to input fields.
-  addLocationAutofill();
+  addInputPoiLocationAutofill();
+  addInputDestinationLocationAutofill();
 
   // Set up trigger to add hidden POI form elements upon submission.
   addHiddenPoiFormTrigger();
@@ -312,38 +313,44 @@ function buildInput(type, value, className, name) {
   return form;
 }
 
-// Get all location input fields, and add the Google Places autofill.
-function addLocationAutofill() {
-  let locationInputs = document.getElementsByClassName('places-autofill');
-  Array.prototype.forEach.call(locationInputs, (locationInput) => {
-    let locationAutocomplete = new google.maps.places.Autocomplete(locationInput);
+// Add text input POI Google Places autofill.
+function addInputPoiLocationAutofill() {
+  let inputPoi = document.getElementById('inputPoi');
+  let locationAutocomplete = new google.maps.places.Autocomplete(inputPoi);
 
-    // Any time the input changes through user typing, remove the 'is-valid' class.
-    // This will not be called if the user clicks on Google Place autofill.
-    locationInput.addEventListener('input', () => {
-      locationInput.classList.remove('is-valid');
+  // Any time the input changes through user typing, remove the 'is-valid' class
+  // and check "Add POI" button. This will not be called if the user clicks on 
+  // the Google Place autofill.
+  inputPoi.addEventListener('input', () => {
+    inputPoi.classList.remove('is-valid');
+    checkAddPoiButton();
+  });
 
-      // For "input destination" field, check "Next" button; for POI, check 
-      // "Add POI" button.
-      if (locationInput.id === 'inputDestination') {
-        checkNextButton();
-      } else if (locationInput.id === 'inputPoi') {
-        checkAddPoiButton();
-      }
-    });
+  // If the user changes the place (click on Google Place autofill), add
+  // 'is-valid' class and check "Add POI" button.
+  locationAutocomplete.addListener('place_changed', () => {
+    inputPoi.classList.add('is-valid');
+    checkAddPoiButton();
+  });
+}
 
-    // If the user changes the place (click on Google Place autofill), add 
-    // 'is-valid' class.
-    locationAutocomplete.addListener('place_changed', () => {
-      locationInput.classList.add('is-valid');
-      
-      // For "input destination" field, check "Next" button; for POI, check 
-      // "Add POI" button.
-      if (locationInput.id === 'inputDestination') {
-        checkNextButton();
-      } else if (locationInput.id === 'inputPoi') {
-        checkAddPoiButton();
-      }
-    });
+// Add text input POI Google Places autofill.
+function addInputDestinationLocationAutofill() {
+  let inputDestination = document.getElementById('inputDestination');
+  let locationAutocomplete = new google.maps.places.Autocomplete(inputDestination);
+
+  // Any time the input changes through user typing, remove the 'is-valid' class
+  // and check "Next" button. This will not be called if the user clicks on 
+  // the Google Place autofill.
+  inputDestination.addEventListener('input', () => {
+    inputDestination.classList.remove('is-valid');
+    checkNextButton();
+  });
+
+  // If the user changes the place (click on Google Place autofill), add
+  // 'is-valid' class and check "Next" button.
+  locationAutocomplete.addListener('place_changed', () => {
+    inputDestination.classList.add('is-valid');
+    checkNextButton();
   });
 }
