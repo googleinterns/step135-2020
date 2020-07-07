@@ -461,7 +461,6 @@ function buildSuggestedLocationWidget(name, vicinity, photoSrc) {
   addSuggestedPoiButton.innerText = 'Add this POI';
   addSuggestedPoiButton.onclick = () => {
     // Add this POI.
-    // TODO: This may not generate valid addresses -- check with backend.
     addPoi(name);
 
     // Check the submit button.
