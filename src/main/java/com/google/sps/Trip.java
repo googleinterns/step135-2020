@@ -183,8 +183,8 @@ public class Trip {
       // is 1 more than the difference between the dates.
       int numDays = Math.round(difference / (1000*60*60*24)) + 1;
       return numDays;
-	 } catch (Exception e) {
+    } catch (Exception e) {
       throw new IllegalArgumentException("Invalid startDate or endDate.");
-	 }
+    }
   }
 }
