@@ -23,7 +23,7 @@ $(document).ready(() => {
 
   getAuthObject().then((authObject) => {
     // Display the sign-in page or "start trip" form depending on sign in status.
-    if (authObject.loggedIn) {
+    if (authObject.email !== null) {
       // Add the link to the "sign out" a element.
       const signOutLink = document.getElementById('sign-out-link');
       signOutLink.href = authObject.logoutUrl;
