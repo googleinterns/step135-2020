@@ -35,7 +35,7 @@ public class AuthServlet extends HttpServlet {
     UserAuth userAuth;
 
     // Set redirect URL after login / logout as index page.
-    final String redirectUrl = "/";
+    static final String redirectUrl = "/";
 
     // Create UserAuth object with relevant login / logout information.
     if (userService.isUserLoggedIn()) {
