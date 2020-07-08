@@ -31,6 +31,8 @@ public class Event {
   // format: HHMM
   private LocalDateTime startTime;
   private LocalDateTime endTime;
+  private String strStartTime;
+  private String strEndTime;
 
   //in mins
   private long travelTime;
@@ -59,6 +61,8 @@ public class Event {
     this.endTime = startTime.plusMinutes(Long.valueOf(timeAtLocation));
     this.travelTime = Long.valueOf(travelTime);
     checkTravelTime(this.travelTime);
+    this.strStartTime = getProperDateFormat(startTime);
+    this.strEndTime = getProperDateFormat(endTime);
   }
 
   /**
