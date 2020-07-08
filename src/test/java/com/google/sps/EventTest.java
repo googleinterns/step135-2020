@@ -15,6 +15,10 @@
 package com.google.sps;
 
 import com.google.sps.data.Event;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.LocalTime;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -35,90 +39,58 @@ public final class EventTest {
   // files for event 1
   private static final String GOLDEN_GATE_PARK = "GGPark";
   private static final String ADDRESS =  "4265 24th Street San Francisco, CA, 94114";
-  
 
-  @Test
-  public void testMinuteToHHMMFormatOneHour() {
-    String output = Event.convertToFormat(HOUR);
-    Assert.assertEquals("0100", output);
-  }
+  private static final LocalDateTime DEF_LDT = LocalDateTime.of(LocalDate.parse("2020-06-25"), LocalTime.of(10, 0));
 
-  @Test
-  public void testMinuteToHHMMFormatHalfHour() {
-    String output = Event.convertToFormat(HALF_HOUR);
-    Assert.assertEquals("0030", output);
-  }
-
-  @Test
-  public void testMinuteToHHMMFormatNinetyMin() {
-    String output = Event.convertToFormat(NINETY_MIN);
-    Assert.assertEquals("0130", output);
-  }
-
-  @Test
-  public void testMinuteToHHMMFormatHourFivetyFive() {
-    String output = Event.convertToFormat(HOUR_FIFTY_FIVE);
-    Assert.assertEquals("0155", output);
-  }
-
-  @Test
-  public void testMinuteToHHMMFormatThreeHour() {
-    String output = Event.convertToFormat(THREE_HOURS);
-    Assert.assertEquals("0300", output);
+  @Test(expected = IllegalArgumentException.class)
+  public void testcheckTravelTimeMinPossibleTime() {
+    Event e = new Event (GOLDEN_GATE_PARK, ADDRESS, DEF_LDT, -1, HOUR);
   }
 
   @Test(expected = IllegalArgumentException.class)
-  public void testMinuteToHHMMFormatLessThanZero() {
-    Event.convertToFormat(-1);
+  public void testcheckTravelTimeGreaterThanFullDay() {
+    Event e = new Event (GOLDEN_GATE_PARK, ADDRESS, DEF_LDT, 1440, HOUR);
   }
 
-  @Test(expected = IllegalArgumentException.class)
-  public void testMinuteToHHMMFormatGreaterThanFullDay() {
-    Event.convertToFormat(1440);
-  }
-  
   @Test
   public void testConstructorManualTimeSpent() {
-    // clarifying values
-    String DATE = "2020-06-25";
-    int START_TIME = 1000;
-    int DEFAULT_TRAVEL_TIME = 30;
-    int DURATION_IN_MIN = 80;
-    int END_TIME = 1100;
+    // clarifying inputs
+    int timeAtLocation = 80;
+    LocalDateTime manualEndTime = LocalDateTime.of(
+                          LocalDate.parse("2020-06-25"), LocalTime.of(11, 20));
 
-    Event e1 = new Event(GOLDEN_GATE_PARK , ADDRESS, DATE, START_TIME, 
-                        DEFAULT_TRAVEL_TIME, DURATION_IN_MIN);
+    Event e = new Event (GOLDEN_GATE_PARK, ADDRESS, DEF_LDT, HALF_HOUR, 
+                        timeAtLocation);
 
-    Assert.assertEquals(GOLDEN_GATE_PARK , e1.getName());
-    Assert.assertEquals(ADDRESS, e1.getAddress());
-    Assert.assertEquals(DATE, e1.getDate());
-    Assert.assertEquals(START_TIME, e1.getStartTime());
-    Assert.assertEquals(DEFAULT_TRAVEL_TIME, e1.getTravelTime());
-    Assert.assertEquals(1120, e1.getEndTime());
+    Assert.assertEquals(GOLDEN_GATE_PARK , e.getName());
+    Assert.assertEquals(ADDRESS, e.getAddress());
+    Assert.assertEquals(DEF_LDT, e.getStartTime());
+    Assert.assertEquals(manualEndTime, e.getEndTime());
+    Assert.assertEquals(HALF_HOUR, e.getTravelTime());
 
-    Assert.assertEquals("2020-06-25T10:00:00", e1.getStrStartTime());
-    Assert.assertEquals("2020-06-25T11:20:00", e1.getStrEndTime());
+    Assert.assertEquals("2020-06-25T10:00:00", Event.getProperDateFormat(
+                                                            e.getStartTime()));
+    Assert.assertEquals("2020-06-25T11:20:00", Event.getProperDateFormat(
+                                                              e.getEndTime()));
   }
 
    @Test
   public void testConstructorDefaultTimeSpent() {
-    // clarifying values
-    String DATE = "2020-06-25";
-    int START_TIME = 1000;
-    int DEFAULT_TRAVEL_TIME = 30;
-    int END_TIME = 1100;
+    // clarifying inputs
+    LocalDateTime manualEndTime = LocalDateTime.of(
+                          LocalDate.parse("2020-06-25"), LocalTime.of(11, 0));
 
-    Event e1 = new Event(GOLDEN_GATE_PARK , ADDRESS, DATE, START_TIME, 
-                        DEFAULT_TRAVEL_TIME);
+    Event e = new Event (GOLDEN_GATE_PARK, ADDRESS, DEF_LDT, HALF_HOUR);
 
-    Assert.assertEquals(GOLDEN_GATE_PARK , e1.getName());
-    Assert.assertEquals(ADDRESS, e1.getAddress());
-    Assert.assertEquals(DATE, e1.getDate());
-    Assert.assertEquals(START_TIME, e1.getStartTime());
-    Assert.assertEquals(DEFAULT_TRAVEL_TIME, e1.getTravelTime());
-    Assert.assertEquals(END_TIME, e1.getEndTime());
+    Assert.assertEquals(GOLDEN_GATE_PARK , e.getName());
+    Assert.assertEquals(ADDRESS, e.getAddress());
+    Assert.assertEquals(DEF_LDT, e.getStartTime());
+    Assert.assertEquals(manualEndTime, e.getEndTime());
+    Assert.assertEquals(HALF_HOUR, e.getTravelTime());
 
-    Assert.assertEquals("2020-06-25T10:00:00", e1.getStrStartTime());
-    Assert.assertEquals("2020-06-25T11:00:00", e1.getStrEndTime());
+    Assert.assertEquals("2020-06-25T10:00:00", Event.getProperDateFormat(
+                                                            e.getStartTime()));
+    Assert.assertEquals("2020-06-25T11:00:00", Event.getProperDateFormat(
+                                                              e.getEndTime()));
   }
 }
