@@ -16,8 +16,9 @@ package com.google.sps.data;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.time.LocalTime;
+
+import java.time.format.DateTimeFormatter;
 
 /**
  * Class that creates an event specific to a POI 
@@ -85,7 +86,7 @@ public class Event {
     }
 
     if (time >= MINUTES_IN_A_DAY) {
-      throw new IllegalArgumentException("Time cannot be more than " + MINUTES_IN_A_DAY);
+      throw new IllegalArgumentException("Time cannot be more than or equal to" + MINUTES_IN_A_DAY);
     }
   }
 
