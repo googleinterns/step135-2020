@@ -27,7 +27,7 @@ public class User {
   private String email;
 
   // List of trip IDs.
-  private List<String> trips;
+  private List<String> tripIdList;
 
   // Constants to create user entity for datastore.
   public static final String USER = "user";
@@ -36,11 +36,11 @@ public class User {
   public static final String TRIP_ID_LIST = "trip_id_list";
 
   // Constructor to create a User object (userId is generated automatically,
-  // trips are added to the User after constructing the object).
+  // trip IDs are added to the User after constructing the object).
   public User(String email) {
     this.userId = createUserId();
     this.email = email;
-    this.trips = new ArrayList<String>();
+    this.tripIdList = new ArrayList<String>();
   }
 
   // Generates a random 16-digit alphanumeric.
@@ -54,8 +54,8 @@ public class User {
   }
 
   // Add trip ID.
-  public void addTrip(String trip) {
-    trips.add(trip);
+  public void addTripId(String tripId) {
+    tripIdList.add(tripId);
   }
 
   // Builds an Entity object for datastore based on current User attributes.
@@ -63,8 +63,24 @@ public class User {
     Entity userEntity = new Entity(USER);
     userEntity.setProperty(USER_EMAIL, this.email);
     userEntity.setProperty(USER_ID, this.userId);
-    userEntity.setProperty(TRIP_ID_LIST, this.trips);
+    userEntity.setProperty(TRIP_ID_LIST, this.tripIdList);
     return userEntity;
+  }
+
+  /**
+   * Getter functions for private User variables.
+   */
+  
+  public String getUserId() {
+    return this.userId;
+  }
+
+  public String getEmail() {
+    return this.email;
+  }
+
+  public List<String> getTripIdList() {
+    return this.tripIdList;
   }
 
 }
