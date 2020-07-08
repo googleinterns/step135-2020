@@ -44,6 +44,12 @@
       <version>1.9.59</version>
     </dependency>
 
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-text</artifactId>
+      <version>1.7</version>
+    </dependency>
+
   </dependencies>
 
   <build>

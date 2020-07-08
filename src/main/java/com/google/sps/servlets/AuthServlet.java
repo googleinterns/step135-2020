@@ -14,9 +14,15 @@
 
 package com.google.sps.servlets;
 
+import com.google.appengine.api.datastore.DatastoreService;
+import com.google.appengine.api.datastore.DatastoreServiceFactory;
+import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.datastore.PreparedQuery;
+import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
 import com.google.gson.Gson;
+import com.google.sps.data.User;
 import java.io.IOException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -26,6 +32,9 @@ import javax.servlet.http.HttpServletResponse;
 @WebServlet("/auth")
 public class AuthServlet extends HttpServlet {
 
+  // Set redirect URL after login / logout as index page.
+  public static final String redirectUrl = "/";
+
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
     response.setContentType("application/json");
@@ -33,9 +42,6 @@ public class AuthServlet extends HttpServlet {
     // Set up user auth objects.
     UserService userService = UserServiceFactory.getUserService();
     UserAuth userAuth;
-
-    // Set redirect URL after login / logout as index page.
-    static final String redirectUrl = "/";
 
     // Create UserAuth object with relevant login / logout information.
     if (userService.isUserLoggedIn()) {
@@ -45,6 +51,9 @@ public class AuthServlet extends HttpServlet {
 
       // Create UserAuth object to represent logged-in user.
       userAuth = new UserAuth(logoutUrl, userEmail);
+
+      // Add user to database (if not already present).
+      addUserToDatabase(userEmail);
     } else {
       String loginUrl = userService.createLoginURL(redirectUrl);
 
@@ -70,12 +79,34 @@ public class AuthServlet extends HttpServlet {
   }
 
   /**
-  * Converts a UserAuth object into a JSON string using the Gson library.
-  */
+   * Converts a UserAuth object into a JSON string using the Gson library.
+   */
   private String convertToJson(UserAuth userAuth) {
     Gson gson = new Gson();
     String json = gson.toJson(userAuth);
     return json;
+  }
+  
+  /**
+   * If the user is not in database already, add them.
+   */
+  private void addUserToDatabase(String email) {
+    // Query database to see if User has already been added.
+    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+    Query query = new Query(User.USER);
+    PreparedQuery results = datastore.prepare(query);
+
+    // If user is already in database, return.
+    for (Entity entity : results.asIterable()) {
+      if (entity.getProperty(User.USER_EMAIL).equals(email)) {
+        return;
+      }
+    }
+
+    // User is not in database, create and add user object.
+    User user = new User(email);
+    Entity userEntity = user.buildEntity();
+    datastore.put(userEntity);
   }
 
   /**
