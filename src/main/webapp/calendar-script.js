@@ -23,44 +23,37 @@ document.addEventListener('DOMContentLoaded', function() {
     },
     initialView: 'timeGridWeek',
     initialDate: '2020-06-29',
-    eventLimit: true,
-    events: [{
-            title: 'Golden Gate Bridge',
-            start: '2020-06-29T09:00:00',
-            end: '2020-06-29T10:00:00',
-            allDay: false
-        },
-        {
-            title: 'Fishermans Wharf',
-            start: '2020-06-29T10:30:00',
-            end: '2020-06-29T11:30:00',
-            allDay: false
-        },
-        {
-            title: 'Mission District',
-            start: '2020-06-29T12:00:00',
-            end: '2020-06-29T13:00:00',
-            allDay: false
-        },
-        {
-            title: 'Lunch Time',
-            start: '2020-06-29T13:00:00',
-            end: '2020-06-29T14:00:00',
-            allDay: false
-        },
-        {
-            title: 'Sutro Tower',
-            start: '2020-06-29T14:30:00',
-            end: '2020-06-29T15:30:00',
-            allDay: false
-        },
-        {
-            title: 'West Portal Neighborhood',
-            start: '2020-06-29T16:00:00',
-            end: '2020-06-29T17:00:00',
-            allDay: false
-        },
-    ]
+    navLinks: true,
+    dayMaxEvents: true, //alow "more" link when too many events on one day
   });
+  /** 
+  fetch('/calculate-trip').then(respone => respone.json()).then((events) => {
+    events.forEach((event) => {
+      calendar.addEvent({
+        
+        title: event.name,
+        start: event.strStartTime,
+        end: event.strEndTime,
+        allDay: false
+      });
+    });
+  });*/
+  getEvents(calendar);
   calendar.render();
 });
+
+/**
+ * retrives the events from /calculate-trip url and dynamically adds the events
+ */
+function getEvents(calendar) {
+  fetch('/calculate-trip').then(respone => respone.json()).then((events) => {
+    events.forEach((event) => {
+      calendar.addEvent({
+        title: event.name,
+        start: event.strStartTime,
+        end: event.strEndTime,
+        allDay: false
+      });
+    });
+  });
+}
