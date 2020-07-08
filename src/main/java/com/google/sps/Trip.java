@@ -76,11 +76,9 @@ public class Trip {
     this.tripDays.addAll(tripDays);
 
     int numDays = calcNumDays(this.startDate, this.endDate);
-
     if (numDays <= 0 || numDays > MAX_NUM_DAYS) {
       throw new IllegalArgumentException("numDays must be an integer between 1 and 31, inclusive.");
     }
-
     this.numDays = numDays;
   }
 
@@ -125,7 +123,7 @@ public class Trip {
   }
 
   /**
-   * Returns an List<TripDay> of TripDays for this trip.
+   * Returns an List<TripDay> copy of TripDays for this trip.
    */
   public List<TripDay> getTripDays() {
     List<TripDay> tripDaysCopy = new ArrayList<>();
