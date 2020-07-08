@@ -48,9 +48,27 @@ public final class TripDayTest {
     Assert.assertEquals(tripDay.getLocations(), locations);
   }
 
+  // Test TripDay constructor with null origin
+  @Test(expected = IllegalArgumentException.class)
+  public void testTripDayConstructorNullOrigin() {
+    locations = new ArrayList<>();
+    locations.add(TIMES_SQUARE_ID);
+
+    TripDay tripDay = new TripDay(null, HOTEL_ID, locations);
+  }
+
   // Test TripDay constructor with null parameter
   @Test(expected = IllegalArgumentException.class)
-  public void testTripDayConstructorNull() {
+  public void testTripDayConstructorNullDestination() {
+    locations = new ArrayList<>();
+    locations.add(TIMES_SQUARE_ID);
+
+    TripDay tripDay = new TripDay(HOTEL_ID, null, locations);
+  }
+
+  // Test TripDay constructor with null locations
+  @Test(expected = IllegalArgumentException.class)
+  public void testTripDayConstructorNullLocations() {
     TripDay tripDay = new TripDay(HOTEL_ID, HOTEL_ID, null);
   }
 }
