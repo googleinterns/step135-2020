@@ -29,8 +29,8 @@ public class Trip {
   private static final int MAX_NUM_DAYS = 31;
 
   private String tripName;
-  private String startDate;
-  private String endDate;
+  private LocalDate startDate;
+  private LocalDate endDate;
   private int numDays;
   private List<TripDay> tripDays;
 
@@ -38,9 +38,8 @@ public class Trip {
    * Creates a new Trip.
    *
    * @param tripName The human-readable name for the trip. Must be non-null.
-   * @param startDate The start date for the trip. Must be non-null.
-   * @param endDate The end date for the trip. Must be non-null.
-   * @param numDays The number of days for the trip. 
+   * @param startDate The start date for the trip. Must be non-null. Must be in yyyy-MM-dd date format.
+   * @param endDate The end date for the trip. Must be non-null. Must be in yyyy-MM-dd date format.
    * @param tripDays The list of tripDays. Must be non-null.
    */
   public Trip(String tripName, String startDate, String endDate, List<TripDay> tripDays) {
@@ -68,20 +67,21 @@ public class Trip {
       throw new IllegalArgumentException("Invalid endDate format. Must be in yyyy-MM-dd date format.");
     }
 
-    int numDays = calcNumDays(startDate, endDate);
+    this.tripName = tripName;
+    this.startDate = LocalDate.parse(startDate);
+    this.endDate = LocalDate.parse(endDate);
+    
+    // Duplicate tripDays to avoid modifying original parameter
+    this.tripDays = new ArrayList<>();
+    this.tripDays.addAll(tripDays);
+
+    int numDays = calcNumDays(this.startDate, this.endDate);
 
     if (numDays <= 0 || numDays > MAX_NUM_DAYS) {
       throw new IllegalArgumentException("numDays must be an integer between 1 and 31, inclusive.");
     }
 
-    this.tripName = tripName;
-    this.startDate = startDate;
-    this.endDate = endDate;
     this.numDays = numDays;
-    
-    // Duplicate tripDays to avoid modifying original parameter
-    this.tripDays = new ArrayList<>();
-    this.tripDays.addAll(tripDays);
   }
 
   /**
@@ -148,17 +148,11 @@ public class Trip {
 
   /**
    * Calculates number of days between two dates.
-   * @param startDateString The String representation of start date.
-   * @param endDateString The String representation of end date.
+   * @param startDate The LocalDate representation of start date.
+   * @param endDate The LocalDate representation of end date.
    */
-  private static int calcNumDays(String startDateString, String endDateString) {
-    try {
-      LocalDate startDate = LocalDate.parse(startDateString);
-      LocalDate endDate = LocalDate.parse(endDateString);
-	    int numDays = ((int) ChronoUnit.DAYS.between(startDate, endDate)) + 1;
-      return numDays;
-    } catch (Exception e) {
-      throw new IllegalArgumentException("Invalid startDate or endDate. Must be in yyyy-MM-dd date format.");
-    }
+  private static int calcNumDays(LocalDate startDate, LocalDate endDate) {
+	  int numDays = ((int) ChronoUnit.DAYS.between(startDate, endDate)) + 1;
+    return numDays;
   }
 }
