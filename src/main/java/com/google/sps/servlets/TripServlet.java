@@ -126,8 +126,8 @@ public class TripServlet extends HttpServlet {
   }
 
   /**
-  * Converts list of Event objects into a JSON string using the Gson library.
-  */
+   * Converts list of Event objects into a JSON string using the Gson library.
+   */
   private String convertToJson(List<Event> events) {
     Gson gson = new Gson();
     String json = gson.toJson(events);

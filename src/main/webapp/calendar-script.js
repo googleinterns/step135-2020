@@ -26,18 +26,6 @@ document.addEventListener('DOMContentLoaded', function() {
     navLinks: true,
     dayMaxEvents: true, //alow "more" link when too many events on one day
   });
-  /** 
-  fetch('/calculate-trip').then(respone => respone.json()).then((events) => {
-    events.forEach((event) => {
-      calendar.addEvent({
-        
-        title: event.name,
-        start: event.strStartTime,
-        end: event.strEndTime,
-        allDay: false
-      });
-    });
-  });*/
   getEvents(calendar);
   calendar.render();
 });
