@@ -106,14 +106,14 @@ public class Trip {
   /**
    * Returns the start date for this trip.
    */
-  public String getStartDate() {
+  public LocalDate getStartDate() {
     return this.startDate;
   }
 
   /**
    * Returns the end date for this trip.
    */
-  public String getEndDate() {
+  public LocalDate getEndDate() {
     return this.endDate;
   }
 
