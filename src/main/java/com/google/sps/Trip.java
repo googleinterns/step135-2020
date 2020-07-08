@@ -25,6 +25,7 @@ import java.text.SimpleDateFormat;
  */
 public class Trip {
   private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+  private static final int MAX_NUM_DAYS = 31;
 
   private String tripName;
   private String startDate;
@@ -68,8 +69,8 @@ public class Trip {
 
     int numDays = calcNumDays(startDate, endDate);
 
-    if (numDays < 0 || numDays > 31) {
-      throw new IllegalArgumentException("numDays must be an integer between 1 and 31.");
+    if (numDays <= 0 || numDays > MAX_NUM_DAYS) {
+      throw new IllegalArgumentException("numDays must be an integer between 1 and 31, inclusive.");
     }
 
     this.tripName = tripName;
