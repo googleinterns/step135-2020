@@ -150,7 +150,7 @@ public class Trip {
    * @param endDate The LocalDate representation of end date.
    */
   private static int calcNumDays(LocalDate startDate, LocalDate endDate) {
-	  int numDays = ((int) ChronoUnit.DAYS.between(startDate, endDate)) + 1;
+    int numDays = ((int) ChronoUnit.DAYS.between(startDate, endDate)) + 1;
     return numDays;
   }
 }
