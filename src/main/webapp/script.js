@@ -12,8 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Triggered upon DOM load.
-$(document).ready(() => {
+let script = document.createElement('script');
+script.src = 'https://maps.googleapis.com/maps/api/js?key=' + config.API_KEY + 
+  '&libraries=places&callback=initScript';
+script.defer = true;
+script.async = true;
+
+// Attach callback function to the 'window' object.
+window.initScript = function() {
   // Add Google Places location autofill to input fields.
   addInputPoiLocationAutofill();
   addInputDestinationLocationAutofill();
@@ -31,8 +37,8 @@ $(document).ready(() => {
   }).catch((error) => {
     // If an error occurs, print error to console and do not display button.
     console.error(error);
-  })
-});
+  });
+}
 
 // Returns Promise with the sign in status in a boolean.
 function isSignedIn() {
@@ -354,3 +360,6 @@ function addInputDestinationLocationAutofill() {
     checkNextButton();
   });
 }
+
+// Append the 'script' element to the document head.
+document.head.appendChild(script);
