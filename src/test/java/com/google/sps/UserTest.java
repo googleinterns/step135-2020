@@ -37,6 +37,8 @@ public final class UserTest {
   public static final int USER_ID_LENGTH = 16;
   public static final List<String> EMPTY_TRIP_ID_LIST = new ArrayList<String>();
 
+  // Add helper to allow datastore testing in local JUnit tests.
+  // See https://cloud.google.com/appengine/docs/standard/java/tools/localunittesting.
   private final LocalServiceTestHelper helper =
       new LocalServiceTestHelper(new LocalDatastoreServiceTestConfig());
 
