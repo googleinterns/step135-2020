@@ -26,6 +26,9 @@ import javax.servlet.http.HttpServletResponse;
 @WebServlet("/auth")
 public class AuthServlet extends HttpServlet {
 
+  // Set redirect URL after login / logout as index page.
+  public static final String redirectUrl = "/";
+
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
     response.setContentType("application/json");
@@ -33,9 +36,6 @@ public class AuthServlet extends HttpServlet {
     // Set up user auth objects.
     UserService userService = UserServiceFactory.getUserService();
     UserAuth userAuth;
-
-    // Set redirect URL after login / logout as index page.
-    static final String redirectUrl = "/";
 
     // Create UserAuth object with relevant login / logout information.
     if (userService.isUserLoggedIn()) {
