@@ -22,6 +22,8 @@ import com.google.appengine.api.datastore.Query;
 import com.google.gson.Gson;
 import com.google.sps.data.Event;
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -40,6 +42,7 @@ import javax.servlet.http.HttpServletResponse;
 public class TripServlet extends HttpServlet {
 
   private static final int HALF_HOUR = 30;
+  private static final int TWO_HOURS = 120;
 
   // event fields to request
   private static final String NAME = "name";
@@ -62,9 +65,10 @@ public class TripServlet extends HttpServlet {
     for (Entity entity : results.asIterable()) {
     	String name = (String) entity.getProperty(NAME);
       String address = (String) entity.getProperty(ADDRESS);
-      String startTime = (String) entity.getProperty(START_TIME);
-      String endTime = (String) entity.getProperty(END_TIME);
-      Event e = new Event(name, address, startTime, endTime);
+      String startDateTimeStr = (String) entity.getProperty(START_TIME);
+      String travelTime = (String) entity.getProperty(TRAVEL_TIME);
+      Event e = new Event(name, address, LocalDateTime.parse(startDateTimeStr),
+                          Integer.parseInt(travelTime));
       events.add(e);
     }   
 
@@ -78,44 +82,49 @@ public class TripServlet extends HttpServlet {
     response.setContentType("application/json;");
 
     // Print out params to site to verify retrieval of "start trip" user input.
-    Enumeration<String> params = request.getParameterNames(); 
+    Enumeration<String> params = request.getParameterNames();
 
     // get date of trip
-    String date = request.getParameter("inputDateOfTrvael");
+    String date = request.getParameter("inputDayOfTravel");
+    System.err.println(date);
+    LocalDateTime startDateTime = LocalDateTime.of(LocalDate.parse(date), LocalTime.of(10, 0));
 
-    int count = 0;
-    LocalTime startTime = LocalTime.of(10, 0);
 
+    // search through all the parameters looking for pois
     while (params.hasMoreElements()) {
       String p = params.nextElement();
+
+      /** 
+       * for each poi create the necessary fields, this will change
+       * as we are able to pull from the maps backend api
+       */
       if (p.contains("poi")) {
         String address = request.getParameter(p);
         String name = address.split(",")[0];
-        createEvent(name, address, date, startTime, HALF_HOUR)
+        createEvent(name, address, startDateTime, HALF_HOUR);
+
+        // sets start time for next event 2 hours after start of prev
+        startDateTime.plusMinutes(Long.valueOf(TWO_HOURS)); 
       }
     }
-
 
     // chris's code to display elements
     while (params.hasMoreElements()) {
       String paramName = params.nextElement();
       response.getWriter().println(paramName + ": " + request.getParameter(paramName));
     }
-
-    createEvents(request, response);
   }
 
   // creates the events and puts them in datastore
-  private void createEvent(String name, String address, String date, int startTime, 
+  private void createEvent(String name, String address, LocalDateTime startDateTime, 
               int travelTime) {
 
     // create entity that posts events
     Entity eventEntity = new Entity("events");
     eventEntity.setProperty(NAME, name);
     eventEntity.setProperty(ADDRESS, address);
-    eventEntity.setProperty(DATE, date);
-    eventEntity.setProperty(START_TIME, startTime);
-    evetnEntity.setProperty(TRAVEL_TIME, travelTime);
+    eventEntity.setProperty(START_TIME, Event.getProperDateFormat(startDateTime));
+    eventEntity.setProperty(TRAVEL_TIME, Integer.toString(travelTime));
 
     // put entity in datastore
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();

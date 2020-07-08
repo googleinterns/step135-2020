@@ -26,7 +26,9 @@ document.addEventListener('DOMContentLoaded', function() {
     navLinks: true,
     dayMaxEvents: true, //alow "more" link when too many events on one day
   });
+  console.log("before");
   getEvents(calendar);
+  console.log("after");
   calendar.render();
 });
 
@@ -34,12 +36,15 @@ document.addEventListener('DOMContentLoaded', function() {
  * retrives the events from /calculate-trip url and dynamically adds the events
  */
 function getEvents(calendar) {
-  fetch('/calculate-trip').then(respone => respone.json()).then((events) => {
+  console.log("inside");
+  fetch('/calculate-trip').then(response => response.json()).then((events) => {
+    console.log(events);
     events.forEach((event) => {
-      calendar.addEvent({
+      console.log(event.name + " " + event.startTime + " " + endTime);
+      calendar.addEvent({     
         title: event.name,
-        start: event.strStartTime,
-        end: event.strEndTime,
+        start: event.startTime,
+        end: event.endTime,
         allDay: false
       });
     });
