@@ -16,14 +16,13 @@ package com.google.sps;
 
 import com.google.sps.Trip;
 import com.google.sps.TripDay;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Arrays;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.time.LocalDate;
-
 
 @RunWith(JUnit4.class)
 public final class TripTest {
