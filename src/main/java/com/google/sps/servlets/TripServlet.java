@@ -86,7 +86,6 @@ public class TripServlet extends HttpServlet {
 
     // get date of trip
     String date = request.getParameter("inputDayOfTravel");
-    System.err.println(date);
     LocalDateTime startDateTime = LocalDateTime.of(LocalDate.parse(date), LocalTime.of(10, 0));
 
 
@@ -124,6 +123,7 @@ public class TripServlet extends HttpServlet {
     eventEntity.setProperty(NAME, name);
     eventEntity.setProperty(ADDRESS, address);
     eventEntity.setProperty(START_TIME, Event.getProperDateFormat(startDateTime));
+    System.err.println(Event.getProperDateFormat(startDateTime));
     eventEntity.setProperty(TRAVEL_TIME, Integer.toString(travelTime));
 
     // put entity in datastore
