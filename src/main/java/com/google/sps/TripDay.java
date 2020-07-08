@@ -72,6 +72,8 @@ public class TripDay {
    * Returns an List<String> of locations for this TripDay.
    */
   public List<String> getLocations() {
-    return this.locations;
+    List<String> locationsCopy = new ArrayList<>();
+    locationsCopy.addAll(this.locations);
+    return locationsCopy;
   }
 }

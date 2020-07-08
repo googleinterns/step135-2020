@@ -152,7 +152,9 @@ public class Trip {
    * Returns an List<TripDay> of TripDays for this trip.
    */
   public List<TripDay> getTripDays() {
-    return this.tripDays;
+    List<TripDay> tripDaysCopy = new ArrayList<>();
+    tripDaysCopy.addAll(this.tripDays);
+    return tripDaysCopy;
   }
 
   /**
