@@ -9,14 +9,15 @@
     <link rel="stylesheet" href="style.css">
     <script src="../../config.js"></script>
     <script src="mapsScript.js"></script>
+    <script src="authScript.js"></script>
   </head>
   <body>
     <div id="mapsContent">
       <div id="header">
         <a href="/"><h3 class="header-child float-left" id="header-title">TravIS</h3>
-        <form class="header-child float-right" id="sign-out-button-form" action="/auth" method="POST">
-          <input class="btn btn-primary" type="submit" value="Sign out">
-        </form>
+        <div class="header-child float-right">
+          <a class="btn btn-primary" id="sign-out-link">Sign out</a>
+        </div>
         <div class="header-child float-right">
           <a class="btn btn-primary" href="/trips/">Trips</a>
         </div>
