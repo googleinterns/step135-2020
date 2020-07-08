@@ -14,17 +14,18 @@
 
 package com.google.sps;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Date;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 
 /**
  * Trip is the class for storing a single trip (could be multiple days).
  */
 public class Trip {
-  private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+  // Trip cannot be longer than a month (31 days)
   private static final int MAX_NUM_DAYS = 31;
 
   private String tripName;
@@ -60,11 +61,11 @@ public class Trip {
     }
 
     if (!isValidDate(startDate)) {
-      throw new IllegalArgumentException("Invalid startDate format.");
+      throw new IllegalArgumentException("Invalid startDate format. Must be in yyyy-MM-dd date format.");
     }
 
     if (!isValidDate(endDate)) {
-      throw new IllegalArgumentException("Invalid endDate format.");
+      throw new IllegalArgumentException("Invalid endDate format. Must be in yyyy-MM-dd date format.");
     }
 
     int numDays = calcNumDays(startDate, endDate);
@@ -137,10 +138,9 @@ public class Trip {
    * @param inDate The String date representation.
    */
   private static boolean isValidDate(String inDate) {
-    DATE_FORMAT.setLenient(false);
     try {
-        DATE_FORMAT.parse(inDate.trim());
-    } catch (ParseException pe) {
+        LocalDate.parse(inDate);
+    } catch (DateTimeParseException pe) {
         return false;
     }
     return true;
@@ -153,16 +153,12 @@ public class Trip {
    */
   private static int calcNumDays(String startDateString, String endDateString) {
     try {
-      Date startDate = DATE_FORMAT.parse(startDateString);
-      Date endDate = DATE_FORMAT.parse(endDateString);
-      // Difference is in milliseconds
-      long difference = endDate.getTime() - startDate.getTime();
-      // Convert milliseconds to days and add 1 because the number of days 
-      // is 1 more than the difference between the dates.
-      int numDays = Math.round(difference / (1000*60*60*24)) + 1;
+      LocalDate startDate = LocalDate.parse(startDateString);
+      LocalDate endDate = LocalDate.parse(endDateString);
+	    int numDays = ((int) ChronoUnit.DAYS.between(startDate, endDate)) + 1;
       return numDays;
     } catch (Exception e) {
-      throw new IllegalArgumentException("Invalid startDate or endDate.");
+      throw new IllegalArgumentException("Invalid startDate or endDate. Must be in yyyy-MM-dd date format.");
     }
   }
 }
