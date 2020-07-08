@@ -92,32 +92,7 @@ public class Trip {
    * @param tripDays The list of tripDays. Must be non-null.
    */
   public Trip(String tripName, String startDate, List<TripDay> tripDays) {
-    if (tripName == null) {
-      throw new IllegalArgumentException("tripName cannot be null");
-    }
-
-    if (startDate == null) {
-      throw new IllegalArgumentException("startDate cannot be null");
-    }
-
-    if (tripDays == null) {
-      throw new IllegalArgumentException("tripDays cannot be null. Use empty array instead.");
-    }
-
-    if (!isValidDate(startDate)) {
-      throw new IllegalArgumentException("Invalid startDate format.");
-    }
-
-    this.tripName = tripName;
-    this.startDate = startDate;
-
-    // For MVP: trips will only be one day
-    this.endDate = this.startDate;
-    this.numDays = 1;
-
-    // Duplicate tripDays to avoid modifying original parameter
-    this.tripDays = new ArrayList<>();
-    this.tripDays.addAll(tripDays);
+    this(tripName, startDate, startDate, tripDays);
   }
 
   /**
