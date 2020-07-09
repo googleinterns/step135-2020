@@ -115,7 +115,7 @@ public class Trip {
   }
 
   /**
-   * Returns an List<TripDay> copy of TripDays for this trip.
+   * Returns a List<TripDay> copy of TripDays for this trip.
    */
   public List<TripDay> getTripDays() {
     List<TripDay> tripDaysCopy = new ArrayList<>();
