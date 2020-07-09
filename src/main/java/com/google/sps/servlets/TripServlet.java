@@ -48,12 +48,14 @@ public class TripServlet extends HttpServlet {
   private static final int HALF_HOUR = 30;
   private static final int NINETY_MINS = 90;
 
-  // event fields to request
+  // event fields for entity
   private static final String NAME = "name";
   private static final String ADDRESS = "end-time";
   private static final String DATE = "date";
   private static final String START_TIME = "start-time";
   private static final String TRAVEL_TIME = "travel-time";
+
+  
 
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) 
@@ -89,6 +91,15 @@ public class TripServlet extends HttpServlet {
   public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
     response.setContentType("application/json;");
 
+    eventDoPost(request, response);
+    
+  }
+
+  /**
+   * Make the servlet cleaner
+   * Searches through the parameters and creates the events and puts them into datastore
+   */
+  private void eventDoPost(HttpServletRequest request, HttpServletResponse response) throws IOException { 
     // Print out params to site to verify retrieval of "start trip" user input.
     Enumeration<String> params = request.getParameterNames();
 
@@ -110,7 +121,12 @@ public class TripServlet extends HttpServlet {
       if (p.contains("poi")) {
         String address = request.getParameter(p);
         String name = address.split(",")[0];
-        createEvent(name, address, startDateTime, HALF_HOUR);
+        Event event = new Event(name, address, startDateTime, HALF_HOUR);
+        Entity eventEntity = event.buildEventEntity();
+
+        // put entity in datastore
+        DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+       datastore.put(eventEntity);
 
         // sets start time for next event 2 hours after start of prev
         startDateTime = startDateTime.plusMinutes(Long.valueOf(NINETY_MINS)); 
@@ -121,8 +137,8 @@ public class TripServlet extends HttpServlet {
     }
   }
 
-  // creates the events and puts them in datastore
-  private void createEvent(String name, String address, LocalDateTime startDateTime, 
+  /**
+  private void addEventToDatabase(String name, String address, LocalDateTime startDateTime, 
               int travelTime) {
 
     // create entity that posts events
@@ -135,7 +151,7 @@ public class TripServlet extends HttpServlet {
     // put entity in datastore
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
     datastore.put(eventEntity);
-  }
+  }*/
 
   /**
    * Converts list of Event objects into a JSON string using the Gson library.

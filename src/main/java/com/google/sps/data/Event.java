@@ -14,6 +14,7 @@
  
 package com.google.sps.data;
 
+import com.google.appengine.api.datastore.Entity;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -42,6 +43,13 @@ public class Event {
   private static final int MINUTES_IN_A_DAY = 1440;
   private static final int MIN_POSSIBLE_TIME = 0;
 
+  // event fields for entity
+  private static final String NAME = "name";
+  private static final String ADDRESS = "end-time";
+  private static final String DATE = "date";
+  private static final String START_TIME = "start-time";
+  private static final String TRAVEL_TIME = "travel-time";
+
   /**
    * Constructor that takes in time spent at location
    * 
@@ -60,8 +68,8 @@ public class Event {
     this.endTime = startTime.plusMinutes(Long.valueOf(timeAtLocation));
     this.travelTime = Long.valueOf(travelTime);
     checkTravelTime(this.travelTime);
-    this.strStartTime = getProperDateFormat(startTime);
-    this.strEndTime = getProperDateFormat(endTime);
+    this.strStartTime = DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(startTime);
+    this.strEndTime = DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(endTime);
   }
 
   /**
@@ -85,13 +93,26 @@ public class Event {
    */
   private static void checkTravelTime(long time) {
     if (time < MIN_POSSIBLE_TIME) {
-      throw new IllegalArgumentException("Time cannot be less than " + MIN_POSSIBLE_TIME);
+      throw new IllegalArgumentException("Time cannot be less than "
+                                         + MIN_POSSIBLE_TIME);
     }
 
     if (time >= MINUTES_IN_A_DAY) {
-      throw new IllegalArgumentException("Time cannot be more than or equal to" + MINUTES_IN_A_DAY);
+      throw new IllegalArgumentException("Time cannot be more than or equal to"
+                                         + MINUTES_IN_A_DAY);
     }
   }
+
+  // build event entity to be put in datastore off event attributes
+  public Entity buildEventEntity() {
+    Entity eventEntity = new Entity("events");
+    eventEntity.setProperty(NAME, this.name);
+    eventEntity.setProperty(ADDRESS, this.address);
+    eventEntity.setProperty(START_TIME, 
+                  DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(startTime));
+    eventEntity.setProperty(TRAVEL_TIME, Long.toString(this.travelTime));
+    return eventEntity;
+  } 
 
   // getter functions
   public String getName() {
