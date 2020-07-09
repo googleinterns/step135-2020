@@ -116,6 +116,8 @@ public class TripServlet extends HttpServlet {
 
     // get date of trip
     String date = request.getParameter("inputDayOfTravel");
+
+    // set startDateTime, will be removed
     if (count == 0) {
       setDateTime(date);
       count++;
@@ -137,7 +139,7 @@ public class TripServlet extends HttpServlet {
 
         // put entity in datastore
         DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-       datastore.put(eventEntity);
+        datastore.put(eventEntity);
 
         // sets start time for next event 2 hours after start of prev
         startDateTime = startDateTime.plusMinutes(Long.valueOf(NINETY_MINS)); 
