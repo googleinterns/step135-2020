@@ -17,7 +17,6 @@ package com.google.sps.data;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-
 import java.time.format.DateTimeFormatter;
 
 /**
@@ -48,7 +47,7 @@ public class Event {
    * 
    * @param name name of the location (NOT address)
    * @param address exact address of the POI
-   * @param startTime start of activity (YYYY-MM-DD'T'HH:MM:SS)
+   * @param startTime start of activity
    * @param travelTime time spent traveling to next location (minutes). 
    *        Null if last location of the day.
    * @param timeAtLocation time spent at POI (minutes)
@@ -66,11 +65,11 @@ public class Event {
   }
 
   /**
-   * Constructor that takes in time spent at location
+   * Constructor that assume one hour default spent at location
    * 
    * @param name name of the location (NOT address)
    * @param address exact address of the POI
-   * @param startTime start of activity (YYYY-MM-DD'T'HH:MM:SS)
+   * @param startTime start of activity
    * @param travelTime time spent traveling to next location (minutes). 
    *        Null if last location of the day.
    */
@@ -92,12 +91,6 @@ public class Event {
     if (time >= MINUTES_IN_A_DAY) {
       throw new IllegalArgumentException("Time cannot be more than or equal to" + MINUTES_IN_A_DAY);
     }
-  }
-
-  public static String getProperDateFormat(LocalDateTime ldt) {
-    DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
-    String output = ldt.format(dtf);
-    return output;
   }
 
   // getter functions

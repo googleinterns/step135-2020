@@ -17,8 +17,8 @@ package com.google.sps;
 import com.google.sps.data.Event;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -43,12 +43,12 @@ public final class EventTest {
   private static final LocalDateTime DEF_LDT = LocalDateTime.of(LocalDate.parse("2020-06-25"), LocalTime.of(10, 0));
 
   @Test(expected = IllegalArgumentException.class)
-  public void testcheckTravelTimeMinPossibleTime() {
+  public void testTravelTimeBelowMinPossible() {
     Event e = new Event (GOLDEN_GATE_PARK, ADDRESS, DEF_LDT, -1, HOUR);
   }
 
   @Test(expected = IllegalArgumentException.class)
-  public void testcheckTravelTimeGreaterThanFullDay() {
+  public void testCheckTravelTimeGreaterThanFullDay() {
     Event e = new Event (GOLDEN_GATE_PARK, ADDRESS, DEF_LDT, 1440, HOUR);
   }
 
@@ -68,10 +68,10 @@ public final class EventTest {
     Assert.assertEquals(manualEndTime, e.getEndTime());
     Assert.assertEquals(HALF_HOUR, e.getTravelTime());
 
-    Assert.assertEquals("2020-06-25T10:00:00", Event.getProperDateFormat(
-                                                            e.getStartTime()));
-    Assert.assertEquals("2020-06-25T11:20:00", Event.getProperDateFormat(
-                                                              e.getEndTime()));
+    Assert.assertEquals("2020-06-25T10:00:00", 
+              DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(e.getStartTime()));
+    Assert.assertEquals("2020-06-25T11:20:00", 
+              DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(e.getEndTime()));
   }
 
    @Test
@@ -88,9 +88,9 @@ public final class EventTest {
     Assert.assertEquals(manualEndTime, e.getEndTime());
     Assert.assertEquals(HALF_HOUR, e.getTravelTime());
 
-    Assert.assertEquals("2020-06-25T10:00:00", Event.getProperDateFormat(
-                                                            e.getStartTime()));
-    Assert.assertEquals("2020-06-25T11:00:00", Event.getProperDateFormat(
-                                                              e.getEndTime()));
+    Assert.assertEquals("2020-06-25T10:00:00", 
+              DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(e.getStartTime()));
+    Assert.assertEquals("2020-06-25T11:00:00", 
+              DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(e.getEndTime()));
   }
 }
