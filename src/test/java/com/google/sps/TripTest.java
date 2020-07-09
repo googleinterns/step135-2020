@@ -165,6 +165,18 @@ public final class TripTest {
     Trip trip = new Trip(TRIP_NAME, "2020-07-04", "2020-06-09", tripDays);
   }
 
+  // Test multiple day constructor with 0 numDays
+  @Test(expected = IllegalArgumentException.class)
+  public void testTripConstructorMultiDayZeroNumDays() {
+    TripDay tripDay = new TripDay(HOTEL_ID, HOTEL_ID, locations);
+    tripDays = new ArrayList<>();
+    tripDays.add(tripDay);
+
+    // A trip with the same start and end date is considered to have 1 day,
+    // so a zero day trip would have the start date one day after the end date
+    Trip trip = new Trip(TRIP_NAME, "2020-07-04", "2020-07-03", tripDays);
+  }
+
   // Test single day constructor with null trip name
   @Test(expected = IllegalArgumentException.class)
   public void testTripConstructorSingleDayNullTripName() {

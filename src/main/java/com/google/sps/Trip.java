@@ -59,17 +59,9 @@ public class Trip {
       throw new IllegalArgumentException("tripDays cannot be null. Use empty array instead.");
     }
 
-    if (!isValidDate(startDate)) {
-      throw new IllegalArgumentException("Invalid startDate format. Must be in yyyy-MM-dd date format.");
-    }
-
-    if (!isValidDate(endDate)) {
-      throw new IllegalArgumentException("Invalid endDate format. Must be in yyyy-MM-dd date format.");
-    }
-
     this.tripName = tripName;
-    this.startDate = LocalDate.parse(startDate);
-    this.endDate = LocalDate.parse(endDate);
+    this.startDate = getLocalDate(startDate);
+    this.endDate = getLocalDate(endDate);
     
     // Duplicate tripDays to avoid modifying original parameter
     this.tripDays = new ArrayList<>();
@@ -123,7 +115,7 @@ public class Trip {
   }
 
   /**
-   * Returns an List<TripDay> copy of TripDays for this trip.
+   * Returns a List<TripDay> copy of TripDays for this trip.
    */
   public List<TripDay> getTripDays() {
     List<TripDay> tripDaysCopy = new ArrayList<>();
@@ -132,16 +124,16 @@ public class Trip {
   }
 
   /**
-   * Checks that a String is in the proper yyyy-MM-dd date format.
+   * Returns LocalDate representation of a String if it is in the yyyy-MM-dd date format.
+   * Otherwise, throws an IllegalArgumentException
    * @param inDate The String date representation.
    */
-  private static boolean isValidDate(String inDate) {
+  private static LocalDate getLocalDate(String inDate) {
     try {
-        LocalDate.parse(inDate);
+      return LocalDate.parse(inDate);
     } catch (DateTimeParseException pe) {
-        return false;
+      throw new IllegalArgumentException("Invalid date format. Must be in yyyy-MM-dd date format.");
     }
-    return true;
   }
 
   /**
@@ -150,7 +142,7 @@ public class Trip {
    * @param endDate The LocalDate representation of end date.
    */
   private static int calcNumDays(LocalDate startDate, LocalDate endDate) {
-	  int numDays = ((int) ChronoUnit.DAYS.between(startDate, endDate)) + 1;
+    int numDays = ((int) ChronoUnit.DAYS.between(startDate, endDate)) + 1;
     return numDays;
   }
 }
