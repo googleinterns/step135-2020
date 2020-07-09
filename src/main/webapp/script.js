@@ -12,29 +12,47 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Triggered upon DOM load.
-$(document).ready(() => {
+let script = document.createElement('script');
+script.src = 'https://maps.googleapis.com/maps/api/js?key=' + config.API_KEY + 
+  '&libraries=places&callback=initScript';
+script.defer = true;
+script.async = true;
+
+// Attach callback function to the 'window' object.
+window.initScript = function() {
+  // Add Google Places location autofill to input fields.
+  addInputPoiLocationAutofill();
+  addInputDestinationLocationAutofill();
+
   // Set up trigger to add hidden POI form elements upon submission.
   addHiddenPoiFormTrigger();
 
-  isSignedIn().then((signInStatus) => {
+  getAuthObject().then((authObject) => {
     // Display the sign-in page or "start trip" form depending on sign in status.
-    if (signInStatus) {
+    if (authObject.hasOwnProperty('email')) {
+      // Add the link to the "sign out" a element.
+      const signOutLink = document.getElementById('sign-out-link');
+      signOutLink.href = authObject.url;
+
       displayStartTripDesign();
     } else {
+      // Add the link to the "sign in" a element.
+      const signInLink = document.getElementById('sign-in-link');
+      signInLink.href = authObject.url;
+
       displaySignInPage();
     }
   }).catch((error) => {
     // If an error occurs, print error to console and do not display button.
     console.error(error);
-  })
-});
+  });
+}
 
-// Returns Promise with the sign in status in a boolean.
-function isSignedIn() {
+// Returns Promise with the auth object, containing login status and information.
+function getAuthObject() {
   return new Promise((resolve, reject) => {
-    fetch('/auth').then(response => response.json()).then((signInStatus) => {
-      resolve(signInStatus);
+    fetch('/auth').then(response => response.json()).then((authObject) => {
+      resolve(authObject);
     }).catch((error) => {
       reject(error);
     });
@@ -50,8 +68,7 @@ function displaySignInPage() {
   document.body.id = 'body-background-image';
 
   // Get the homepage "registration" block to and add elements.
-  const indexRegistrationBlock = document.getElementById('index-registration-block');
-  indexRegistrationBlock.style.display = 'block';
+  document.getElementById('index-registration-block').style.display = 'block';
 }
 
 // User is signed in, show the start trip homepage.
@@ -62,9 +79,15 @@ function displayStartTripDesign() {
   // Remove background image id from body.
   document.body.removeAttribute('id');
 
+  // Add Google Places location autofill to input fields.
+  addInputPoiLocationAutofill();
+  addInputDestinationLocationAutofill();
+
+  // Set up trigger to add hidden POI form elements upon submission.
+  addHiddenPoiFormTrigger();
+
   // Get the homepage "start trip" block to and add elements.
-  const indexStartTripBlock = document.getElementById('index-start-trip-block');
-  indexStartTripBlock.style.display = 'block';
+  document.getElementById('index-start-trip-block').style.display = 'block';
 
   // Display the site header.
   displayHeader();
@@ -75,21 +98,66 @@ function displayStartTripDesign() {
 
 function displayHeader() {
   // Display header for site.
-  const header = document.getElementById('header');
-  header.style.display = 'block';
+  document.getElementById('header').style.display = 'block';
 }
 
 // Set the width of the content container.
 function setContentWidth(width) {
-  const contentContainer = document.getElementById('content');
-  contentContainer.style.width = width;
+  document.getElementById('content').style.width = width;
 }
 
 // Display the start trip input form, with location, dates, and POIs.
 function displayStartTripForm() {
   // Get the homepage "start trip" block and add elements.
-  const indexStartTripBlock = document.getElementById('index-start-trip-block');
-  indexStartTripBlock.style.display = 'block';
+  document.getElementById('index-start-trip-block').style.display = 'block';
+
+  // Initially hide the POI list, "Add POIs" form, and "Submit" button.
+  document.getElementById('poi-list-container').style.display = 'none';
+  document.getElementById('add-pois-container').style.display = 'none';
+  document.getElementById('submit-calculate-trip').style.display = 'none';
+
+  // Initially make the "Next" , "Add POI", and "Submit" button disabled.
+  document.getElementById('toggle-stage-button').disabled = true;
+  document.getElementById('addPoiButton').disabled = true;
+  document.getElementById('submit-calculate-trip').disabled = true;
+
+  // Add onchange listeners to inputs in "start trip" form.
+  addStartTripOnChangeListeners();
+
+  // Add Start Trip onclick listeners to buttons.
+  addStartTripOnClickListeners();
+  
+}
+
+// Add onchange listeners to inputs that call relevant functions in the
+// "start trip" form.
+function addStartTripOnChangeListeners() {
+  // Input trip name onchange listeners to check input and and next / submit.
+  document.getElementById('inputTripName').oninput = () => {
+    checkValidInput('inputTripName');
+    checkNextButton();
+  };
+
+  // Input day of travel onchange listeners to check input and and next / submit.
+  document.getElementById('inputDayOfTravel').onchange = () => {
+    checkValidInput('inputDayOfTravel');
+    checkNextButton();
+  };
+}
+
+// Add onclick listeners to buttons that call relevant functions in the 
+// "start trip" form.
+function addStartTripOnClickListeners() {
+  // Toggle stage button toggles the current "stage" of the "start trip" form.
+  document.getElementById('toggle-stage-button').onclick = () => {
+    toggleStartTripInputStage();
+  };
+
+  // Add POI Button adds the current POI in text input, and checks submit button.
+  document.getElementById('addPoiButton').onclick = () => {
+    addPoi();
+    checkSubmitButton();
+  };
 }
 
 // Set up trigger to add hidden POI elements.
@@ -99,12 +167,214 @@ function addHiddenPoiFormTrigger() {
     const poiInputs = document.getElementsByClassName('poi-input');
     let count = 1;
     Array.prototype.forEach.call(poiInputs, (poiInput) => {
+      let poiNumber = 'poi-' + count;
+      // Add hidden input to the "start trip" form.
       $('<input>').attr('type', 'hidden')
-      .attr('name', 'poi-' + count)
-      .attr('value', poiInput.name)
-      .appendTo('#startTripForm');
+        .attr('name', poiNumber)
+        .attr('id', poiNumber)
+        .attr('value', poiInput.name)
+        .appendTo('#startTripForm');
       count++;
     });
     return true;
   });
 }
+
+// Checks whether the input is valid (non-empty), and adds the 'is-valid'
+// Bootstrap class; otherwise, removes the 'is-valid' class if it exists.
+function checkValidInput(elementId) {
+  const input = document.getElementById(elementId);
+
+  // If an input exists, add 'is-valid' class.
+  if (input.value !== '') {
+    input.classList.add('is-valid');
+  } else if (input.classList.contains('is-valid')) {
+    input.classList.remove('is-valid');
+  }
+}
+
+// Returns true if all name, location, and date inputs are valid; otherwise, false;
+function isStartingInputValid() {
+  // Get three input fields.
+  const inputTripName = document.getElementById('inputTripName');
+  const inputDestination = document.getElementById('inputDestination');
+  const inputDayOfTravel = document.getElementById('inputDayOfTravel');
+
+  return inputTripName.classList.contains('is-valid') &&
+    inputDestination.classList.contains('is-valid') && 
+    inputDayOfTravel.classList.contains('is-valid');
+}
+
+// Return true if user has submitted a POI; otherwise, false.
+function isPoiSubmitted() {
+  const poiInputs = document.getElementsByClassName('poi-input');
+  return poiInputs.length !== 0;
+}
+
+// If location and date forms have valid inputs, enable next button; otherwise,
+// disable button.
+function checkNextButton() {
+  const toggleStartTripStageButton = document.getElementById('toggle-stage-button');
+
+  // Enable next button if all forms have valid input.
+  if (isStartingInputValid()) {    
+    toggleStartTripStageButton.disabled = false;
+  } else {
+    toggleStartTripStageButton.disabled = true;
+  }
+}
+
+// If location and date forms have valid inputs, and there is at least one POI,
+// enable submit button; otherwise, disable button.
+function checkSubmitButton() {
+  const startTripSubmitButton = document.getElementById('submit-calculate-trip');
+
+  // Enable submit button if all starting forms (name/location/date) have valid input.
+  if (isStartingInputValid() && isPoiSubmitted()) {    
+    startTripSubmitButton.disabled = false;
+  } else {
+    startTripSubmitButton.disabled = true;
+  }
+}
+
+// If POI text input is valid, enable "Add POI" button; otherwise, disable button.
+function checkAddPoiButton() {
+  const addPoiButton = document.getElementById('addPoiButton');
+  const inputPoi = document.getElementById('inputPoi');
+
+  // Enable submit button if text input POI is valid.
+  if (inputPoi.classList.contains('is-valid')) {
+    addPoiButton.disabled = false;
+  } else {
+    addPoiButton.disabled = true;
+  }
+}
+
+/**
+ * Toggle the start trip input stage, initiated from click of "Next/Back" button.
+ * If toggle "Next/Back" button equals "Next", set location and date inputs to
+ * readonly and show POI input and submit button.
+ * If toggle "Next/Back" button equals "Back", set location and date inputs to 
+ * editable and hide POI input and submit button.
+ */
+function toggleStartTripInputStage() {
+  const toggleStartTripStageButton = document.getElementById('toggle-stage-button');
+
+  if (toggleStartTripStageButton.value === 'Next') {
+    // Display the POI list, "Add POIs" form, and "Submit" button.
+    document.getElementById('poi-list-container').style.display = 'block';
+    document.getElementById('add-pois-container').style.display = 'flex';
+    document.getElementById('submit-calculate-trip').style.display = 'inline-block';
+
+    // Change name, location, and date inputs to be readonly.
+    document.getElementById('inputTripName').readOnly = true;
+    document.getElementById('inputDestination').readOnly = true;
+    document.getElementById('inputDayOfTravel').readOnly = true;
+
+    // Change the text of the toggle button to 'Back'.
+    toggleStartTripStageButton.value = 'Back';
+  } else {
+    // Hide the POI list, "Add POIs" form, and "Submit" button.
+    document.getElementById('poi-list-container').style.display = 'none';
+    document.getElementById('add-pois-container').style.display = 'none';
+    document.getElementById('submit-calculate-trip').style.display = 'none';
+
+    // Change name, location, and date inputs to be editable.
+    document.getElementById('inputTripName').readOnly = false;
+    document.getElementById('inputDestination').readOnly = false;
+    document.getElementById('inputDayOfTravel').readOnly = false;
+
+    // Change the text of the toggle button to 'Next'.
+    toggleStartTripStageButton.value = 'Next';
+  }
+}
+
+// Add an HTML button element as a POI to the form. The POI is retrieved from 
+// the current POI input text, which is subsequently reset.
+function addPoi() {
+  const inputPoi = document.getElementById('inputPoi');
+
+  // Add POI input button to the page.
+  const poiListContainer = document.getElementById('poi-list-container');
+  poiListContainer.appendChild(buildPoiObject(inputPoi.value));
+
+  // Reset "Add POI" button to disabled, reset text of POI text input, and
+  // remove 'is-valid' class.
+  const addPoiButton = document.getElementById('addPoiButton');
+  addPoiButton.disabled = true;
+  inputPoi.value = '';
+  inputPoi.classList.remove('is-valid');
+}
+
+// Build and return a user-added POI HTML object.
+function buildPoiObject(poi) {
+  const formGroupContainer = document.createElement('div');
+  formGroupContainer.className = 'form-group';
+  formGroupContainer.style.display = 'block';
+
+  // Create poiInputButton, as well as function to remove the container upon 
+  // click. The submit button is also checked.
+  const poiInputButton = buildInput('button', poi + ' (click to remove)', 
+    'btn btn-secondary poi-input', poi);
+  poiInputButton.onclick = 
+    () => { formGroupContainer.remove(); checkSubmitButton() };
+
+  // Add the POI input button to the div container, and return the container.
+  formGroupContainer.appendChild(poiInputButton);
+  return formGroupContainer;
+}
+
+// Build input attribute (for button); has type, value, className, name params.
+function buildInput(type, value, className, name) {
+  const form = document.createElement('input');
+  form.type = type;
+  form.value = value;
+  form.className = className;
+  form.name = name;
+  return form;
+}
+
+// Add text input POI Google Places autofill.
+function addInputPoiLocationAutofill() {
+  let inputPoi = document.getElementById('inputPoi');
+  let locationAutocomplete = new google.maps.places.Autocomplete(inputPoi);
+
+  // Any time the input changes through user typing, remove the 'is-valid' class
+  // and check "Add POI" button. This will not be called if the user clicks on 
+  // the Google Place autofill.
+  inputPoi.addEventListener('input', () => {
+    inputPoi.classList.remove('is-valid');
+    checkAddPoiButton();
+  });
+
+  // If the user changes the place (click on Google Place autofill), add
+  // 'is-valid' class and check "Add POI" button.
+  locationAutocomplete.addListener('place_changed', () => {
+    inputPoi.classList.add('is-valid');
+    checkAddPoiButton();
+  });
+}
+
+// Add text input POI Google Places autofill.
+function addInputDestinationLocationAutofill() {
+  let inputDestination = document.getElementById('inputDestination');
+  let locationAutocomplete = new google.maps.places.Autocomplete(inputDestination);
+
+  // Any time the input changes through user typing, remove the 'is-valid' class
+  // and check "Next" button. This will not be called if the user clicks on 
+  // the Google Place autofill.
+  inputDestination.addEventListener('input', () => {
+    inputDestination.classList.remove('is-valid');
+    checkNextButton();
+  });
+
+  // If the user changes the place (click on Google Place autofill), add
+  // 'is-valid' class and check "Next" button.
+  locationAutocomplete.addListener('place_changed', () => {
+    inputDestination.classList.add('is-valid');
+    checkNextButton();
+  });
+}
+
+// Append the 'script' element to the document head.
+document.head.appendChild(script);
