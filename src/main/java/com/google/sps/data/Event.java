@@ -28,13 +28,15 @@ public class Event {
   // inputs
   private String name;
   private String address;
-  // format: HHMM
+  
   private LocalDateTime startTime;
   private LocalDateTime endTime;
+
+  // format (yyyy-MM-dd'T'HH:mm:ss)
   private String strStartTime;
   private String strEndTime;
 
-  //in mins
+  // in mins
   private long travelTime;
  
   // class constants
