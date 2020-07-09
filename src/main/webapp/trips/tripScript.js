@@ -21,6 +21,9 @@
 $(document).ready(() => {
   // Set the content width of the site.
   setContentWidth('800px');
+
+  // Add the trip cards to the site.
+  getAndAddTripCards();
 });
 
 // Set the width of the content container.
@@ -29,11 +32,26 @@ function setContentWidth(width) {
 }
 
 // Fetch the trip details for the user from the database, add trip cards.
-function addTripCards() {
-  fetch('/user-trips').then(response => response.json()).then((userTripObject) => {
-    resolve(userTripObject);
+function getAndAddTripCards() {
+  fetch('/user-trips').then(response => response.json()).then((trips) => {
+    // If trips are present, add them to the page.
+    if (trips !== null) {
+      addTripCards(trips);
+    }
   }).catch((error) => {
     reject(error);
+  });
+}
+
+// Add the trip cards to the site.
+function addTripCards(trips) {
+  trips.forEach((trip) => {
+    const tripCardContainer = document.getElementById('trips-cards-container');
+
+    // Build and add the trip card.
+    const tripCard = buildTripCard(trip.tripName, trip.imageSrc, trip.startDate, 
+      trip.endDate, trip.tripId);
+    tripcardContainer.appendChild(tripCard);
   });
 }
 
