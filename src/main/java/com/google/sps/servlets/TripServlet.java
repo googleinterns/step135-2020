@@ -46,7 +46,7 @@ public class TripServlet extends HttpServlet {
   private static int count = 0;
 
   private static final int HALF_HOUR = 30;
-  private static final int TWO_HOURS = 120;
+  private static final int NINETY_MINS = 90;
 
   // event fields to request
   private static final String NAME = "name";
@@ -113,7 +113,7 @@ public class TripServlet extends HttpServlet {
         createEvent(name, address, startDateTime, HALF_HOUR);
 
         // sets start time for next event 2 hours after start of prev
-        startDateTime = startDateTime.plusMinutes(Long.valueOf(TWO_HOURS)); 
+        startDateTime = startDateTime.plusMinutes(Long.valueOf(NINETY_MINS)); 
       }
 
       // redirect to home page
