@@ -71,7 +71,8 @@ public class TripServlet extends HttpServlet {
   }
 
   @Override
-  public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+  public void doPost(HttpServletRequest request, HttpServletResponse response) 
+      throws IOException {
     response.setContentType("application/json;");
 
     // do post for events
@@ -83,7 +84,8 @@ public class TripServlet extends HttpServlet {
    * Make the servlet cleaner
    * Iterate through the entities and create the events and write them to json
    */
-   private void eventDoGet(HttpServletRequest request, HttpServletResponse response) throws IOException { 
+  private void eventDoGet(HttpServletRequest request, HttpServletResponse response)
+      throws IOException { 
     Query query = new Query("events");
 
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
@@ -107,10 +109,12 @@ public class TripServlet extends HttpServlet {
    }
 
   /**
-   * Make the servlet cleaner
-   * Searches through the parameters and creates the events and puts them into datastore
+   * Make the servlet cleaner.
+   * Searches through the parameters and creates the events and puts them into
+   * datastore.
    */
-  private void eventDoPost(HttpServletRequest request, HttpServletResponse response) throws IOException { 
+  private void eventDoPost(HttpServletRequest request, HttpServletResponse response) 
+      throws IOException { 
     // Print out params to site to verify retrieval of "start trip" user input.
     Enumeration<String> params = request.getParameterNames();
 
@@ -138,11 +142,12 @@ public class TripServlet extends HttpServlet {
         Entity eventEntity = event.buildEventEntity();
 
         // put entity in datastore
-        DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+        DatastoreService datastore = 
+                                DatastoreServiceFactory.getDatastoreService();      
         datastore.put(eventEntity);
 
         // sets start time for next event 2 hours after start of prev
-        startDateTime = startDateTime.plusMinutes(Long.valueOf(NINETY_MINS)); 
+        startDateTime = startDateTime.plusMinutes(Long.valueOf(NINETY_MINS));
       }
 
       // redirect to home page
