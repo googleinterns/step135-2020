@@ -149,22 +149,6 @@ public class TripServlet extends HttpServlet {
   }
 
   /**
-  private void addEventToDatabase(String name, String address, LocalDateTime startDateTime, 
-              int travelTime) {
-
-    // create entity that posts events
-    Entity eventEntity = new Entity("events");
-    eventEntity.setProperty(NAME, name);
-    eventEntity.setProperty(ADDRESS, address);
-    eventEntity.setProperty(START_TIME, DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(startDateTime));
-    eventEntity.setProperty(TRAVEL_TIME, Integer.toString(travelTime));
-
-    // put entity in datastore
-    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-    datastore.put(eventEntity);
-  }*/
-
-  /**
    * Converts list of Event objects into a JSON string using the Gson library.
    */
   private String convertToJson(List<Event> events) {
