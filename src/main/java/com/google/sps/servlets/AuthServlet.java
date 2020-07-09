@@ -98,7 +98,7 @@ public class AuthServlet extends HttpServlet {
    * This method returns the User object in the database (or the newly-created
    * user, if none previously existed).
    */
-  private User addUserToDatabase(String email) {
+  private static User addUserToDatabase(String email) {
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 
     // Only add User to database if they are not already present there.
@@ -142,7 +142,7 @@ public class AuthServlet extends HttpServlet {
   }
 
   // Return user from database using email, or null if user email is not in db.
-  public User getUserFromEmail(String email) {
+  public static User getUserFromEmail(String email) {
     // Query database to see if User has already been added.
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
     Filter emailFilter =

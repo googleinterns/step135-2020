@@ -17,6 +17,7 @@ package com.google.sps.servlets;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.datastore.FetchOptions;
 import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.datastore.Query.Filter;
@@ -26,15 +27,20 @@ import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
 import com.google.gson.Gson;
 import com.google.sps.data.User;
+import com.google.sps.data.Trip;
 import java.io.IOException;
+import java.util.List;
+import java.util.ArrayList;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-
 @WebServlet("/user-trips")
 public class UserTripServlet extends HttpServlet {
+
+  // This allows the doGet method to return null.
+  private static final String nullReturn = null;
 
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -43,11 +49,16 @@ public class UserTripServlet extends HttpServlet {
     // If no user is signed in, return null.
     User user = AuthServlet.getCurrentUser();
     if (user == null) {
-      return null;
+      response.getWriter().println(nullReturn);
+      return;
     }
 
     // Get the list of trip IDs, and return the relevant trip information.
     List<String> tripIdList = user.getTripIdList();
+    if (tripIdList == null) {
+      response.getWriter().println(nullReturn);
+      return;
+    }
 
     // Query database to get all relevant trips.
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
@@ -59,18 +70,19 @@ public class UserTripServlet extends HttpServlet {
     // Get the list of results. If empty, return null; otherwise, return the trip objects.
     List<Entity> listResults = results.asList(FetchOptions.Builder.withDefaults());
     if (listResults.isEmpty()) {
-      return null;
+      response.getWriter().println(nullReturn);
+      return;
     }
 
     // Iterate over the trip Entity objects, and convert them to Trip objects.
     List<Trip> tripList = new ArrayList<>();
     for (Entity entity : listResults) {
-      tripList.add(Trip.buildTripFromEntity());
+      tripList.add(Trip.buildTripFromEntity(entity));
     }
 
     // Convert the trip list to JSON, and return JSON.
     String json = convertTripListToJson(tripList);
-    return json;
+    response.getWriter().println(json);
   }
 
   /**
@@ -80,17 +92,6 @@ public class UserTripServlet extends HttpServlet {
     Gson gson = new Gson();
     String json = gson.toJson(tripList);
     return json;
-  }
-
-  // Placeholder inner class for the Trip class.
-  class Trip {
-
-    public Trip() {}
-
-    public static Trip buildTripFromEntity(Entity entity) {
-      return new Trip();
-    }
-
   }
 
 }

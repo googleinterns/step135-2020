@@ -39,7 +39,7 @@ function getAndAddTripCards() {
       addTripCards(trips);
     }
   }).catch((error) => {
-    reject(error);
+    console.error(error);
   });
 }
 
