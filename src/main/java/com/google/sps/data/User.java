@@ -43,6 +43,13 @@ public class User {
     this.tripIdList = new ArrayList<String>();
   }
 
+  // Constructor to create a User object with predefined values.
+  public User(String userId, String email, List<String> tripIdList) {
+    this.userId = userId;
+    this.email = email;
+    this.tripIdList = tripIdList;
+  }
+
   // Generates a random 16-digit alphanumeric.
   private String createUserId() {
     RandomStringGenerator generator = new RandomStringGenerator.Builder()
@@ -65,6 +72,15 @@ public class User {
     userEntity.setProperty(USER_ID, this.userId);
     userEntity.setProperty(TRIP_ID_LIST, this.tripIdList);
     return userEntity;
+  }
+
+  // Builds a User object from a User Entity object (typically from datastore).
+  public static User buildUserFromEntity(Entity userEntity) {
+    String userId = (String) userEntity.getProperty(User.USER_ID);
+    String userEmail = (String) userEntity.getProperty(User.USER_EMAIL);
+    List<String> tripIdList = (List<String>) userEntity.getProperty(User.TRIP_ID_LIST);
+    User user = new User(userId, userEmail, tripIdList);
+    return user;
   }
 
   /**
