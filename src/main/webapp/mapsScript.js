@@ -13,39 +13,11 @@
 // limitations under the License.
 
 // Create the script tag, set the appropriate attributes
-var script = document.createElement('script');
-script.src = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyCmQyeeWI_cV0yvh1SuXYGoLej3g_D9NbY&libraries=places&callback=initMap';
+let script = document.createElement('script');
+script.src = 'https://maps.googleapis.com/maps/api/js?key=' + config.API_KEY + 
+  '&libraries=places&callback=initMap';
 script.defer = true;
 script.async = true;
-
-// Triggered upon DOM load.
-$(document).ready(() => {
-  // Redirect to homepage if user is not signed in.
-  isSignedIn().then((signInStatus) => {
-    if (!signInStatus) {
-      window.location.replace('/');
-    } else {
-      displayHeader();
-    }
-  });
-});
-
-// Returns Promise with the sign in status in a boolean.
-function isSignedIn() {
-  return new Promise((resolve, reject) => {
-    fetch('/auth').then(response => response.json()).then((signInStatus) => {
-      resolve(signInStatus);
-    }).catch((error) => {
-      reject(error);
-    });
-  });
-}
-
-function displayHeader() {
-  // Display header for site.
-  const header = document.getElementById('header');
-  header.style.display = 'block';
-}
 
 var map;
 var directionsService;

@@ -12,8 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Triggered upon DOM load.
-$(document).ready(() => {
+let script = document.createElement('script');
+script.src = 'https://maps.googleapis.com/maps/api/js?key=' + config.API_KEY + 
+  '&libraries=places&callback=initScript';
+script.defer = true;
+script.async = true;
+
+// Attach callback function to the 'window' object.
+window.initScript = function() {
   // Add Google Places location autofill to input fields.
   addInputPoiLocationAutofill();
   addInputDestinationLocationAutofill();
@@ -21,24 +27,32 @@ $(document).ready(() => {
   // Set up trigger to add hidden POI form elements upon submission.
   addHiddenPoiFormTrigger();
 
-  isSignedIn().then((signInStatus) => {
+  getAuthObject().then((authObject) => {
     // Display the sign-in page or "start trip" form depending on sign in status.
-    if (signInStatus) {
+    if (authObject.hasOwnProperty('email')) {
+      // Add the link to the "sign out" a element.
+      const signOutLink = document.getElementById('sign-out-link');
+      signOutLink.href = authObject.url;
+
       displayStartTripDesign();
     } else {
+      // Add the link to the "sign in" a element.
+      const signInLink = document.getElementById('sign-in-link');
+      signInLink.href = authObject.url;
+
       displaySignInPage();
     }
   }).catch((error) => {
     // If an error occurs, print error to console and do not display button.
     console.error(error);
-  })
-});
+  });
+}
 
-// Returns Promise with the sign in status in a boolean.
-function isSignedIn() {
+// Returns Promise with the auth object, containing login status and information.
+function getAuthObject() {
   return new Promise((resolve, reject) => {
-    fetch('/auth').then(response => response.json()).then((signInStatus) => {
-      resolve(signInStatus);
+    fetch('/auth').then(response => response.json()).then((authObject) => {
+      resolve(authObject);
     }).catch((error) => {
       reject(error);
     });
@@ -64,6 +78,13 @@ function displayStartTripDesign() {
 
   // Remove background image id from body.
   document.body.removeAttribute('id');
+
+  // Add Google Places location autofill to input fields.
+  addInputPoiLocationAutofill();
+  addInputDestinationLocationAutofill();
+
+  // Set up trigger to add hidden POI form elements upon submission.
+  addHiddenPoiFormTrigger();
 
   // Get the homepage "start trip" block to and add elements.
   document.getElementById('index-start-trip-block').style.display = 'block';
@@ -354,3 +375,6 @@ function addInputDestinationLocationAutofill() {
     checkNextButton();
   });
 }
+
+// Append the 'script' element to the document head.
+document.head.appendChild(script);

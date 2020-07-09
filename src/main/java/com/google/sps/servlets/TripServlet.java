@@ -119,12 +119,6 @@ public class TripServlet extends HttpServlet {
       // redirect to home page
       response.sendRedirect("/");
     }
-
-    // chris's code to display elements
-    while (params.hasMoreElements()) {
-      String paramName = params.nextElement();
-      response.getWriter().println(paramName + ": " + request.getParameter(paramName));
-    }
   }
 
   // creates the events and puts them in datastore

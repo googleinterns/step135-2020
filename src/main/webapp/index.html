@@ -3,20 +3,20 @@
   <head>
     <meta charset="UTF-8">
     <title>TravIS: Travel Information System</title>
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCmQyeeWI_cV0yvh1SuXYGoLej3g_D9NbY&v=3.exp&libraries=places"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" 
       integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
     <link rel="stylesheet" href="style.css">
+    <script src="../../config.js"></script>
     <script src="script.js"></script>
   </head>
   <body>
     <div id="content">
       <div id="header">
         <a href="/"><h3 class="header-child float-left" id="header-title">TravIS</h3></a>
-        <form class="header-child float-right" id="sign-out-button-form" action="/auth" method="POST">
-          <input class="btn btn-primary" type="submit" value="Sign out">
-        </form>
+        <div class="header-child float-right">
+          <a class="btn btn-primary" id="sign-out-link">Sign out</a>
+        </div>
         <div class="header-child float-right">
           <a class="btn btn-primary" href="/trips/">Trips</a>
         </div>
@@ -27,10 +27,7 @@
           TravIS, your personal Travel Information System, allows you to plan 	
           the optimal trip to wherever you want to visit.	
         </p>	
-        <form action="/auth" method="POST" class="index-registration-block-child"	
-          id="sign-in-button-form">	
-          <input value="Sign in" type="submit" class="btn btn-primary" />	
-        </form>
+        <a class="index-registration-block-child btn btn-primary" id="sign-in-link">Sign in</a>
       </div>
       <div id="index-start-trip-block">
         <form action="/calculate-trip" method="POST" id="startTripForm">
