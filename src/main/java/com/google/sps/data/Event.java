@@ -89,12 +89,6 @@ public class Event {
     }
   }
 
-  public static String getProperDateFormat(LocalDateTime ldt) {
-    DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
-    String output = ldt.format(dtf);
-    return output;
-  }
-
   // getter functions
   public String getName() {
     return this.name;
