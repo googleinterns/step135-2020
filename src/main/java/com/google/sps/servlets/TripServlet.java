@@ -41,6 +41,10 @@ import javax.servlet.http.HttpServletResponse;
 @WebServlet("/calculate-trip")
 public class TripServlet extends HttpServlet {
 
+  // temporary vars
+  private LocalDateTime startDateTime;
+  private static int count = 0;
+
   private static final int HALF_HOUR = 30;
   private static final int TWO_HOURS = 120;
 
@@ -73,8 +77,12 @@ public class TripServlet extends HttpServlet {
     }   
 
     response.setContentType("application/json;");
-
     response.getWriter().println(convertToJson(events));
+  }
+
+  // function to set time, need to do only once
+  public void setDateTime(String date) {
+    startDateTime = LocalDateTime.of(LocalDate.parse(date), LocalTime.of(10, 0));
   }
 
   @Override
@@ -86,8 +94,10 @@ public class TripServlet extends HttpServlet {
 
     // get date of trip
     String date = request.getParameter("inputDayOfTravel");
-    LocalDateTime startDateTime = LocalDateTime.of(LocalDate.parse(date), LocalTime.of(10, 0));
-
+    if (count == 0) {
+      setDateTime(date);
+      count++;
+    }
 
     // search through all the parameters looking for pois
     while (params.hasMoreElements()) {
@@ -103,8 +113,11 @@ public class TripServlet extends HttpServlet {
         createEvent(name, address, startDateTime, HALF_HOUR);
 
         // sets start time for next event 2 hours after start of prev
-        startDateTime.plusMinutes(Long.valueOf(TWO_HOURS)); 
+        startDateTime = startDateTime.plusMinutes(Long.valueOf(TWO_HOURS)); 
       }
+
+      // redirect to home page
+      response.sendRedirect("/");
     }
 
     // chris's code to display elements
@@ -123,15 +136,11 @@ public class TripServlet extends HttpServlet {
     eventEntity.setProperty(NAME, name);
     eventEntity.setProperty(ADDRESS, address);
     eventEntity.setProperty(START_TIME, Event.getProperDateFormat(startDateTime));
-    System.err.println(Event.getProperDateFormat(startDateTime));
     eventEntity.setProperty(TRAVEL_TIME, Integer.toString(travelTime));
 
     // put entity in datastore
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
     datastore.put(eventEntity);
-
-    // redirect to home page
-    //response.sendRedirect("/");
   }
 
   /**
