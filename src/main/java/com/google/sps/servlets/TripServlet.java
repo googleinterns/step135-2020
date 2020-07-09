@@ -37,6 +37,12 @@ import com.google.maps.model.Unit;
 import com.google.maps.errors.ApiException;
 import com.google.maps.DirectionsApiRequest;
 
+import com.google.sps.Trip;
+import com.google.sps.TripDay;
+
+import java.util.ArrayList;
+import java.util.List;
+
 @WebServlet("/calculate-trip")
 public class TripServlet extends HttpServlet {
 
@@ -45,39 +51,38 @@ public class TripServlet extends HttpServlet {
     response.setContentType("application/json;");
 
     // Print out params to site to verify retrieval of "start trip" user input.
-    Enumeration<String> params = request.getParameterNames(); 
+    Enumeration<String> params = request.getParameterNames();
+
+    String tripName = request.getParameter("inputTripName");
+    String origin = request.getParameter("inputDestination");
+    String startDate = request.getParameter("inputDayofTravel");
+    List<String> pois = new ArrayList<>(); 
     while (params.hasMoreElements()) {
       String paramName = params.nextElement();
-      response.getWriter().println(paramName + ": " + request.getParameter(paramName));
+      pois.add(request.getParameter(paramName));
     }
 
    	GeoApiContext distCalcer = new GeoApiContext.Builder()
 		    .apiKey("AIzaSyCmQyeeWI_cV0yvh1SuXYGoLej3g_D9NbY")
 		    .build();
 
-    // try (LocalTestServerContext sc =
-    //     new LocalTestServerContext("{\"routes\": [{}],\"status\": \"OK\"}")) {
     DirectionsApiRequest directionsRequest = DirectionsApi.newRequest(distCalcer)
-        .origin("Boston,MA")
-        .destination("Concord,MA")
+        .origin(origin)
+        .destination(origin)
         .waypoints("Charlestown,MA", "Lexington,MA")
         .optimizeWaypoints(true)
         .mode(TravelMode.DRIVING);
 
     try {
       DirectionsResult dirResult = directionsRequest.await();
-          
     } catch (ApiException | InterruptedException e) {
       throw new IOException(e);
     } 
 
-    // sc.assertParamValue("Boston,MA", "origin");
-    // sc.assertParamValue("Concord,MA", "destination");
-    // sc.assertParamValue("Charlestown,MA|Lexington,MA", "waypoints");
-    // } catch (Exception e) {
-    //   System.out.println("ERROR");
-    // }
-
+    TripDay newTripDay = new TripDay(origin, origin, pois);
+    List<TripDay> newTripDays = new ArrayList<>();
+    newTripDays.add(newTripDay);
+    Trip newTrip = new Trip(tripName, startDate, newTripDays);
   }
 
 }
