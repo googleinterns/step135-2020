@@ -12,31 +12,42 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Triggered upon DOM load.
-$(document).ready(() => {
+// Create script to add API key.
+let script = document.createElement('script');
+script.src = 'https://maps.googleapis.com/maps/api/js?key=' + config.API_KEY + 
+  '&libraries=places&callback=initScript';
+script.defer = true;
+script.async = true;
+
+// Attach callback function to the 'window' object.
+window.initScript = function() {
+  // Add Google Places location autofill to input fields.
+  addInputPoiLocationAutofill();
+  addInputDestinationLocationAutofill();
+
   // Set up trigger to add hidden POI form elements upon submission.
   addHiddenPoiFormTrigger();
 
   getAuthObject().then((authObject) => {
     // Display the sign-in page or "start trip" form depending on sign in status.
-    if (authObject.loggedIn) {
+    if (authObject.hasOwnProperty('email')) {
       // Add the link to the "sign out" a element.
       const signOutLink = document.getElementById('sign-out-link');
-      signOutLink.href = authObject.logoutUrl;
+      signOutLink.href = authObject.url;
 
       displayStartTripDesign();
     } else {
       // Add the link to the "sign in" a element.
       const signInLink = document.getElementById('sign-in-link');
-      signInLink.href = authObject.loginUrl;
+      signInLink.href = authObject.url;
 
       displaySignInPage();
     }
   }).catch((error) => {
     // If an error occurs, print error to console and do not display button.
     console.error(error);
-  })
-});
+  });
+}
 
 // Returns Promise with the auth object, containing login status and information.
 function getAuthObject() {
@@ -481,3 +492,7 @@ function buildSuggestedLocationWidget(name, vicinity, photoSrc) {
   
   return cardContainer;
 }
+
+// Append the 'script' element to the document head.
+document.head.appendChild(script);
+

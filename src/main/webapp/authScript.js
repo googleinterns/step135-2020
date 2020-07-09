@@ -23,12 +23,12 @@
 $(document).ready(() => {
   // Redirect to homepage if user is not signed in.
   getAuthObject().then((authObject) => {
-    if (!authObject.loggedIn) {
+    if (!authObject.hasOwnProperty('email')) {
       window.location.replace('/');
     } else {
       // Add the link to the "sign out" a element.
       const signOutLink = document.getElementById('sign-out-link');
-      signOutLink.href = authObject.logoutUrl;
+      signOutLink.href = authObject.url;
 
       // Display the site header.
       displayHeader();

@@ -26,6 +26,9 @@ import javax.servlet.http.HttpServletResponse;
 @WebServlet("/auth")
 public class AuthServlet extends HttpServlet {
 
+  // Set redirect URL after login / logout as index page.
+  public static final String redirectUrl = "/";
+
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
     response.setContentType("application/json");
@@ -33,9 +36,6 @@ public class AuthServlet extends HttpServlet {
     // Set up user auth objects.
     UserService userService = UserServiceFactory.getUserService();
     UserAuth userAuth;
-
-    // Set redirect URL after login / logout as index page.
-    final String redirectUrl = "/";
 
     // Create UserAuth object with relevant login / logout information.
     if (userService.isUserLoggedIn()) {
@@ -83,29 +83,19 @@ public class AuthServlet extends HttpServlet {
    */
   class UserAuth {
     // Fields that hold relevant login data.
-    private boolean loggedIn;
-    private String loginUrl;
-    private String logoutUrl;
+    private String url;
     private String email;
 
     // Constructor to create UserAuth object with no user logged in.
     // Null represents no value.
-    private UserAuth(String loginUrl) {
-      this(false, loginUrl, null, null);
-    }
-
-    // Constructor to create UserAuth object with user logged in.
-    private UserAuth(String logoutUrl, String email) {
-      this(true, null, logoutUrl, email);
+    private UserAuth(String url) {
+      this(url, null);
     }
 
     // Full constructor to assign values to all fields.
-    private UserAuth(boolean loggedIn, String loginUrl, String logoutUrl, 
-      String email) {
-        this.loggedIn = loggedIn;
-        this.loginUrl = loginUrl;
-        this.logoutUrl = logoutUrl;
-        this.email = email;
+    private UserAuth(String url, String email) {
+      this.url = url;
+      this.email = email;
     }
   }
 }
