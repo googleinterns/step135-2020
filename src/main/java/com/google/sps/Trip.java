@@ -20,6 +20,8 @@ import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.commons.text.CharacterPredicates;
+import org.apache.commons.text.RandomStringGenerator;
 
 /**
  * Trip is the class for storing a single trip (could be multiple days).
@@ -29,6 +31,7 @@ public class Trip {
   private static final int MAX_NUM_DAYS = 31;
 
   private String tripName;
+  private String tripId;
   private LocalDate startDate;
   private LocalDate endDate;
   private int numDays;
@@ -38,13 +41,20 @@ public class Trip {
    * Creates a new Trip.
    *
    * @param tripName The human-readable name for the trip. Must be non-null.
+   * @param tripId The 16-digit alphanumeric String for the trip. Must be non-null.
    * @param startDate The start date for the trip. Must be non-null. Must be in yyyy-MM-dd date format.
    * @param endDate The end date for the trip. Must be non-null. Must be in yyyy-MM-dd date format.
    * @param tripDays The list of tripDays. Must be non-null.
    */
-  public Trip(String tripName, String startDate, String endDate, List<TripDay> tripDays) {
+  public Trip(String tripName, String tripId, String startDate, String endDate, 
+    List<TripDay> tripDays) {
+
     if (tripName == null) {
       throw new IllegalArgumentException("tripName cannot be null");
+    }
+
+    if (tripId == null) {
+      throw new IllegalArgumentException("tripId cannot be null");
     }
 
     if (startDate == null) {
@@ -59,7 +69,9 @@ public class Trip {
       throw new IllegalArgumentException("tripDays cannot be null. Use empty array instead.");
     }
 
+    // Set field attributes.
     this.tripName = tripName;
+    this.tripId = tripId;
     this.startDate = getLocalDate(startDate);
     this.endDate = getLocalDate(endDate);
     
@@ -74,6 +86,18 @@ public class Trip {
     this.numDays = numDays;
   }
 
+    /**
+   * Creates a new Trip.
+   *
+   * @param tripName The human-readable name for the trip. Must be non-null.
+   * @param startDate The start date for the trip. Must be non-null. Must be in yyyy-MM-dd date format.
+   * @param endDate The end date for the trip. Must be non-null. Must be in yyyy-MM-dd date format.
+   * @param tripDays The list of tripDays. Must be non-null.
+   */
+  public Trip(String tripName, String startDate, String endDate, List<TripDay> tripDays) {
+    this(tripName, createTripId(), startDate, endDate, tripDays);
+  }
+
   /**
    * Creates a new Trip that is only one day by default. 
    * This constructor will be used for the MVP.
@@ -83,7 +107,17 @@ public class Trip {
    * @param tripDays The list of tripDays. Must be non-null.
    */
   public Trip(String tripName, String startDate, List<TripDay> tripDays) {
-    this(tripName, startDate, startDate, tripDays);
+    this(tripName, createTripId(), startDate, startDate, tripDays);
+  }
+
+  // Generates a random 16-digit alphanumeric.
+  private String createTripId() {
+    RandomStringGenerator generator = new RandomStringGenerator.Builder()
+      .withinRange('0', 'z')
+      .filteredBy(CharacterPredicates.DIGITS, CharacterPredicates.LETTERS)
+      .build();
+
+    return generator.generate(16);
   }
 
   /**
