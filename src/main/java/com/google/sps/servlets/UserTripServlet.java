@@ -19,6 +19,9 @@ import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
+import com.google.appengine.api.datastore.Query.Filter;
+import com.google.appengine.api.datastore.Query.FilterOperator;
+import com.google.appengine.api.datastore.Query.FilterPredicate;
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
 import com.google.gson.Gson;
@@ -37,7 +40,57 @@ public class UserTripServlet extends HttpServlet {
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
     response.setContentType("application/json;");
 
-    
+    // If no user is signed in, return null.
+    User user = AuthServlet.getCurrentUser();
+    if (user == null) {
+      return null;
+    }
+
+    // Get the list of trip IDs, and return the relevant trip information.
+    List<String> tripIdList = user.getTripIdList();
+
+    // Query database to get all relevant trips.
+    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+    Filter emailFilter =
+      new FilterPredicate(Trip.TRIP_ID, FilterOperator.IN, tripIdList);
+    Query query = new Query(Trip.TRIP).setFilter(emailFilter);
+    PreparedQuery results = datastore.prepare(query);
+
+    // Get the list of results. If empty, return null; otherwise, return the trip objects.
+    List<Entity> listResults = results.asList(FetchOptions.Builder.withDefaults());
+    if (listResults.isEmpty()) {
+      return null;
+    }
+
+    // Iterate over the trip Entity objects, and convert them to Trip objects.
+    List<Trip> tripList = new ArrayList<>();
+    for (Entity entity : listResults) {
+      tripList.add(Trip.buildTripFromEntity());
+    }
+
+    // Convert the trip list to JSON, and return JSON.
+    String json = convertTripListToJson(tripList);
+    return json;
+  }
+
+  /**
+  * Converts a List of Trips into a JSON string using the Gson library.
+  */
+  private String convertTripListToJson(List<Trip> tripList) {
+    Gson gson = new Gson();
+    String json = gson.toJson(tripList);
+    return json;
+  }
+
+  // Placeholder inner class for the Trip class.
+  class Trip {
+
+    public Trip() {}
+
+    public static Trip buildTripFromEntity(Entity entity) {
+      return new Trip();
+    }
+
   }
 
 }

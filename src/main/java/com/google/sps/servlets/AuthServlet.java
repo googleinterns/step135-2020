@@ -119,7 +119,7 @@ public class AuthServlet extends HttpServlet {
 
   // Get the current user that is signed in. If not already in database,
   // this method adds them and returns the newly-added user.
-  public User getCurrentUser() {
+  public static User getCurrentUser() {
     // Get the current user from UserService.
     UserService userService = UserServiceFactory.getUserService();
 
