@@ -129,7 +129,7 @@ public class TripServlet extends HttpServlet {
     Entity eventEntity = new Entity("events");
     eventEntity.setProperty(NAME, name);
     eventEntity.setProperty(ADDRESS, address);
-    eventEntity.setProperty(START_TIME, Event.getProperDateFormat(startDateTime));
+    eventEntity.setProperty(START_TIME, DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(startDateTime));
     eventEntity.setProperty(TRAVEL_TIME, Integer.toString(travelTime));
 
     // put entity in datastore
