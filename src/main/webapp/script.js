@@ -388,7 +388,6 @@ function addInputDestinationLocationAutofill() {
     let location = new google.maps.LatLng(locationAutocomplete.getPlace().geometry.location.lat(), 
       locationAutocomplete.getPlace().geometry.location.lng());
     getAndAddSuggestedLocations(location, radius);
-
   });
 }
 
@@ -436,7 +435,6 @@ function addSuggestedLocations(suggestedLocations) {
       location.vicinity, photoSrc);
     suggestedLocationBlock.appendChild(suggestedLocationWidget);
   });
-
 }
 
 // Builds and returns an HTML widget of a suggested location.
