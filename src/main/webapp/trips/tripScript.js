@@ -41,7 +41,7 @@ function displayHeader() {
   document.getElementById('header').style.display = 'block';
 }
 
-// Set the width of the content container.
+// Set the width of the content container
 function setContentWidth(width) {
   document.getElementById('content').style.width = width;
 }
