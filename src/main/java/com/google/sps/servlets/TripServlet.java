@@ -60,6 +60,30 @@ public class TripServlet extends HttpServlet {
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) 
       throws IOException {
+    
+    // do get for events
+    eventDoGet(request, response);
+  }
+
+  // function to set time, need to do only once
+  public void setDateTime(String date) {
+    startDateTime = LocalDateTime.of(LocalDate.parse(date), LocalTime.of(10, 0));
+  }
+
+  @Override
+  public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    response.setContentType("application/json;");
+
+    // do post for events
+    eventDoPost(request, response);
+    
+  }
+
+  /**
+   * Make the servlet cleaner
+   * Iterate through the entities and create the events and write them to json
+   */
+   private void eventDoGet(HttpServletRequest request, HttpServletResponse response) throws IOException { 
     Query query = new Query("events");
 
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
@@ -80,20 +104,7 @@ public class TripServlet extends HttpServlet {
 
     response.setContentType("application/json;");
     response.getWriter().println(convertToJson(events));
-  }
-
-  // function to set time, need to do only once
-  public void setDateTime(String date) {
-    startDateTime = LocalDateTime.of(LocalDate.parse(date), LocalTime.of(10, 0));
-  }
-
-  @Override
-  public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
-    response.setContentType("application/json;");
-
-    eventDoPost(request, response);
-    
-  }
+   }
 
   /**
    * Make the servlet cleaner
