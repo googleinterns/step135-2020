@@ -20,6 +20,7 @@ import com.google.maps.DirectionsApi;
 import com.google.maps.GeoApiContext;
 import com.google.maps.errors.NotFoundException;
 import com.google.maps.model.AddressType;
+import com.google.maps.model.DirectionsLeg;
 import com.google.maps.model.DirectionsResult;
 import com.google.maps.model.GeocodedWaypointStatus;
 import com.google.maps.model.LatLng;
@@ -36,6 +37,11 @@ import com.google.sps.TripDay;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Arrays;
+
+import com.google.sps.data.Config;
+
+
 
 @WebServlet("/calculate-trip")
 public class TripServlet extends HttpServlet {
@@ -49,34 +55,51 @@ public class TripServlet extends HttpServlet {
 
     String tripName = request.getParameter("inputTripName");
     String origin = request.getParameter("inputDestination");
-    String startDate = request.getParameter("inputDayofTravel");
+    String startDate = request.getParameter("inputDayOfTravel");
+
+    response.getWriter().println("startDate: " + startDate);
+    response.getWriter().println("tripName: " + tripName);
+    response.getWriter().println("origin: " + origin);
+
     List<String> pois = new ArrayList<>(); 
     while (params.hasMoreElements()) {
       String paramName = params.nextElement();
-      pois.add(request.getParameter(paramName));
+      if (paramName.contains("poi")) {
+        String newPOI = request.getParameter(paramName);
+        pois.add(newPOI);
+      }
     }
-
+    response.getWriter().println(pois);
    	GeoApiContext distCalcer = new GeoApiContext.Builder()
-		    .apiKey("AIzaSyCmQyeeWI_cV0yvh1SuXYGoLej3g_D9NbY")
+		    .apiKey(Config.API_KEY)
 		    .build();
+
+    String[] poiStrings = new String[pois.size()]; 
+    poiStrings = pois.toArray(poiStrings); 
 
     DirectionsApiRequest directionsRequest = DirectionsApi.newRequest(distCalcer)
         .origin(origin)
         .destination(origin)
-        .waypoints("Charlestown,MA", "Lexington,MA")
+        .waypoints(poiStrings)
         .optimizeWaypoints(true)
         .mode(TravelMode.DRIVING);
 
     try {
       DirectionsResult dirResult = directionsRequest.await();
+      int[] orderedWaypoints = dirResult.routes[0].waypointOrder;
+      List<Integer> travelTimes = new ArrayList<>();
+      for (DirectionsLeg leg : dirResult.routes[0].legs) {
+        int travelTime = (int) leg.duration.inSeconds / 60;
+        travelTimes.add(travelTime);
+      }
+      List<String> orderedLocationStrings = new ArrayList<>();
+      for (int i = 0; i < orderedWaypoints.length; i++) {
+        orderedLocationStrings.add(pois.get(orderedWaypoints[i]));
+      }
+      response.getWriter().println(travelTimes.toString());
+      response.getWriter().println(orderedLocationStrings.toString());
     } catch (ApiException | InterruptedException e) {
       throw new IOException(e);
     } 
-
-    TripDay newTripDay = new TripDay(origin, origin, pois);
-    List<TripDay> newTripDays = new ArrayList<>();
-    newTripDays.add(newTripDay);
-    Trip newTrip = new Trip(tripName, startDate, newTripDays);
   }
-
 }
