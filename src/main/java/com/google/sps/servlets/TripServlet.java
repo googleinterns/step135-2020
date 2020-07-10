@@ -41,18 +41,15 @@ import java.util.Arrays;
 
 import com.google.sps.data.Config;
 
-
-
 @WebServlet("/calculate-trip")
 public class TripServlet extends HttpServlet {
 
+  // Saves user input and calculates optimal route using Maps Java Client
   @Override
   public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
     response.setContentType("application/json;");
 
-    // Print out params to site to verify retrieval of "start trip" user input.
     Enumeration<String> params = request.getParameterNames();
-
     String tripName = request.getParameter("inputTripName");
     String origin = request.getParameter("inputDestination");
     String startDate = request.getParameter("inputDayOfTravel");
@@ -61,6 +58,7 @@ public class TripServlet extends HttpServlet {
     response.getWriter().println("tripName: " + tripName);
     response.getWriter().println("origin: " + origin);
 
+    // Save POIs to an array
     List<String> pois = new ArrayList<>(); 
     while (params.hasMoreElements()) {
       String paramName = params.nextElement();
@@ -69,14 +67,14 @@ public class TripServlet extends HttpServlet {
         pois.add(newPOI);
       }
     }
-    response.getWriter().println(pois);
+    String[] poiStrings = new String[pois.size()]; 
+    poiStrings = pois.toArray(poiStrings); 
+
    	GeoApiContext distCalcer = new GeoApiContext.Builder()
 		    .apiKey(Config.API_KEY)
 		    .build();
 
-    String[] poiStrings = new String[pois.size()]; 
-    poiStrings = pois.toArray(poiStrings); 
-
+    // Generate directions request
     DirectionsApiRequest directionsRequest = DirectionsApi.newRequest(distCalcer)
         .origin(origin)
         .destination(origin)
@@ -84,6 +82,7 @@ public class TripServlet extends HttpServlet {
         .optimizeWaypoints(true)
         .mode(TravelMode.DRIVING);
 
+    // Calculate route and save travelTimes and waypointOrder to two ArrayLists
     try {
       DirectionsResult dirResult = directionsRequest.await();
       int[] orderedWaypoints = dirResult.routes[0].waypointOrder;
