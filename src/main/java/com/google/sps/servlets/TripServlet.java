@@ -64,15 +64,7 @@ public class TripServlet extends HttpServlet {
     startDateTime = LocalDateTime.of(LocalDate.parse(date), LocalTime.of(10, 0));
   }
 
-  @Override
-  public void doPost(HttpServletRequest request, HttpServletResponse response) 
-      throws IOException {
-    response.setContentType("application/json;");
-
-    // do post for events
-    eventDoPost(request, response);
-    
-  }
+  
 
   /**
    * Make the servlet cleaner
@@ -95,25 +87,43 @@ public class TripServlet extends HttpServlet {
     response.getWriter().println(convertToJson(events));
    }
 
+  @Override
+  public void doPost(HttpServletRequest request, HttpServletResponse response) 
+      throws IOException {
+    response.setContentType("application/json;");
+
+    // global info needed
+    DatastoreService datastore = 
+                                DatastoreServiceFactory.getDatastoreService();
+    Enumeration<String> params = request.getParameterNames(); 
+    String date = request.getParameter("inputDayOfTravel");
+
+    // put TripDay entity into datastore
+    Entity tripDayEntity = putTripDayInDatastore(request, response, datastore, date);
+
+    // put Event entities in datastore
+    eventDoPost(request, response, params, tripDayEntity);
+    
+  }
+
+  private void putTripDayInDatastore(HttpServletRequest request, HttpServletResponse response,
+      DatastoreService datastore, String date) throws IOException {
+    
+    String origin = request.getParameter("inputDestination");
+    String destination = origin; // may change if user can differentiate b/t the two
+
+    TripDay tripDay = new TripDay(origin, destination, new ArrayList<>(), date);
+    Entity tripDayEntity = tripDay.buildEntity();
+    datastore.put(tripDayEntity);
+    return tripDayEntity;  
+  }
   /**
    * Make the servlet cleaner.
    * Searches through the parameters and creates the events and puts them into
    * datastore.
    */
-  private void eventDoPost(HttpServletRequest request, HttpServletResponse response) 
-      throws IOException { 
-    DatastoreService datastore = 
-                                DatastoreServiceFactory.getDatastoreService(); 
-
-    // Print out params to site to verify retrieval of "start trip" user input.
-    Enumeration<String> params = request.getParameterNames();
-
-    // get date of trip
-    String date = request.getParameter("inputDayOfTravel");
-
-    // create TripDay entity
-    Entity tripDayEntity = createTripDay(request, response, date);
-    datastore.put(tripDayEntity);
+  private void putEventsInDatastore(HttpServletRequest request, HttpServletResponse response, 
+      Enumeration<String> params, Entity tripDayEntity) throws IOException { 
 
     // set startDateTime, will be removed
     if (count == 0) {
@@ -145,18 +155,6 @@ public class TripServlet extends HttpServlet {
       // redirect to home page
       response.sendRedirect("/");
     }
-  }
-
-  /**
-   * Create TripDay Entity off user input
-   */
-  private Entity createTripDay(HttpServletRequest request, HttpServletResponse response, String date) 
-      throws IOException { 
-    String origin = request.getParameter("inputDestination");
-    String destination = origin; // may change if user can differentiate b/t the two
-
-    TripDay tripDay = new TripDay(origin, destination, new ArrayList<>(), date);
-    return tripDay.buildEntity();
   }
 
   /**
