@@ -14,6 +14,7 @@
 
 package com.google.sps;
 
+import com.google.appengine.api.datastore.Entity;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -27,11 +28,21 @@ import org.apache.commons.text.RandomStringGenerator;
  * Trip is the class for storing a single trip (could be multiple days).
  */
 public class Trip {
+  // Trip constants to store and access datastore Entity objects.
+  public static final String TRIP = "trip";
+  public static final String TRIP_NAME = "trip_name";
+  public static final String TRIP_IMAGE_SRC = "trip_image_src";
+  public static final String TRIP_ID = "trip_id";
+  public static final String TRIP_START_DATE = "trip_start_date";
+  public static final String TRIP_END_DATE = "trip_end_date";
+  public static final String TRIP_DAYS = "trip_days";
+
   // Trip cannot be longer than a month (31 days)
   private static final int MAX_NUM_DAYS = 31;
 
   private String tripName;
   private String tripId;
+  private String tripImageSrc;
   private LocalDate startDate;
   private LocalDate endDate;
   private int numDays;
@@ -72,6 +83,7 @@ public class Trip {
     // Set field attributes.
     this.tripName = tripName;
     this.tripId = tripId;
+    this.tripImageSrc = "../../webapp/images/placeholder_image.png";
     this.startDate = getLocalDate(startDate);
     this.endDate = getLocalDate(endDate);
     
@@ -86,7 +98,7 @@ public class Trip {
     this.numDays = numDays;
   }
 
-    /**
+  /**
    * Creates a new Trip.
    *
    * @param tripName The human-readable name for the trip. Must be non-null.
@@ -111,13 +123,27 @@ public class Trip {
   }
 
   // Generates a random 16-digit alphanumeric.
-  private String createTripId() {
+  private static String createTripId() {
     RandomStringGenerator generator = new RandomStringGenerator.Builder()
       .withinRange('0', 'z')
       .filteredBy(CharacterPredicates.DIGITS, CharacterPredicates.LETTERS)
       .build();
 
     return generator.generate(16);
+  }
+
+  /**
+   * Build and return a Trip object from the Entity.
+   */
+  public static Trip buildTripFromEntity(Entity tripEntity) {
+    String tripName = (String) tripEntity.getProperty(TRIP_NAME);
+    String tripId = (String) tripEntity.getProperty(TRIP_ID);
+    String tripImageSrc = (String) tripEntity.getProperty(TRIP_IMAGE_SRC); // TODO
+    String tripStartDate = (String) tripEntity.getProperty(TRIP_START_DATE);
+    String tripEndDate = (String) tripEntity.getProperty(TRIP_END_DATE);
+    List<TripDay> tripDays = (List<TripDay>) tripEntity.getProperty(TRIP_DAYS);
+    Trip trip = new Trip(tripName, tripId, tripStartDate, tripEndDate, tripDays);
+    return trip;
   }
 
   /**

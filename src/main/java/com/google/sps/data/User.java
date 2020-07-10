@@ -76,9 +76,9 @@ public class User {
 
   // Builds a User object from a User Entity object (typically from datastore).
   public static User buildUserFromEntity(Entity userEntity) {
-    String userId = (String) userEntity.getProperty(User.USER_ID);
-    String userEmail = (String) userEntity.getProperty(User.USER_EMAIL);
-    List<String> tripIdList = (List<String>) userEntity.getProperty(User.TRIP_ID_LIST);
+    String userId = (String) userEntity.getProperty(USER_ID);
+    String userEmail = (String) userEntity.getProperty(USER_EMAIL);
+    List<String> tripIdList = (List<String>) userEntity.getProperty(TRIP_ID_LIST);
     User user = new User(userId, userEmail, tripIdList);
     return user;
   }
