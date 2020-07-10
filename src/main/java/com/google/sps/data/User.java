@@ -17,8 +17,6 @@ package com.google.sps.data;
 import com.google.appengine.api.datastore.Entity;
 import java.util.List;
 import java.util.ArrayList;
-import org.apache.commons.text.CharacterPredicates;
-import org.apache.commons.text.RandomStringGenerator;
 
 public class User {
 
@@ -26,63 +24,31 @@ public class User {
   private String userId;
   private String email;
 
-  // List of trip IDs.
-  private List<String> tripIdList;
-
   // Constants to create user entity for datastore.
   public static final String USER = "user";
   public static final String USER_EMAIL = "email";
-  public static final String USER_ID = "user_id";
-  public static final String TRIP_ID_LIST = "trip_id_list";
 
   /**
    * Constructor to create a User object; the userId is generated automatically,
    * and the trip IDs are added to the User after constructing the object.
    */
   public User(String email) {
-    this.userId = createUserId();
     this.email = email;
-    this.tripIdList = new ArrayList<String>();
-  }
-
-  // Generates a random 16-digit alphanumeric.
-  private String createUserId() {
-    RandomStringGenerator generator = new RandomStringGenerator.Builder()
-      .withinRange('0', 'z')
-      .filteredBy(CharacterPredicates.DIGITS, CharacterPredicates.LETTERS)
-      .build();
-
-    return generator.generate(16);
-  }
-
-  // Add trip ID.
-  public void addTripId(String tripId) {
-    tripIdList.add(tripId);
   }
 
   // Builds an Entity object for datastore based on current User attributes.
   public Entity buildEntity() {
     Entity userEntity = new Entity(USER);
     userEntity.setProperty(USER_EMAIL, this.email);
-    userEntity.setProperty(USER_ID, this.userId);
-    userEntity.setProperty(TRIP_ID_LIST, this.tripIdList);
     return userEntity;
   }
 
   /**
    * Getter functions for private User variables.
    */
-  
-  public String getUserId() {
-    return this.userId;
-  }
 
   public String getEmail() {
     return this.email;
-  }
-
-  public List<String> getTripIdList() {
-    return this.tripIdList;
   }
 
 }

@@ -47,7 +47,6 @@ public class AuthServlet extends HttpServlet {
     if (userService.isUserLoggedIn()) {
       String userEmail = userService.getCurrentUser().getEmail();
       String logoutUrl = userService.createLogoutURL(redirectUrl);
-      String id = userService.getCurrentUser().getUserId();
 
       // Create UserAuth object to represent logged-in user.
       userAuth = new UserAuth(logoutUrl, userEmail);
