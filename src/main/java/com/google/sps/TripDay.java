@@ -15,6 +15,7 @@
 package com.google.sps;
 
 import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.datastore.Key;
 import com.google.sps.data.Event;
 import java.util.ArrayList;
 import java.util.List;
@@ -53,6 +54,12 @@ public class TripDay {
       throw new IllegalArgumentException("locations cannot be null. Use empty array instead.");
     }
 
+    if (date == null) {
+      throw new IllegalArgumentException("date cannot be null");
+    } else if (date.equals("")) {
+      throw new IllegalArgumentException("date cannot be empty string");
+    }
+
     this.origin = origin;
     this.destination = destination;
     this.date = date;
@@ -60,9 +67,6 @@ public class TripDay {
     // Duplicate locations to not modify original parameter
     this.locations = new ArrayList<>();
     this.locations.addAll(locations);
-
-    // instantiate events
-    this.events = new ArrayList<>();
   }
 
   /**
@@ -108,7 +112,7 @@ public class TripDay {
   /**
    * Builds entity corresponds to current TripDay with parent ID
    */
-  public Entity buildEntity(String parentKeyID) {
+  public Entity buildEntity(Key parentKeyID) {
     Entity tripDayEntity = new Entity("trip-day", parentKeyID);
     tripDayEntity.setProperty(ORIGIN, this.origin);
     tripDayEntity.setProperty(DESTINATION, this.destination);

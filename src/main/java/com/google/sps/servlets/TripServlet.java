@@ -16,12 +16,13 @@ package com.google.sps.servlets;
 
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
+import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
 import com.google.gson.Gson;
 import com.google.sps.data.Event;
-import com.google.sps.data.TripDay;
+import com.google.sps.TripDay;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -153,7 +154,7 @@ public class TripServlet extends HttpServlet {
     String origin = request.getParameter("inputDestination");
     String destination = origin; // may change if user can differentiate b/t the two
 
-    TripDay tripDay = new Trip(origin, destinaton, new ArrayList<>(), date);
+    TripDay tripDay = new TripDay(origin, destination, new ArrayList<>(), date);
     return tripDay.buildEntity();
   }
 

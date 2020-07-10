@@ -30,6 +30,8 @@ public final class TripDayTest {
   private static final String EMPIRE_STATE_ID = "ChIJtcaxrqlZwokRfwmmibzPsTU";
   private static final String HOTEL_ID = "ChIJ68J3tfpYwokR2HaRoBcB4xg";
 
+  private static final String DATE = "2020-07-08";
+
   private ArrayList<String> locations;
 
   // Test TripDay constructor and get functions
@@ -41,11 +43,12 @@ public final class TripDayTest {
     locations.add(WORLD_TRADE_ID);
     locations.add(EMPIRE_STATE_ID);
 
-    TripDay tripDay = new TripDay(HOTEL_ID, HOTEL_ID, locations);
+    TripDay tripDay = new TripDay(HOTEL_ID, HOTEL_ID, locations, DATE);
 
     Assert.assertEquals(tripDay.getOrigin(), HOTEL_ID);
     Assert.assertEquals(tripDay.getDestination(), HOTEL_ID);
     Assert.assertEquals(tripDay.getLocations(), locations);
+    Assert.assertEquals(tripDay.getDate(), DATE);
   }
 
   // Test TripDay constructor with null origin
@@ -54,7 +57,7 @@ public final class TripDayTest {
     locations = new ArrayList<>();
     locations.add(TIMES_SQUARE_ID);
 
-    TripDay tripDay = new TripDay(null, HOTEL_ID, locations);
+    TripDay tripDay = new TripDay(null, HOTEL_ID, locations, DATE);
   }
 
   // Test TripDay constructor with null parameter
@@ -63,12 +66,24 @@ public final class TripDayTest {
     locations = new ArrayList<>();
     locations.add(TIMES_SQUARE_ID);
 
-    TripDay tripDay = new TripDay(HOTEL_ID, null, locations);
+    TripDay tripDay = new TripDay(HOTEL_ID, null, locations, DATE);
   }
 
   // Test TripDay constructor with null locations
   @Test(expected = IllegalArgumentException.class)
   public void testTripDayConstructorNullLocations() {
-    TripDay tripDay = new TripDay(HOTEL_ID, HOTEL_ID, null);
+    TripDay tripDay = new TripDay(HOTEL_ID, HOTEL_ID, null, DATE);
+  }
+
+  // Test TripDay null date
+  @Test(expected = IllegalArgumentException.class)
+  public void testTripDayConstructorNullDate() {
+    TripDay tripDay = new TripDay(HOTEL_ID, HOTEL_ID, locations, null);
+  }
+
+  // Test TripDay empty date
+  @Test(expected = IllegalArgumentException.class)
+  public void testTripDayConstructorEmptyDate() {
+    TripDay tripDay = new TripDay(HOTEL_ID, HOTEL_ID, locations, "");
   }
 }
