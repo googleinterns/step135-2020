@@ -105,8 +105,8 @@ public class Event {
     }
   }
 
-  // build event entity to be put in datastore off event attributes
-  public Entity buildEventEntity() {
+  // build entity from event to be put in datastore off event attributes
+  public Entity eventToEntity() {
     Entity eventEntity = new Entity("events");
     eventEntity.setProperty(NAME, this.name);
     eventEntity.setProperty(ADDRESS, this.address);
@@ -115,6 +115,17 @@ public class Event {
     eventEntity.setProperty(TRAVEL_TIME, Long.toString(this.travelTime));
     return eventEntity;
   } 
+
+  // build event from entity
+  public static Event eventFromEntity(Entity eventEntity) {
+    String name = (String) entity.getProperty(NAME);
+    String address = (String) entity.getProperty(ADDRESS);
+    String startDateTimeStr = (String) entity.getProperty(START_TIME);
+    String travelTime = (String) entity.getProperty(TRAVEL_TIME);
+    Event event = new Event(name, address, LocalDateTime.parse(startDateTimeStr),
+                          Integer.parseInt(travelTime));
+    return event;
+  }
 
   // getter functions
   public String getName() {

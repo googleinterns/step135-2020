@@ -96,13 +96,7 @@ public class TripServlet extends HttpServlet {
 
     // create the events
     for (Entity entity : results.asIterable()) {
-    	String name = (String) entity.getProperty(NAME);
-      String address = (String) entity.getProperty(ADDRESS);
-      String startDateTimeStr = (String) entity.getProperty(START_TIME);
-      String travelTime = (String) entity.getProperty(TRAVEL_TIME);
-      Event e = new Event(name, address, LocalDateTime.parse(startDateTimeStr),
-                          Integer.parseInt(travelTime));
-      events.add(e);
+      events.add(Event.eventFromEntity(entity));
     }   
 
     response.getWriter().println(convertToJson(events));
@@ -139,7 +133,7 @@ public class TripServlet extends HttpServlet {
         String address = request.getParameter(p);
         String name = address.split(",")[0];
         Event event = new Event(name, address, startDateTime, HALF_HOUR);
-        Entity eventEntity = event.buildEventEntity();
+        Entity eventEntity = event.eventToEntity();
 
         // put entity in datastore
         DatastoreService datastore = 
