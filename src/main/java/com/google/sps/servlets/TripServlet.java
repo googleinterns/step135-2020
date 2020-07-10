@@ -60,6 +60,7 @@ public class TripServlet extends HttpServlet {
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) 
       throws IOException {
+    response.setContentType("application/json;");
     
     // do get for events
     eventDoGet(request, response);
@@ -104,7 +105,6 @@ public class TripServlet extends HttpServlet {
       events.add(e);
     }   
 
-    response.setContentType("application/json;");
     response.getWriter().println(convertToJson(events));
    }
 
