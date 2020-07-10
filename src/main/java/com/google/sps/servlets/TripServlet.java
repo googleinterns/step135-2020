@@ -9,15 +9,20 @@
 package com.google.sps.servlets;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Enumeration;
+import java.util.List;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.google.maps.DirectionsApi.RouteRestriction;
 import com.google.maps.DirectionsApi;
+import com.google.maps.DirectionsApiRequest;
+import com.google.maps.DirectionsApi.RouteRestriction;
 import com.google.maps.GeoApiContext;
+import com.google.maps.errors.ApiException;
 import com.google.maps.errors.NotFoundException;
 import com.google.maps.model.AddressType;
 import com.google.maps.model.DirectionsLeg;
@@ -29,16 +34,8 @@ import com.google.maps.model.TransitMode;
 import com.google.maps.model.TransitRoutingPreference;
 import com.google.maps.model.TravelMode;
 import com.google.maps.model.Unit;
-import com.google.maps.errors.ApiException;
-import com.google.maps.DirectionsApiRequest;
-
 import com.google.sps.Trip;
 import com.google.sps.TripDay;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Arrays;
-
 import com.google.sps.data.Config;
 
 @WebServlet("/calculate-trip")
@@ -85,16 +82,20 @@ public class TripServlet extends HttpServlet {
     // Calculate route and save travelTimes and waypointOrder to two ArrayLists
     try {
       DirectionsResult dirResult = directionsRequest.await();
-      int[] orderedWaypoints = dirResult.routes[0].waypointOrder;
+      int[] waypointOrder = dirResult.routes[0].waypointOrder;
       List<Integer> travelTimes = new ArrayList<>();
       for (DirectionsLeg leg : dirResult.routes[0].legs) {
         int travelTime = (int) leg.duration.inSeconds / 60;
         travelTimes.add(travelTime);
       }
+
+      // Generate an ordered list of location Strings from waypointOrder
       List<String> orderedLocationStrings = new ArrayList<>();
-      for (int i = 0; i < orderedWaypoints.length; i++) {
-        orderedLocationStrings.add(pois.get(orderedWaypoints[i]));
+      for (int i = 0; i < waypointOrder.length; i++) {
+        orderedLocationStrings.add(pois.get(waypointOrder[i]));
       }
+
+      // Print out results on page for now
       response.getWriter().println(travelTimes.toString());
       response.getWriter().println(orderedLocationStrings.toString());
     } catch (ApiException | InterruptedException e) {
