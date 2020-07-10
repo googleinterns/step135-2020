@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Create script to add API key.
 let script = document.createElement('script');
 script.src = 'https://maps.googleapis.com/maps/api/js?key=' + config.API_KEY + 
   '&libraries=places&callback=initScript';
@@ -115,6 +116,8 @@ function displayStartTripForm() {
   document.getElementById('poi-list-container').style.display = 'none';
   document.getElementById('add-pois-container').style.display = 'none';
   document.getElementById('submit-calculate-trip').style.display = 'none';
+  document.getElementById('suggested-location-block-header').style.display = 'none';
+  document.getElementById('suggested-location-block').style.display = 'none';
 
   // Initially make the "Next" , "Add POI", and "Submit" button disabled.
   document.getElementById('toggle-stage-button').disabled = true;
@@ -154,8 +157,19 @@ function addStartTripOnClickListeners() {
   };
 
   // Add POI Button adds the current POI in text input, and checks submit button.
-  document.getElementById('addPoiButton').onclick = () => {
-    addPoi();
+  const addPoiButton = document.getElementById('addPoiButton');
+  addPoiButton.onclick = () => {
+    // Get the text from the text input POI, add that POI, then clear the text input.
+    const inputPoi = document.getElementById('inputPoi');
+    addPoi(inputPoi.value);
+
+    // Reset "Add POI" button to disabled, reset text of POI text input, and
+    // remove 'is-valid' class.
+    addPoiButton.disabled = true;
+    inputPoi.value = '';
+    inputPoi.classList.remove('is-valid');
+
+    // Check the submit button.
     checkSubmitButton();
   };
 }
@@ -261,10 +275,12 @@ function toggleStartTripInputStage() {
   const toggleStartTripStageButton = document.getElementById('toggle-stage-button');
 
   if (toggleStartTripStageButton.value === 'Next') {
-    // Display the POI list, "Add POIs" form, and "Submit" button.
+    // Display the POI list, "Add POIs" form, "Submit" button, and suggested POIs.
     document.getElementById('poi-list-container').style.display = 'block';
     document.getElementById('add-pois-container').style.display = 'flex';
     document.getElementById('submit-calculate-trip').style.display = 'inline-block';
+    document.getElementById('suggested-location-block-header').style.display = 'block';
+    document.getElementById('suggested-location-block').style.display = 'block';
 
     // Change name, location, and date inputs to be readonly.
     document.getElementById('inputTripName').readOnly = true;
@@ -274,10 +290,12 @@ function toggleStartTripInputStage() {
     // Change the text of the toggle button to 'Back'.
     toggleStartTripStageButton.value = 'Back';
   } else {
-    // Hide the POI list, "Add POIs" form, and "Submit" button.
+    // Hide the POI list, "Add POIs" form, "Submit" button, and suggested POIs.
     document.getElementById('poi-list-container').style.display = 'none';
     document.getElementById('add-pois-container').style.display = 'none';
     document.getElementById('submit-calculate-trip').style.display = 'none';
+    document.getElementById('suggested-location-block-header').style.display = 'none';
+    document.getElementById('suggested-location-block').style.display = 'none';
 
     // Change name, location, and date inputs to be editable.
     document.getElementById('inputTripName').readOnly = false;
@@ -289,21 +307,11 @@ function toggleStartTripInputStage() {
   }
 }
 
-// Add an HTML button element as a POI to the form. The POI is retrieved from 
-// the current POI input text, which is subsequently reset.
-function addPoi() {
-  const inputPoi = document.getElementById('inputPoi');
-
+// Add an HTML button element as a POI to the form.
+function addPoi(poi) {
   // Add POI input button to the page.
   const poiListContainer = document.getElementById('poi-list-container');
-  poiListContainer.appendChild(buildPoiObject(inputPoi.value));
-
-  // Reset "Add POI" button to disabled, reset text of POI text input, and
-  // remove 'is-valid' class.
-  const addPoiButton = document.getElementById('addPoiButton');
-  addPoiButton.disabled = true;
-  inputPoi.value = '';
-  inputPoi.classList.remove('is-valid');
+  poiListContainer.appendChild(buildPoiObject(poi));
 }
 
 // Build and return a user-added POI HTML object.
@@ -336,7 +344,7 @@ function buildInput(type, value, className, name) {
 
 // Add text input POI Google Places autofill.
 function addInputPoiLocationAutofill() {
-  let inputPoi = document.getElementById('inputPoi');
+  const inputPoi = document.getElementById('inputPoi');
   let locationAutocomplete = new google.maps.places.Autocomplete(inputPoi);
 
   // Any time the input changes through user typing, remove the 'is-valid' class
@@ -357,7 +365,7 @@ function addInputPoiLocationAutofill() {
 
 // Add text input POI Google Places autofill.
 function addInputDestinationLocationAutofill() {
-  let inputDestination = document.getElementById('inputDestination');
+  const inputDestination = document.getElementById('inputDestination');
   let locationAutocomplete = new google.maps.places.Autocomplete(inputDestination);
 
   // Any time the input changes through user typing, remove the 'is-valid' class
@@ -373,8 +381,116 @@ function addInputDestinationLocationAutofill() {
   locationAutocomplete.addListener('place_changed', () => {
     inputDestination.classList.add('is-valid');
     checkNextButton();
+
+    // Remove any current elements, then get and add the suggested locations.
+    removeSuggestedLocations();
+    const radius = 50000;
+    let location = new google.maps.LatLng(locationAutocomplete.getPlace().geometry.location.lat(), 
+      locationAutocomplete.getPlace().geometry.location.lng());
+    getAndAddSuggestedLocations(location, radius);
   });
+}
+
+// Get suggested locations based on a central location (latitude, longitude) and
+// radius (meters). All suggested locations are of type "tourist attraction".
+// Then, call addSuggestedLocations function.
+function getAndAddSuggestedLocations(centralLocation, radius) {
+  let googlePlacesObject = new google.maps.places.PlacesService(document.createElement('div'));
+
+  let placesRequest = {
+    location: centralLocation,
+    radius: radius,
+    type: 'tourist_attraction'
+  };
+
+  googlePlacesObject.nearbySearch(placesRequest, (placesList, placesServiceStatus, _) => {
+    if (placesServiceStatus === google.maps.places.PlacesServiceStatus.OK) {
+      addSuggestedLocations(placesList);
+    }
+  });
+}
+
+// Removes all of the current suggested locations by setting innerHTML to empty.
+function removeSuggestedLocations() {
+  const suggestedLocationBlock = document.getElementById('suggested-location-block');
+  suggestedLocationBlock.innerHTML = '';
+}
+
+// Add suggested locations for POIs after user has submitted initial "Start 
+// Trip" form details (name of trip, location, and date).
+function addSuggestedLocations(suggestedLocations) {
+  const suggestedLocationBlock = document.getElementById('suggested-location-block');
+
+  // Add all of the suggested locations to the page.
+  suggestedLocations.forEach((location) => {
+    // If photo is present, get the photo source; if not, use placeholder.
+    let photoSrc;
+    if (location.photos !== undefined) {
+      photoSrc = location.photos[0].getUrl();
+    } else {
+      photoSrc = 'images/placeholder_image.png';
+    }
+    
+    const suggestedLocationWidget = buildSuggestedLocationWidget(location.name,
+      location.vicinity, photoSrc);
+    suggestedLocationBlock.appendChild(suggestedLocationWidget);
+  });
+}
+
+// Builds and returns an HTML widget of a suggested location.
+function buildSuggestedLocationWidget(name, vicinity, photoSrc) {
+  // The container that holds the full card.
+  const cardContainer = document.createElement('div');
+  cardContainer.className = 'card';
+  cardContainer.style = 'width: 15rem';
+
+  // Add the photo of this location.
+  const photoElement = document.createElement('img');
+  photoElement.className = 'card-img-top';
+  photoElement.src = photoSrc;
+  photoElement.alt = 'Image of ' + name;
+
+  // Create the body container for the card.
+  const cardBodyContainer = document.createElement('div');
+  cardBodyContainer.className = 'card-body';
+
+  // Create the card title, which is the name of the location.
+  const titleElement = document.createElement('h5');
+  titleElement.className = 'card-title';
+  titleElement.innerText = name;
+
+  // Create the general address / vicinity of the locagtion.
+  const addressText = document.createElement('p');
+  addressText.className = 'card-title';
+  addressText.innerText = vicinity;
+
+  // Add a button that allows you to add this suggested location as a POI.
+  const addSuggestedPoiButton = document.createElement('button');
+  addSuggestedPoiButton.className = 'btn btn-primary';
+  addSuggestedPoiButton.innerText = 'Add this POI';
+  addSuggestedPoiButton.onclick = () => {
+    // Add this POI.
+    addPoi(name);
+
+    // Check the submit button.
+    checkSubmitButton();
+
+    // Remove the card from the page.
+    cardContainer.remove();
+  }
+
+  // Add the title, address, and suggested POI button to the card body.
+  cardBodyContainer.appendChild(titleElement);
+  cardBodyContainer.appendChild(addressText);
+  cardBodyContainer.appendChild(addSuggestedPoiButton);
+
+  // Add the photo element and card body to the card container.
+  cardContainer.appendChild(photoElement);
+  cardContainer.appendChild(cardBodyContainer);
+  
+  return cardContainer;
 }
 
 // Append the 'script' element to the document head.
 document.head.appendChild(script);
+
