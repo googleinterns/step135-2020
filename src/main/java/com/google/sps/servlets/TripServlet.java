@@ -102,7 +102,9 @@ public class TripServlet extends HttpServlet {
    */
   private void eventDoPost(HttpServletRequest request, HttpServletResponse response) 
       throws IOException { 
-        
+    DatastoreService datastore = 
+                                DatastoreServiceFactory.getDatastoreService(); 
+
     // Print out params to site to verify retrieval of "start trip" user input.
     Enumeration<String> params = request.getParameterNames();
 
@@ -111,6 +113,7 @@ public class TripServlet extends HttpServlet {
 
     // create TripDay entity
     Entity tripDayEntity = createTripDay(request, response, date);
+    datastore.put(tripDayEntity);
 
     // set startDateTime, will be removed
     if (count == 0) {
@@ -132,9 +135,7 @@ public class TripServlet extends HttpServlet {
         Event event = new Event(name, address, startDateTime, HALF_HOUR);
         Entity eventEntity = event.eventToEntity(tripDayEntity.getKey());
 
-        // put entity in datastore
-        DatastoreService datastore = 
-                                DatastoreServiceFactory.getDatastoreService();      
+        // put entity in datastore     
         datastore.put(eventEntity);
 
         // sets start time for next event 2 hours after start of prev
