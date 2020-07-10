@@ -35,8 +35,10 @@ public class User {
   public static final String USER_ID = "user_id";
   public static final String TRIP_ID_LIST = "trip_id_list";
 
-  // Constructor to create a User object (userId is generated automatically,
-  // trip IDs are added to the User after constructing the object).
+  /**
+   * Constructor to create a User object; the userId is generated automatically,
+   * and the trip IDs are added to the User after constructing the object.
+   */
   public User(String email) {
     this.userId = createUserId();
     this.email = email;
