@@ -14,6 +14,8 @@
 
 package com.google.sps;
 
+import com.google.appengine.api.datastore.Entity;
+import com.google.sps.data.Event;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,6 +26,11 @@ public class TripDay {
   private String origin;
   private String destination;
   private List<String> locations;
+  private String date;
+
+  // Entity params
+  private static final String ORIGIN = "origin";
+  private static final String DESTINATION = "destination";
 
   /**
    * Creates a new TripDay.
@@ -33,7 +40,7 @@ public class TripDay {
    * @param locations The list of POIs (list of Google Maps Place ID strings) 
                       that are stopovers for this day. Must be non-null.
    */
-  public TripDay(String origin, String destination, List<String> locations) {
+  public TripDay(String origin, String destination, List<String> locations, String date) {
     if (origin == null) {
       throw new IllegalArgumentException("origin cannot be null");
     }
@@ -48,10 +55,14 @@ public class TripDay {
 
     this.origin = origin;
     this.destination = destination;
+    this.date = date;
 
     // Duplicate locations to not modify original parameter
     this.locations = new ArrayList<>();
     this.locations.addAll(locations);
+
+    // instantiate events
+    this.events = new ArrayList<>();
   }
 
   /**
@@ -69,11 +80,38 @@ public class TripDay {
   }
 
   /**
+   * Returns the date for this TripDay.
+   */
+  public String getDate() {
+    return this.date;
+  }
+
+  /**
    * Returns a List<String> copy of locations for this TripDay.
    */
   public List<String> getLocations() {
     List<String> locationsCopy = new ArrayList<>();
     locationsCopy.addAll(this.locations);
     return locationsCopy;
+  }
+
+  /**
+   * Builds entity corresponds to current TripDay
+   */
+  public Entity buildEntity() {
+    Entity tripDayEntity = new Entity("trip-day");
+    tripDayEntity.setProperty(ORIGIN, this.origin);
+    tripDayEntity.setProperty(DESTINATION, this.destination);
+    return tripDayEntity;
+  }
+
+  /**
+   * Builds entity corresponds to current TripDay with parent ID
+   */
+  public Entity buildEntity(String parentKeyID) {
+    Entity tripDayEntity = new Entity("trip-day", parentKeyID);
+    tripDayEntity.setProperty(ORIGIN, this.origin);
+    tripDayEntity.setProperty(DESTINATION, this.destination);
+    return tripDayEntity;
   }
 }
