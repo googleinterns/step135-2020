@@ -21,6 +21,7 @@ import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
 import com.google.gson.Gson;
 import com.google.sps.data.Event;
+import com.google.sps.data.TripDay;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -47,15 +48,6 @@ public class TripServlet extends HttpServlet {
 
   private static final int HALF_HOUR = 30;
   private static final int NINETY_MINS = 90;
-
-  // event fields for entity
-  private static final String NAME = "name";
-  private static final String ADDRESS = "end-time";
-  private static final String DATE = "date";
-  private static final String START_TIME = "start-time";
-  private static final String TRAVEL_TIME = "travel-time";
-
-  
 
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) 
@@ -109,11 +101,15 @@ public class TripServlet extends HttpServlet {
    */
   private void eventDoPost(HttpServletRequest request, HttpServletResponse response) 
       throws IOException { 
+        
     // Print out params to site to verify retrieval of "start trip" user input.
     Enumeration<String> params = request.getParameterNames();
 
     // get date of trip
     String date = request.getParameter("inputDayOfTravel");
+
+    // create TripDay entity
+    Entity tripDayEntity = createTripDay(request, response, date);
 
     // set startDateTime, will be removed
     if (count == 0) {
@@ -133,7 +129,7 @@ public class TripServlet extends HttpServlet {
         String address = request.getParameter(p);
         String name = address.split(",")[0];
         Event event = new Event(name, address, startDateTime, HALF_HOUR);
-        Entity eventEntity = event.eventToEntity();
+        Entity eventEntity = event.eventToEntity(tripDayEntity.getKey());
 
         // put entity in datastore
         DatastoreService datastore = 
@@ -147,6 +143,18 @@ public class TripServlet extends HttpServlet {
       // redirect to home page
       response.sendRedirect("/");
     }
+  }
+
+  /**
+   * Create TripDay Entity off user input
+   */
+  private Entity createTripDay(HttpServletRequest request, HttpServletResponse response, String date) 
+      throws IOException { 
+    String origin = request.getParameter("inputDestination");
+    String destination = origin; // may change if user can differentiate b/t the two
+
+    TripDay tripDay = new Trip(origin, destinaton, new ArrayList<>(), date);
+    return tripDay.buildEntity();
   }
 
   /**
