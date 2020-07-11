@@ -64,7 +64,7 @@ public class TripServlet extends HttpServlet {
     response.setContentType("application/json;");
     
     // do get for events
-    eventDoGet(request, response);
+    eventDoGet(response);
   }
 
   // function to set time, need to do only once
