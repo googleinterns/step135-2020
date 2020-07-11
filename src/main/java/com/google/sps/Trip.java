@@ -14,6 +14,7 @@
 
 package com.google.sps;
 
+import com.google.appengine.api.datastore.Entity;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -25,14 +26,23 @@ import java.util.List;
  * Trip is the class for storing a single trip (could be multiple days).
  */
 public class Trip {
+
   // Trip cannot be longer than a month (31 days)
   private static final int MAX_NUM_DAYS = 31;
 
+  // Field attributes for the Trip class.
   private String tripName;
   private LocalDate startDate;
   private LocalDate endDate;
   private int numDays;
-  private List<TripDay> tripDays;
+
+  // Constants to get and put the Entity objects in Datastore.
+  private static final String TRIP = "trip";
+  private static final String TRIP_NAME = "trip_name";
+  private static final String IMAGE_SRC = "image_src";
+  private static final String DESTINATION = "destination";
+  private static final String START_DATE = "start_date";
+  private static final String END_DATE = "end_date";
 
   /**
    * Creates a new Trip.
@@ -40,9 +50,8 @@ public class Trip {
    * @param tripName The human-readable name for the trip. Must be non-null.
    * @param startDate The start date for the trip. Must be non-null. Must be in yyyy-MM-dd date format.
    * @param endDate The end date for the trip. Must be non-null. Must be in yyyy-MM-dd date format.
-   * @param tripDays The list of tripDays. Must be non-null.
    */
-  public Trip(String tripName, String startDate, String endDate, List<TripDay> tripDays) {
+  public Trip(String tripName, String startDate, String endDate) {
     if (tripName == null) {
       throw new IllegalArgumentException("tripName cannot be null");
     }
@@ -55,17 +64,9 @@ public class Trip {
       throw new IllegalArgumentException("endDate cannot be null");
     }
 
-    if (tripDays == null) {
-      throw new IllegalArgumentException("tripDays cannot be null. Use empty array instead.");
-    }
-
     this.tripName = tripName;
     this.startDate = getLocalDate(startDate);
     this.endDate = getLocalDate(endDate);
-    
-    // Duplicate tripDays to avoid modifying original parameter
-    this.tripDays = new ArrayList<>();
-    this.tripDays.addAll(tripDays);
 
     int numDays = calcNumDays(this.startDate, this.endDate);
     if (numDays <= 0 || numDays > MAX_NUM_DAYS) {
@@ -80,10 +81,18 @@ public class Trip {
    * 
    * @param tripName The human-readable name for the trip. Must be non-null.
    * @param startDate The start date for the trip. Must be non-null.
-   * @param tripDays The list of tripDays. Must be non-null.
    */
-  public Trip(String tripName, String startDate, List<TripDay> tripDays) {
-    this(tripName, startDate, startDate, tripDays);
+  public Trip(String tripName, String startDate) {
+    this(tripName, startDate, startDate);
+  }
+
+  /**
+   * Builds and return an Entity object from the Trip class.
+   */
+  public Entity buildEntity() {
+    Entity tripEntity = new Entity(TRIP);
+    tripEntity.setProperty(TRIP_NAME, this.tripName);
+    // TODO.
   }
 
   /**
@@ -112,15 +121,6 @@ public class Trip {
    */
   public int getNumDays() {
     return this.numDays;
-  }
-
-  /**
-   * Returns a List<TripDay> copy of TripDays for this trip.
-   */
-  public List<TripDay> getTripDays() {
-    List<TripDay> tripDaysCopy = new ArrayList<>();
-    tripDaysCopy.addAll(this.tripDays);
-    return tripDaysCopy;
   }
 
   /**
