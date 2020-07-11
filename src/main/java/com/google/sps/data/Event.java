@@ -108,7 +108,7 @@ public class Event {
 
   // build entity from event to be put in datastore off event attributes
   public Entity eventToEntity(Key parentKeyID) {
-    Entity eventEntity = new Entity("events", parentKeyID);
+    Entity eventEntity = new Entity("event", parentKeyID);
     eventEntity.setProperty(NAME, this.name);
     eventEntity.setProperty(ADDRESS, this.address);
     eventEntity.setProperty(START_TIME, 

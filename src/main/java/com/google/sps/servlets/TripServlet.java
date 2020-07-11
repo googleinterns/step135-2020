@@ -59,20 +59,13 @@ public class TripServlet extends HttpServlet {
     eventDoGet(request, response);
   }
 
-  // function to set time, need to do only once
-  public void setDateTime(String date) {
-    startDateTime = LocalDateTime.of(LocalDate.parse(date), LocalTime.of(10, 0));
-  }
-
-  
-
   /**
    * Make the servlet cleaner
    * Iterate through the entities and create the events and write them to json
    */
   private void eventDoGet(HttpServletRequest request, HttpServletResponse response)
       throws IOException { 
-    Query query = new Query("events");
+    Query query = new Query("event");
 
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
     PreparedQuery results = datastore.prepare(query);
@@ -155,6 +148,11 @@ public class TripServlet extends HttpServlet {
       // redirect to home page
       response.sendRedirect("/");
     }
+  }
+
+  // function to set time, need to do only once
+  public void setDateTime(String date) {
+    startDateTime = LocalDateTime.of(LocalDate.parse(date), LocalTime.of(10, 0));
   }
 
   /**
