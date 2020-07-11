@@ -23,22 +23,6 @@ $(document).ready(() => {
   setContentWidth('800px');
 });
 
-// Returns Promise with the sign in status in a boolean.
-function isSignedIn() {
-  return new Promise((resolve, reject) => {
-    fetch('/auth').then(response => response.json()).then((signInStatus) => {
-      resolve(signInStatus);
-    }).catch((error) => {
-      reject(error);
-    });
-  });
-}
-
-function displayHeader() {
-  // Display header for site.
-  document.getElementById('header').style.display = 'block';
-}
-
 // Set the width of the content container
 function setContentWidth(width) {
   document.getElementById('content').style.width = width;

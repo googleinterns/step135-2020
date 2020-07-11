@@ -28,7 +28,6 @@ public class Event {
   // inputs
   private String name;
   private String address;
-  
   private LocalDateTime startTime;
   private LocalDateTime endTime;
 
@@ -118,10 +117,10 @@ public class Event {
 
   // build event from entity
   public static Event eventFromEntity(Entity eventEntity) {
-    String name = (String) entity.getProperty(NAME);
-    String address = (String) entity.getProperty(ADDRESS);
-    String startDateTimeStr = (String) entity.getProperty(START_TIME);
-    String travelTime = (String) entity.getProperty(TRAVEL_TIME);
+    String name = (String) eventEntity.getProperty(NAME);
+    String address = (String) eventEntity.getProperty(ADDRESS);
+    String startDateTimeStr = (String) eventEntity.getProperty(START_TIME);
+    String travelTime = (String) eventEntity.getProperty(TRAVEL_TIME);
     Event event = new Event(name, address, LocalDateTime.parse(startDateTimeStr),
                           Integer.parseInt(travelTime));
     return event;

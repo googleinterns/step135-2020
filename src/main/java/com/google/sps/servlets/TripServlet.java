@@ -45,6 +45,7 @@ public class TripServlet extends HttpServlet {
   private LocalDateTime startDateTime;
   private static int count = 0;
 
+  // time class constants
   private static final int HALF_HOUR = 30;
   private static final int NINETY_MINS = 90;
 
@@ -68,7 +69,9 @@ public class TripServlet extends HttpServlet {
 
   // function to set time, need to do only once
   public void setDateTime(String date) {
-    startDateTime = LocalDateTime.of(LocalDate.parse(date), LocalTime.of(10, 0));
+    if (startDateTime == null) {
+      startDateTime = LocalDateTime.of(LocalDate.parse(date), LocalTime.of(10, 0));
+    }
   }
 
   @Override
@@ -85,8 +88,7 @@ public class TripServlet extends HttpServlet {
    * Make the servlet cleaner
    * Iterate through the entities and create the events and write them to json
    */
-  private void eventDoGet(HttpServletRequest request, HttpServletResponse response)
-      throws IOException { 
+  private void eventDoGet(HttpServletResponse response) throws IOException { 
     Query query = new Query("events");
 
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
@@ -116,10 +118,7 @@ public class TripServlet extends HttpServlet {
     String date = request.getParameter("inputDayOfTravel");
 
     // set startDateTime, will be removed
-    if (count == 0) {
       setDateTime(date);
-      count++;
-    }
 
     // search through all the parameters looking for pois
     while (params.hasMoreElements()) {
