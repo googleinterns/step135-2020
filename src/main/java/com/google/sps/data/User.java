@@ -15,13 +15,10 @@
 package com.google.sps.data;
 
 import com.google.appengine.api.datastore.Entity;
-import java.util.List;
-import java.util.ArrayList;
 
 public class User {
 
   // Identification information for the user.
-  private String userId;
   private String email;
 
   // Constants to create user entity for datastore.
@@ -43,10 +40,7 @@ public class User {
     return userEntity;
   }
 
-  /**
-   * Getter functions for private User variables.
-   */
-
+  // Get the private email field.
   public String getEmail() {
     return this.email;
   }
