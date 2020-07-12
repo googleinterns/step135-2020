@@ -123,6 +123,9 @@ public class TripDay {
   }
 
   /**
+   * Build tripDay from entity. Not needed for this CL but will be necessary 
+   * later
+   */
   public static TripDay tripDayFromEntity(Entity entity) {
     String origin = (String) entity.getProperty(ORIGIN);
     String destination = (String) emtity.getProperty(DESTINATION);
@@ -131,6 +134,6 @@ public class TripDay {
 
     TripDay tripDay = new TripDay(origin, destiantion, locations, date);
     return tripDay;
-  }**/
+  }
 
 }

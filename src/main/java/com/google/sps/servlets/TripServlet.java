@@ -65,7 +65,6 @@ public class TripServlet extends HttpServlet {
 
     // put Event entities in datastore
     putEventsInDatastore(request, response, params, tripDayEntity, date, datastore);
-    
   }
 
   private Entity putTripDayInDatastore(HttpServletRequest request, HttpServletResponse response,

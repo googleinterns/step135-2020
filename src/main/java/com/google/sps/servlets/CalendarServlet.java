@@ -60,7 +60,6 @@ public class CalendarServlet extends HttpServlet {
     response.getWriter().println(convertToJson(events));
   }
 
-
   /**
    * Converts list of Event objects into a JSON string using the Gson library.
    */
@@ -69,36 +68,4 @@ public class CalendarServlet extends HttpServlet {
     String json = gson.toJson(events);
     return json;
   }
-
-  /**
-   * Make the servlet cleaner
-   * Iterate through the entities and create the events and write them to json
-   *
-  private void eventDoGet(HttpServletRequest request, HttpServletResponse response)
-      throws IOException { 
-    Query query = new Query("event");
-
-    
-    PreparedQuery results = datastore.prepare(query);
-
-    List<Event> events = new ArrayList<>();
-
-    // create the events
-    for (Entity entity : results.asIterable()) {
-      events.add(Event.eventFromEntity(entity));
-    }   
-
-    response.getWriter().println(convertToJson(events));
-   }
-
-  private void getTripDayEntity(DatastoreService datastore) {
-    Query query = new Query("trip-day");
-    PreparedQuery tripDayResults = datastore.prepare(query);
-
-    List<TripDay> tripDays = new ArrayList<>();
-    
-    // create tripDays, for MVP will be just one
-    for (Entity entity : tripDayResults.asIterable()) {
-      tripDays.add(TripDay.tripDayFromEntity(entity));
-    }*/
-  }
+}
