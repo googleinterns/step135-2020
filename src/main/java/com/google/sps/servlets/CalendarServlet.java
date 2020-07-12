@@ -34,7 +34,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 @WebServlet("/get-calendar")
-public class TripServlet extends HttpServlet {
+public class CalendarServlet extends HttpServlet {
 
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) 
@@ -52,12 +52,22 @@ public class TripServlet extends HttpServlet {
       Query eventsQuery = new Query("event", tripDayEntity.getKey());
       PreparedQuery eventResults = datastore.prepare(eventsQuery);
 
-      for (Entity eventEntity : eventREsults.asIterable()) {
-        events.add(Event.eventFromEntity(entity));
+      for (Entity eventEntity : eventResults.asIterable()) {
+        events.add(Event.eventFromEntity(eventEntity));
       }
     }
     
     response.getWriter().println(convertToJson(events));
+  }
+
+
+  /**
+   * Converts list of Event objects into a JSON string using the Gson library.
+   */
+  private String convertToJson(List<Event> events) {
+    Gson gson = new Gson();
+    String json = gson.toJson(events);
+    return json;
   }
 
   /**

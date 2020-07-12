@@ -33,7 +33,7 @@ $(document).ready(() => {
  * retrives the events from /calculate-trip url and dynamically adds the events
  */
 function getEvents(calendar) {
-  fetch('/calculate-trip').then(response => response.json()).then((events) => {
+  fetch('/get-calendar').then(response => response.json()).then((events) => {
     events.forEach((event) => {
       calendar.addEvent({     
         title: event.name,

@@ -64,11 +64,11 @@ public class TripServlet extends HttpServlet {
     Entity tripDayEntity = putTripDayInDatastore(request, response, datastore, date);
 
     // put Event entities in datastore
-    putEventsInDatastore(request, response, params, tripDayEntity);
+    putEventsInDatastore(request, response, params, tripDayEntity, date, datastore);
     
   }
 
-  private void putTripDayInDatastore(HttpServletRequest request, HttpServletResponse response,
+  private Entity putTripDayInDatastore(HttpServletRequest request, HttpServletResponse response,
       DatastoreService datastore, String date) throws IOException {
     
     String origin = request.getParameter("inputDestination");
@@ -85,7 +85,8 @@ public class TripServlet extends HttpServlet {
    * datastore.
    */
   private void putEventsInDatastore(HttpServletRequest request, HttpServletResponse response, 
-      Enumeration<String> params, Entity tripDayEntity) throws IOException { 
+      Enumeration<String> params, Entity tripDayEntity, String date, DatastoreService datastore)
+      throws IOException { 
 
     // set startDateTime, will be removed
     if (count == 0) {
@@ -122,14 +123,5 @@ public class TripServlet extends HttpServlet {
   // function to set time, need to do only once
   public void setDateTime(String date) {
     startDateTime = LocalDateTime.of(LocalDate.parse(date), LocalTime.of(10, 0));
-  }
-
-  /**
-   * Converts list of Event objects into a JSON string using the Gson library.
-   */
-  private String convertToJson(List<Event> events) {
-    Gson gson = new Gson();
-    String json = gson.toJson(events);
-    return json;
   }
 }
