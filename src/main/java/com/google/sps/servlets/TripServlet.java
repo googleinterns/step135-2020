@@ -37,8 +37,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /** 
- * Servlet that currently allows for retrieving info from url and put in 
- *  calendar
+ * Servlet that puts info into datastore to be pulled by maps and calendar
  */
 @WebServlet("/calculate-trip")
 public class TripServlet extends HttpServlet {
@@ -49,36 +48,6 @@ public class TripServlet extends HttpServlet {
 
   private static final int HALF_HOUR = 30;
   private static final int NINETY_MINS = 90;
-
-  @Override
-  public void doGet(HttpServletRequest request, HttpServletResponse response) 
-      throws IOException {
-    response.setContentType("application/json;");
-    
-    // do get for events
-    eventDoGet(request, response);
-  }
-
-  /**
-   * Make the servlet cleaner
-   * Iterate through the entities and create the events and write them to json
-   */
-  private void eventDoGet(HttpServletRequest request, HttpServletResponse response)
-      throws IOException { 
-    Query query = new Query("event");
-
-    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-    PreparedQuery results = datastore.prepare(query);
-
-    List<Event> events = new ArrayList<>();
-
-    // create the events
-    for (Entity entity : results.asIterable()) {
-      events.add(Event.eventFromEntity(entity));
-    }   
-
-    response.getWriter().println(convertToJson(events));
-   }
 
   @Override
   public void doPost(HttpServletRequest request, HttpServletResponse response) 
@@ -95,7 +64,7 @@ public class TripServlet extends HttpServlet {
     Entity tripDayEntity = putTripDayInDatastore(request, response, datastore, date);
 
     // put Event entities in datastore
-    eventDoPost(request, response, params, tripDayEntity);
+    putEventsInDatastore(request, response, params, tripDayEntity);
     
   }
 

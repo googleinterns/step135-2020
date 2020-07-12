@@ -32,6 +32,7 @@ public class TripDay {
   // Entity params
   private static final String ORIGIN = "origin";
   private static final String DESTINATION = "destination";
+  private static final String DATE = "date";
 
   /**
    * Creates a new TripDay.
@@ -106,6 +107,7 @@ public class TripDay {
     Entity tripDayEntity = new Entity("trip-day");
     tripDayEntity.setProperty(ORIGIN, this.origin);
     tripDayEntity.setProperty(DESTINATION, this.destination);
+    tripDayEntity.setProperty(DATE, this.date);
     return tripDayEntity;
   }
 
@@ -116,6 +118,19 @@ public class TripDay {
     Entity tripDayEntity = new Entity("trip-day", parentKeyID);
     tripDayEntity.setProperty(ORIGIN, this.origin);
     tripDayEntity.setProperty(DESTINATION, this.destination);
+    tripDayEntity.setProperty(DATE, this.date);
     return tripDayEntity;
   }
+
+  /**
+  public static TripDay tripDayFromEntity(Entity entity) {
+    String origin = (String) entity.getProperty(ORIGIN);
+    String destination = (String) emtity.getProperty(DESTINATION);
+    String locations = new ArrayList<>();
+    String date = (String) entity.getProperty(DATE);
+
+    TripDay tripDay = new TripDay(origin, destiantion, locations, date);
+    return tripDay;
+  }**/
+
 }
