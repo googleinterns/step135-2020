@@ -128,11 +128,11 @@ public class TripDay {
    */
   public static TripDay tripDayFromEntity(Entity entity) {
     String origin = (String) entity.getProperty(ORIGIN);
-    String destination = (String) emtity.getProperty(DESTINATION);
-    String locations = new ArrayList<>();
+    String destination = (String) entity.getProperty(DESTINATION);
+    List<String> locations = new ArrayList<>();
     String date = (String) entity.getProperty(DATE);
 
-    TripDay tripDay = new TripDay(origin, destiantion, locations, date);
+    TripDay tripDay = new TripDay(origin, destination, locations, date);
     return tripDay;
   }
 
