@@ -73,6 +73,11 @@ public class TripServlet extends HttpServlet {
     // Get User Entity. If user not logged in, redirect to homepage.
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
     Entity userEntity = AuthServlet.getCurrentUserEntity();
+    if (userEntity == null) {
+      response.sendRedirect("/");
+    }
+
+    // Put Trip Entity into datastore.
     Entity tripEntity = Trip.buildEntity(tripName, destinationName, photoSrc,
       tripDayOfTravel, tripDayOfTravel, userEntity.getKey());
     datastore.put(tripEntity);
