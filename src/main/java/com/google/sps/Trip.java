@@ -92,7 +92,7 @@ public class Trip {
   public Entity buildEntity() {
     Entity tripEntity = new Entity(TRIP);
     tripEntity.setProperty(TRIP_NAME, this.tripName);
-    // TODO.
+    return tripEntity;
   }
 
   /**

@@ -8,6 +8,17 @@
 
 package com.google.sps.servlets;
 
+import com.google.appengine.api.datastore.Entity;
+import com.google.maps.errors.ApiException;
+import com.google.maps.FindPlaceFromTextRequest;
+import com.google.maps.GeoApiContext;
+import com.google.maps.PlaceDetailsRequest;
+import com.google.maps.model.FindPlaceFromText;
+import com.google.maps.model.LatLng;
+import com.google.maps.model.PlaceDetails;
+import com.google.maps.model.PlaceType;
+import com.google.sps.data.Config;
+import com.google.sps.Trip;
 import java.io.IOException;
 import java.util.Enumeration;
 import javax.servlet.annotation.WebServlet;
@@ -45,6 +56,24 @@ public class TripServlet extends HttpServlet {
     Trip trip = new Trip(tripName, tripDayOfTravel);
     Entity tripEntity = trip.buildEntity();
 
+    GeoApiContext context = new GeoApiContext.Builder()
+      .apiKey(Config.API_KEY)
+      .build();
+
+    FindPlaceFromTextRequest findPlaceRequest = findPlaceFromText(context, 
+      tripDestination, FindPlaceFromTextRequest.InputType.TEXT_QUERY);
+
+    try {
+      FindPlaceFromText findPlaceResult = findPlaceRequest.await();
+      response.getWriter().println(findPlaceResult.candidates[0]);
+
+      PlaceDetailsRequest placeDetailsRequest = placeDetails(context, 
+        findPlaceResult.candidates[0].placeId);
+      PlaceDetails placeDetailsResult = placeDetailsRequest.await();
+      response.getWriter().println(placeDetailsResult);
+    } catch (ApiException | InterruptedException e) {
+      throw new IOException(e);
+    }
 
 
 
@@ -54,6 +83,21 @@ public class TripServlet extends HttpServlet {
       String paramName = params.nextElement();
       response.getWriter().println(paramName + ": " + request.getParameter(paramName));
     }
+  }
+
+  /**
+   * Find places using either search text, or a phone number.
+   *
+   * @param context The context on which to make Geo API requests.
+   * @param input The input to search on.
+   * @param inputType Whether the input is search text, or a phone number.
+   * @return Returns a FindPlaceFromTextRequest that you can configure and execute.
+   */
+  public static FindPlaceFromTextRequest findPlaceFromText(
+      GeoApiContext context, String input, FindPlaceFromTextRequest.InputType inputType) {
+    FindPlaceFromTextRequest request = new FindPlaceFromTextRequest(context);
+    request.input(input).inputType(inputType);
+    return request;
   }
 
 }
