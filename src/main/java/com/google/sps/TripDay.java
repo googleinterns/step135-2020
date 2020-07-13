@@ -135,5 +135,4 @@ public class TripDay {
     TripDay tripDay = new TripDay(origin, destination, locations, date);
     return tripDay;
   }
-
 }
