@@ -79,16 +79,21 @@ public class TripServlet extends HttpServlet {
     throws IOException {
 
     FindPlaceFromTextRequest findPlaceRequest = PlacesApi.findPlaceFromText(context, 
-      tripDestination, FindPlaceFromTextRequest.InputType.TEXT_QUERY);
-    FindPlaceFromText findPlaceResult = findPlaceRequest.await();
+      textSearch, FindPlaceFromTextRequest.InputType.TEXT_QUERY);
 
-    // Return place ID of the first candidate result.
-    if (findPlaceResult.candidates != null) {
-      return findPlaceResult.candidates[0].placeId;
+    try {
+      FindPlaceFromText findPlaceResult = findPlaceRequest.await();
+
+      // Return place ID of the first candidate result.
+      if (findPlaceResult.candidates != null) {
+        return findPlaceResult.candidates[0].placeId;
+      }
+      
+      // No candidate is given, so return null.
+      return null;
+    } catch(ApiException | InterruptedException e) {
+      throw new IOException(e);
     }
-    
-    // No candidate is given, so return null.
-    return null;
   }
 
   /**
@@ -99,7 +104,11 @@ public class TripServlet extends HttpServlet {
 
     PlaceDetailsRequest placeDetailsRequest = PlacesApi.placeDetails(context, 
       placeId);
-    return placeDetailsRequest.await();
+    try {
+      return placeDetailsRequest.await();
+    } catch(ApiException | InterruptedException e) {
+      throw new IOException(e);
+    }
   }
 
 
