@@ -67,6 +67,10 @@ public class TripServlet extends HttpServlet {
     putEventsInDatastore(request, response, params, tripDayEntity, date, datastore);
   }
 
+  /**
+   * put TripDay into Datastore
+   * @return tripDay entity, needed for event creation
+   */
   private Entity putTripDayInDatastore(HttpServletRequest request, HttpServletResponse response,
       DatastoreService datastore, String date) throws IOException {
     
@@ -78,10 +82,11 @@ public class TripServlet extends HttpServlet {
     datastore.put(tripDayEntity);
     return tripDayEntity;  
   }
+
   /**
    * Make the servlet cleaner.
    * Searches through the parameters and creates the events and puts them into
-   * datastore.
+   * datastore with associated tripDayEntity as a parent
    */
   private void putEventsInDatastore(HttpServletRequest request, HttpServletResponse response, 
       Enumeration<String> params, Entity tripDayEntity, String date, DatastoreService datastore)
@@ -110,7 +115,7 @@ public class TripServlet extends HttpServlet {
         // put entity in datastore     
         datastore.put(eventEntity);
 
-        // sets start time for next event 2 hours after start of prev
+        // sets start time for next event 1.5 hours after start of prev
         startDateTime = startDateTime.plusMinutes(Long.valueOf(NINETY_MINS));
       }
 
