@@ -46,6 +46,7 @@ public class TripServlet extends HttpServlet {
   private LocalDateTime startDateTime;
   private static int count = 0;
 
+  // time class constants
   private static final int HALF_HOUR = 30;
   private static final int NINETY_MINS = 90;
 
@@ -88,10 +89,7 @@ public class TripServlet extends HttpServlet {
       throws IOException { 
 
     // set startDateTime, will be removed
-    if (count == 0) {
       setDateTime(date);
-      count++;
-    }
 
     // search through all the parameters looking for pois
     while (params.hasMoreElements()) {

@@ -29,7 +29,6 @@ public class Event {
   // inputs
   private String name;
   private String address;
-  
   private LocalDateTime startTime;
   private LocalDateTime endTime;
 
