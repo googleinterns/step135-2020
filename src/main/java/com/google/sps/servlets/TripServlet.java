@@ -51,6 +51,7 @@ public class TripServlet extends HttpServlet {
     String origin = request.getParameter("inputDestination");
     String startDate = request.getParameter("inputDayOfTravel");
 
+    // Print user input for now
     response.getWriter().println("startDate: " + startDate);
     response.getWriter().println("tripName: " + tripName);
     response.getWriter().println("origin: " + origin);
