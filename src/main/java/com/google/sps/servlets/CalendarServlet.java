@@ -48,6 +48,7 @@ public class CalendarServlet extends HttpServlet {
 
     List<Event> events = new ArrayList<>();
 
+    // iterate through all the TripDays and get events for each one
     for (Entity tripDayEntity : tripDayResults.asIterable()) {
       Query eventsQuery = new Query("event", tripDayEntity.getKey());
       PreparedQuery eventResults = datastore.prepare(eventsQuery);
