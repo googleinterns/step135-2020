@@ -15,6 +15,7 @@
 package com.google.sps;
 
 import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.datastore.Key;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -32,6 +33,9 @@ public class Trip {
 
   // Field attributes for the Trip class.
   private String tripName;
+  private String destinationName;
+  private String tripKey;
+  private String imageSrc;
   private LocalDate startDate;
   private LocalDate endDate;
   private int numDays;
@@ -39,8 +43,9 @@ public class Trip {
   // Constants to get and put the Entity objects in Datastore.
   private static final String TRIP = "trip";
   private static final String TRIP_NAME = "trip_name";
+  private static final String DESTINATION_NAME = "destination_name";
+  private static final String TRIP_KEY = "trip_key";
   private static final String IMAGE_SRC = "image_src";
-  private static final String DESTINATION = "destination";
   private static final String START_DATE = "start_date";
   private static final String END_DATE = "end_date";
 
@@ -48,12 +53,29 @@ public class Trip {
    * Creates a new Trip.
    *
    * @param tripName The human-readable name for the trip. Must be non-null.
+   * @param destinationName The name of the destination they are heading.
+   * @param tripKey The key of the trip as created by the Trip Entity.
+   * @param imageSrc The image source / URL to represent the trip.
    * @param startDate The start date for the trip. Must be non-null. Must be in yyyy-MM-dd date format.
    * @param endDate The end date for the trip. Must be non-null. Must be in yyyy-MM-dd date format.
    */
-  public Trip(String tripName, String startDate, String endDate) {
+  public Trip(String tripName, String destinationName, String tripKey, 
+    String imageSrc, String startDate, String endDate) {
+
     if (tripName == null) {
       throw new IllegalArgumentException("tripName cannot be null");
+    }
+    
+    if (destinationName == null) {
+      throw new IllegalArgumentException("destinationName cannot be null");
+    }
+    
+    if (tripKey == null) {
+      throw new IllegalArgumentException("tripKey cannot be null");
+    }
+    
+    if (imageSrc == null) {
+      throw new IllegalArgumentException("imageSrc cannot be null");
     }
 
     if (startDate == null) {
@@ -65,6 +87,9 @@ public class Trip {
     }
 
     this.tripName = tripName;
+    this.destinationName = destinationName;
+    this.tripKey = tripKey;
+    this.imageSrc = imageSrc;
     this.startDate = getLocalDate(startDate);
     this.endDate = getLocalDate(endDate);
 
@@ -80,18 +105,30 @@ public class Trip {
    * This constructor will be used for the MVP.
    * 
    * @param tripName The human-readable name for the trip. Must be non-null.
+   * @param destinationName The name of the destination they are heading.
+   * @param tripKey The key of the trip as created by the Trip Entity.
+   * @param imageSrc The image source / URL to represent the trip.
    * @param startDate The start date for the trip. Must be non-null.
    */
-  public Trip(String tripName, String startDate) {
-    this(tripName, startDate, startDate);
+  public Trip(String tripName, String destinationName, String tripKey, 
+    String imageSrc, String startDate) {
+
+    this(tripName, destinationName, tripKey, imageSrc, startDate, startDate);
   }
 
   /**
-   * Builds and return an Entity object from the Trip class.
+   * Builds and return an Entity object of type "Trip".
+   * The Trip Entity must have a User Entity as its parent (ancestor).
    */
-  public Entity buildEntity() {
-    Entity tripEntity = new Entity(TRIP);
-    tripEntity.setProperty(TRIP_NAME, this.tripName);
+  public static Entity buildEntity(String tripName, String destinationName, 
+    String imageSrc, String startDate, String endDate, Key userEntityParentKey) {
+
+    Entity tripEntity = new Entity(TRIP, userEntityParentKey);
+    tripEntity.setProperty(TRIP_NAME, tripName);
+    tripEntity.setProperty(DESTINATION_NAME, destinationName);
+    tripEntity.setProperty(IMAGE_SRC, imageSrc);
+    tripEntity.setProperty(START_DATE, startDate);
+    tripEntity.setProperty(END_DATE, endDate);
     return tripEntity;
   }
 
@@ -100,6 +137,27 @@ public class Trip {
    */
   public String getTripName() {
     return this.tripName;
+  }
+
+  /**
+   * Returns the name of the destination they are heading.
+   */
+  public String getDestinationName() {
+    return this.destinationName;
+  }
+
+  /**
+   * Returns the key of the trip as created by the Trip Entity.
+   */
+  public String getTripKey() {
+    return this.tripKey;
+  }
+
+  /**
+   * Returns the image source / URL to represent the trip.
+   */
+  public String getImageSrc() {
+    return this.imageSrc;
   }
 
   /**

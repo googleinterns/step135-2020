@@ -8,6 +8,8 @@
 
 package com.google.sps.servlets;
 
+import com.google.appengine.api.datastore.DatastoreService;
+import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
 import com.google.maps.errors.ApiException;
 import com.google.maps.FindPlaceFromTextRequest;
@@ -49,25 +51,31 @@ public class TripServlet extends HttpServlet {
       .apiKey(Config.API_KEY)
       .build();
 
-    // Get place ID from search of trip destination. Get photo if not null; 
-    // otherwise, use a placeholder photo.
+    // Get place ID from search of trip destination. Get photo and destination 
+    // if not null; otherwise, use a placeholder photo and destination.
     String destinationPlaceId = getPlaceIdFromTextSearch(context, tripDestination);
+    String destinationName;
     String photoSrc;
     if (destinationPlaceId == null) {
+      destinationName = tripDestination;
       photoSrc = "images/placeholder_image.png";
     } else {
       PlaceDetails placeDetailsResult = getPlaceDetailsFromPlaceId(context, destinationPlaceId);
+
+      // Get the name of the location from the place details result.
+      destinationName = placeDetailsResult.name;
 
       // Get a photo of the location from the place details result.
       Photo photoObject = placeDetailsResult.photos[0];
       photoSrc = getUrlFromPhotoReference(400, photoObject.photoReference);
     }
 
-    // Create Trip object.
-    Trip trip = new Trip(tripName, tripDayOfTravel);
-    Entity tripEntity = trip.buildEntity();
-
-
+    // Get User Entity. If user not logged in, redirect to homepage.
+    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+    Entity userEntity = AuthServlet.getCurrentUserEntity();
+    Entity tripEntity = Trip.buildEntity(tripName, destinationName, photoSrc,
+      tripDayOfTravel, tripDayOfTravel, userEntity.getKey());
+    datastore.put(tripEntity);
 
     // Print out params to site to verify retrieval of "start trip" user input.
     Enumeration<String> params = request.getParameterNames();
