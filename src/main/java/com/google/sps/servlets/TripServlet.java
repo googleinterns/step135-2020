@@ -49,13 +49,19 @@ public class TripServlet extends HttpServlet {
       .apiKey(Config.API_KEY)
       .build();
 
-    // Get place ID and place details from search of trip destination.
+    // Get place ID from search of trip destination. Get photo if not null; 
+    // otherwise, use a placeholder photo.
     String destinationPlaceId = getPlaceIdFromTextSearch(context, tripDestination);
-    PlaceDetails placeDetailsResult = getPlaceDetailsFromPlaceId(context, destinationPlaceId);
+    String photoSrc;
+    if (destinationPlaceId == null) {
+      photoSrc = "images/placeholder_image.png";
+    } else {
+      PlaceDetails placeDetailsResult = getPlaceDetailsFromPlaceId(context, destinationPlaceId);
 
-    // Get a photo of the location from the place details result.
-    Photo photoObject = placeDetailsResult.photos[0];
-    String photoSrc = getUrlFromPhotoReference(400, photoObject.photoReference);
+      // Get a photo of the location from the place details result.
+      Photo photoObject = placeDetailsResult.photos[0];
+      photoSrc = getUrlFromPhotoReference(400, photoObject.photoReference);
+    }
 
     // Create Trip object.
     Trip trip = new Trip(tripName, tripDayOfTravel);
