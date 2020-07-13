@@ -13,8 +13,10 @@ import com.google.maps.errors.ApiException;
 import com.google.maps.FindPlaceFromTextRequest;
 import com.google.maps.GeoApiContext;
 import com.google.maps.PlaceDetailsRequest;
+import com.google.maps.PlacesApi;
 import com.google.maps.model.FindPlaceFromText;
 import com.google.maps.model.LatLng;
+import com.google.maps.model.Photo;
 import com.google.maps.model.PlaceDetails;
 import com.google.maps.model.PlaceType;
 import com.google.sps.data.Config;
@@ -38,42 +40,26 @@ public class TripServlet extends HttpServlet {
   public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
     response.setContentType("application/json;");
 
-    /**
-    inputDestination: California, USA
-    poi-1: Table Mountain Casino
-    poi-2: Fresno Chaffee Zoo
-    inputTripName: My Favorite Trip
-    inputDayOfTravel: 2020-07-17
-    poi-3: Sierra Bicentennial Park
-    */
-
     // Retrieve form inputs to define the Trip object.
     String tripName = request.getParameter(INPUT_TRIP_NAME);
     String tripDestination = request.getParameter(INPUT_DESTINATION);
     String tripDayOfTravel = request.getParameter(INPUT_DAY_OF_TRAVEL);
 
-    // Create Trip object.
-    Trip trip = new Trip(tripName, tripDayOfTravel);
-    Entity tripEntity = trip.buildEntity();
-
     GeoApiContext context = new GeoApiContext.Builder()
       .apiKey(Config.API_KEY)
       .build();
 
-    FindPlaceFromTextRequest findPlaceRequest = findPlaceFromText(context, 
-      tripDestination, FindPlaceFromTextRequest.InputType.TEXT_QUERY);
+    // Get place ID and place details from search of trip destination.
+    String destinationPlaceId = getPlaceIdFromTextSearch(context, tripDestination);
+    PlaceDetails placeDetailsResult = getPlaceDetailsFromPlaceId(context, destinationPlaceId);
 
-    try {
-      FindPlaceFromText findPlaceResult = findPlaceRequest.await();
-      response.getWriter().println(findPlaceResult.candidates[0]);
+    // Get a photo of the location from the place details result.
+    Photo photoObject = placeDetailsResult.photos[0];
+    String photoSrc = getUrlFromPhotoReference(400, photoObject.photoReference);
 
-      PlaceDetailsRequest placeDetailsRequest = placeDetails(context, 
-        findPlaceResult.candidates[0].placeId);
-      PlaceDetails placeDetailsResult = placeDetailsRequest.await();
-      response.getWriter().println(placeDetailsResult);
-    } catch (ApiException | InterruptedException e) {
-      throw new IOException(e);
-    }
+    // Create Trip object.
+    Trip trip = new Trip(tripName, tripDayOfTravel);
+    Entity tripEntity = trip.buildEntity();
 
 
 
@@ -86,18 +72,46 @@ public class TripServlet extends HttpServlet {
   }
 
   /**
-   * Find places using either search text, or a phone number.
-   *
-   * @param context The context on which to make Geo API requests.
-   * @param input The input to search on.
-   * @param inputType Whether the input is search text, or a phone number.
-   * @return Returns a FindPlaceFromTextRequest that you can configure and execute.
+   * Get the place ID of the text search. Return null if no place ID matches
+   * the search.
+   */ 
+  public String getPlaceIdFromTextSearch(GeoApiContext context, String textSearch) 
+    throws IOException {
+
+    FindPlaceFromTextRequest findPlaceRequest = PlacesApi.findPlaceFromText(context, 
+      tripDestination, FindPlaceFromTextRequest.InputType.TEXT_QUERY);
+    FindPlaceFromText findPlaceResult = findPlaceRequest.await();
+
+    // Return place ID of the first candidate result.
+    if (findPlaceResult.candidates != null) {
+      return findPlaceResult.candidates[0].placeId;
+    }
+    
+    // No candidate is given, so return null.
+    return null;
+  }
+
+  /**
+   * Get the PlaceDetails object from the place ID.
    */
-  public static FindPlaceFromTextRequest findPlaceFromText(
-      GeoApiContext context, String input, FindPlaceFromTextRequest.InputType inputType) {
-    FindPlaceFromTextRequest request = new FindPlaceFromTextRequest(context);
-    request.input(input).inputType(inputType);
-    return request;
+  public PlaceDetails getPlaceDetailsFromPlaceId(GeoApiContext context, String placeId)
+    throws IOException {
+
+    PlaceDetailsRequest placeDetailsRequest = PlacesApi.placeDetails(context, 
+      placeId);
+    return placeDetailsRequest.await();
+  }
+
+
+  /**
+   * Get a URL to show the photo from the photoreference.
+   * See https://developers.google.com/places/web-service/photos#place_photo_requests
+   * for more info.
+   */
+  public String getUrlFromPhotoReference(int maxWidth, String photoReference) {
+    final String baseUrl = "https://maps.googleapis.com/maps/api/place/photo?";
+    return baseUrl + "maxwidth=" + maxWidth + "&photoreference=" + 
+      photoReference + "&key=" + Config.API_KEY;
   }
 
 }
