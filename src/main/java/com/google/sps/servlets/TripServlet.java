@@ -94,7 +94,7 @@ public class TripServlet extends HttpServlet {
       throws IOException { 
 
     // set startDateTime, will be removed
-      setDateTime(date);
+    setDateTime(date);
 
     // search through all the parameters looking for pois
     while (params.hasMoreElements()) {
