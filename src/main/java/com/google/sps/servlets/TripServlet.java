@@ -66,8 +66,12 @@ public class TripServlet extends HttpServlet {
       destinationName = placeDetailsResult.name;
 
       // Get a photo of the location from the place details result.
-      Photo photoObject = placeDetailsResult.photos[0];
-      photoSrc = getUrlFromPhotoReference(400, photoObject.photoReference);
+      if (placeDetailsResult.photos == null) {
+        photoSrc = "images/placeholder_image.png";
+      } else {
+        Photo photoObject = placeDetailsResult.photos[0];
+        photoSrc = getUrlFromPhotoReference(400, photoObject.photoReference);
+      }
     }
 
     // Get User Entity. If user not logged in, redirect to homepage.
