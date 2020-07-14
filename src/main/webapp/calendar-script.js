@@ -25,30 +25,20 @@ $(document).ready(() => {
     navLinks: true,
     dayMaxEvents: true, //alow "more" link when too many events on one day
 
-    eventMouseEnter: function (MouseEnterInfo) {
-        MouseEnterInfo.el.popover({
-            title: 'titleTest',
-            content: 'content holder',
-            trigger: 'hover',
-            placement: 'top',
-            container: 'body'
-        });
-    },
-
     eventClick: function(info) {
       var eventObj = info.event;
 
-      alert(
-          'title: ' + eventObj.title + '.\n' +
-          'Address: ' + eventObj.extendedProps.address + '.\n' +
+      const modalLabel = document.getElementById('exampleModalLabel');
+      modalLabel.innerText = 'Title: ' + eventObj.title;
+      const modalBody = document.getElementById('exampleModalBody');
+      modalBody.innerText = 'Address: ' + eventObj.extendedProps.address + '.\n' +
           'Opening hours: ' + eventObj.extendedProps.openTime + '.\n' +
           'Closing hours: ' + eventObj.extendedProps.closeTime + '.\n'
-        );
+      $('#exampleModal').modal('show');
     }
   });
   getEvents(calendar);
-  calendar.render();
-  createPopOver();
+  calendar.render();  
 });
 
 /**
@@ -71,17 +61,4 @@ function getEvents(calendar) {
       });
     });
   });
-}
-
-/**
- * Create popover functions
- */
-function createPopOver() {
-  const cal = document.getElementById('practiceContent');
-  const prac = document.createElement('a');
-  prac.id = 'temp123';
-  prac.modal = 'popover';
-  prac.title = 'Title ex';
-  prac.content = 'to display';
-  $(prac.id).popover('toggle');
 }
