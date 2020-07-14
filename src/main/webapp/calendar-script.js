@@ -14,12 +14,12 @@
 
 let script = document.createElement('script');
 script.src = 'https://maps.googleapis.com/maps/api/js?key=' + config.API_KEY + 
-  '&libraries=places&callback=initScript';
+  '&libraries=&callback=initMod';
 script.defer = true;
 script.async = true;
 
 // Triggered upon DOM load.
-$(document).ready(() => {
+window.initMod = function() {
   var calendarEl = document.getElementById('calendar');
   var calendar = new FullCalendar.Calendar(calendarEl, {
     headerToolbar: {
@@ -46,8 +46,9 @@ $(document).ready(() => {
     }
   });
   getEvents(calendar);
-  calendar.render();  
-});
+  calendar.render();
+  createMap('Sutro Tower, La Avanzada Street, San Francisco, CA, USA');
+};
 
 /**
  * retrives the events from /calculate-trip url and dynamically adds the events
@@ -76,18 +77,19 @@ function getEvents(calendar) {
  */
 function createMap(address) {
   var geocoder = new google.maps.Geocoder();
+  var coords;
 
   geocoder.geocode( { 'address': address}, function(results, status) {
 
   if (status == google.maps.GeocoderStatus.OK) {
     var latitude = results[0].geometry.location.lat();
     var longitude = results[0].geometry.location.lng();
+    coords = {lat: latitude, lng: longitude};
   }
 
   console.log(latitude);
   console.log(longitude);
 
-  var coords = {lat: latitude, lng: longitude};
 
   var map = new google.maps.Map(document.getElementById('map'), {
     zoom: 4,
@@ -97,7 +99,7 @@ function createMap(address) {
   var marker = new google.maps.Marker({
     position: coords,
     map: map,
-    title: 'Hello World!'
+    title: 'Title'
     });
   });
 }
