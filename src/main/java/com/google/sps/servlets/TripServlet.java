@@ -64,9 +64,12 @@ public class TripServlet extends HttpServlet {
   }
 
   // function to set time, need to do only once
-  public void setDateTime(String date) {
+  public LocalDateTime setDateTime(String date, LocalDateTime startDateTime) {
     if (startDateTime == null) {
       startDateTime = LocalDateTime.of(LocalDate.parse(date), LocalTime.of(10, 0));
+      return startDateTime;
+    } else {
+      return null;
     }
   }
 
@@ -85,9 +88,6 @@ public class TripServlet extends HttpServlet {
    */
   private void eventDoGet(HttpServletResponse response) throws IOException { 
     
-    // declare var
-    LocalDateTime startDateTime;
-
     Query query = new Query("events");
 
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
@@ -110,6 +110,10 @@ public class TripServlet extends HttpServlet {
    */
   private void eventDoPost(HttpServletRequest request, HttpServletResponse response) 
       throws IOException { 
+    
+    // declare var
+    LocalDateTime startDateTime = null;
+
     // Print out params to site to verify retrieval of "start trip" user input.
     Enumeration<String> params = request.getParameterNames();
 
@@ -117,7 +121,7 @@ public class TripServlet extends HttpServlet {
     String date = request.getParameter("inputDayOfTravel");
 
     // set startDateTime, will be removed
-      setDateTime(date);
+    startDateTime = setDateTime(date, startDateTime);
 
     // search through all the parameters looking for pois
     while (params.hasMoreElements()) {
