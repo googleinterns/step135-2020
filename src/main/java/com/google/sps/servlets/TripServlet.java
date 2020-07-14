@@ -52,8 +52,6 @@ public class TripServlet extends HttpServlet {
   private static final String START_TIME = "start-time";
   private static final String TRAVEL_TIME = "travel-time";
 
-  
-
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) 
       throws IOException {
@@ -61,16 +59,6 @@ public class TripServlet extends HttpServlet {
     
     // do get for events
     eventDoGet(response);
-  }
-
-  // function to set time, need to do only once
-  public LocalDateTime setDateTime(String date, LocalDateTime startDateTime) {
-    if (startDateTime == null) {
-      startDateTime = LocalDateTime.of(LocalDate.parse(date), LocalTime.of(10, 0));
-      return startDateTime;
-    } else {
-      return null;
-    }
   }
 
   @Override
@@ -111,17 +99,14 @@ public class TripServlet extends HttpServlet {
   private void eventDoPost(HttpServletRequest request, HttpServletResponse response) 
       throws IOException { 
     
-    // declare var
-    LocalDateTime startDateTime = null;
-
     // Print out params to site to verify retrieval of "start trip" user input.
     Enumeration<String> params = request.getParameterNames();
 
     // get date of trip
     String date = request.getParameter("inputDayOfTravel");
 
-    // set startDateTime, will be removed
-    startDateTime = setDateTime(date, startDateTime);
+    // set startDateTime
+    LocalDateTime startDateTime = LocalDateTime.of(LocalDate.parse(date), LocalTime.of(10, 0));
 
     // search through all the parameters looking for pois
     while (params.hasMoreElements()) {
