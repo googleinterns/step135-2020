@@ -41,10 +41,6 @@ import javax.servlet.http.HttpServletResponse;
 @WebServlet("/calculate-trip")
 public class TripServlet extends HttpServlet {
 
-  // temporary vars
-  private LocalDateTime startDateTime;
-  private static int count = 0;
-
   // time class constants
   private static final int HALF_HOUR = 30;
   private static final int NINETY_MINS = 90;
@@ -80,8 +76,7 @@ public class TripServlet extends HttpServlet {
     response.setContentType("application/json;");
 
     // do post for events
-    eventDoPost(request, response);
-    
+    eventDoPost(request, response); 
   }
 
   /**
@@ -89,6 +84,10 @@ public class TripServlet extends HttpServlet {
    * Iterate through the entities and create the events and write them to json
    */
   private void eventDoGet(HttpServletResponse response) throws IOException { 
+    
+    // declare var
+    LocalDateTime startDateTime;
+
     Query query = new Query("events");
 
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
