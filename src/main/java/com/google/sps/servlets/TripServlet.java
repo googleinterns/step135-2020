@@ -92,6 +92,9 @@ public class TripServlet extends HttpServlet {
       String paramName = params.nextElement();
       response.getWriter().println(paramName + ": " + request.getParameter(paramName));
     }
+
+    // Redirect to the "/trips/" page to show the trip that was added.
+    response.sendRedirect("/trips/");
   }
 
   /**
