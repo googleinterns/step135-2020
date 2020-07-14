@@ -25,8 +25,8 @@ $(document).ready(() => {
     navLinks: true,
     dayMaxEvents: true, //alow "more" link when too many events on one day
 
-    eventMouseEnter: function (eventObj, $el) {
-        $el.popover({
+    eventMouseEnter: function (MouseEnterInfo) {
+        MouseEnterInfo.el.popover({
             title: 'titleTest',
             content: 'content holder',
             trigger: 'hover',
@@ -48,7 +48,7 @@ $(document).ready(() => {
   });
   getEvents(calendar);
   calendar.render();
-  //createPopOver();
+  createPopOver();
 });
 
 /**
@@ -83,5 +83,5 @@ function createPopOver() {
   prac.modal = 'popover';
   prac.title = 'Title ex';
   prac.content = 'to display';
-  $(prac.id).modal('toggle');
+  $(prac.id).popover('toggle');
 }
