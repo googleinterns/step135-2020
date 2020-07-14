@@ -15,8 +15,8 @@
 package com.google.sps.data;
 
 import com.google.appengine.api.datastore.Entity;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 public class User {
 

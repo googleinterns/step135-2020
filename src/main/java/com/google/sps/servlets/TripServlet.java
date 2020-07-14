@@ -134,7 +134,6 @@ public class TripServlet extends HttpServlet {
     }
   }
 
-
   /**
    * Get a URL to show the photo from the photoreference.
    * See https://developers.google.com/places/web-service/photos#place_photo_requests
