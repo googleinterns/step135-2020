@@ -50,18 +50,17 @@ function addTripCards(trips) {
     const tripCardContainer = document.getElementById('trips-cards-container');
 
     // Build and add the trip card.
-    const tripCard = buildTripCard(trip.tripName, trip.imageSrc, trip.startDate, 
-      trip.endDate, trip.tripKey);
-    tripcardContainer.appendChild(tripCard);
+    const tripCard = buildTripCard(trip.tripName, trip.destinationName, 
+      trip.imageSrc, trip.startDate, trip.endDate, trip.tripKey);
+    tripCardContainer.appendChild(tripCard);
   });
 }
 
 // Build HTML trip card to display.
-function buildTripCard(tripTitle, imageSrc, startDate, endDate, tripKey) {
+function buildTripCard(tripTitle, destinationName, imageSrc, startDate, endDate, tripKey) {
   // Create the card container.
   const cardContainer = document.createElement('div');
   cardContainer.className = 'card';
-  cardContainer.style.width = '18rem';
 
   // Create a trip image object (image of the destination).
   const tripImage = document.createElement('img');
@@ -78,23 +77,24 @@ function buildTripCard(tripTitle, imageSrc, startDate, endDate, tripKey) {
   titleElement.className = 'card-title';
   titleElement.innerText = tripTitle;
 
-  const datesElement = document.createElement('p');
-  datesElement.className = 'card-text';
-  datesElement.innerText = startDate + ' - ' + endDate;
+  const datesDestinationElement = document.createElement('p');
+  datesDestinationElement.className = 'card-text';
+  datesDestinationElement.innerText = destinationName + ', ' + startDate.year + 
+    '-' + startDate.month + '-' + startDate.day;
 
   const calendarButton = document.createElement('a');
-  calendarButton.className = 'btn btn-primary';
+  calendarButton.className = 'btn btn-primary trip-button';
   calendarButton.href = '../calendar.html?tripKey=' + tripKey;
-  calendarButton.innerText = 'Visit Calendar';
+  calendarButton.innerText = 'Calendar';
 
   const mapsButton = document.createElement('a');
-  mapsButton.className = 'btn btn-primary';
+  mapsButton.className = 'btn btn-primary trip-button';
   mapsButton.href = '../maps.html?tripKey=' + tripKey;
-  mapsButton.innerText = 'Visit Maps';
+  mapsButton.innerText = 'Maps';
 
   // Add the body elements to the card body container.
   cardBodyContainer.appendChild(titleElement);
-  cardBodyContainer.appendChild(datesElement);
+  cardBodyContainer.appendChild(datesDestinationElement);
   cardBodyContainer.appendChild(calendarButton);
   cardBodyContainer.appendChild(mapsButton);
 

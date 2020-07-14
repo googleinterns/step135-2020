@@ -133,3 +133,11 @@
 #suggested-location-block-header {
   margin-top: 15px;
 }
+
+.card {
+  width: 15rem;
+}
+
+.trip-button {
+  margin-right: 5px;
+}

@@ -58,7 +58,7 @@ public class TripServlet extends HttpServlet {
     String photoSrc;
     if (destinationPlaceId == null) {
       destinationName = tripDestination;
-      photoSrc = "images/placeholder_image.png";
+      photoSrc = "../images/placeholder_image.png";
     } else {
       PlaceDetails placeDetailsResult = getPlaceDetailsFromPlaceId(context, destinationPlaceId);
 
@@ -67,7 +67,7 @@ public class TripServlet extends HttpServlet {
 
       // Get a photo of the location from the place details result.
       if (placeDetailsResult.photos == null) {
-        photoSrc = "images/placeholder_image.png";
+        photoSrc = "../images/placeholder_image.png";
       } else {
         Photo photoObject = placeDetailsResult.photos[0];
         photoSrc = getUrlFromPhotoReference(400, photoObject.photoReference);
