@@ -41,6 +41,9 @@ import com.google.sps.data.Config;
 @WebServlet("/calculate-trip")
 public class TripServlet extends HttpServlet {
 
+  // Constant for picking route
+  private static final int ROUTE_INDEX = 0;
+
   // Saves user input and calculates optimal route using Maps Java Client
   @Override
   public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -68,7 +71,26 @@ public class TripServlet extends HttpServlet {
     String[] poiStrings = new String[pois.size()]; 
     poiStrings = pois.toArray(poiStrings); 
 
-   	GeoApiContext distCalcer = new GeoApiContext.Builder()
+    DirectionsApiRequest directionsRequest = generateDirectionsRequest(origin, poiStrings);
+
+    // Calculate route and save travelTimes and waypointOrder to two ArrayLists.
+    try {
+      DirectionsResult dirResult = directionsRequest.await();
+
+      List<Integer> travelTimes = getTravelTimes(dirResult);
+      List<String> orderedLocationStrings = getOrderedWaypoints(dirResult);
+
+      // Print out results on page for now
+      response.getWriter().println(travelTimes.toString());
+      response.getWriter().println(orderedLocationStrings.toString());
+    } catch (ApiException | InterruptedException e) {
+      // If no directions are found or API throws an error.
+      throw new IOException(e);
+    } 
+  }
+
+  public static DirectionsApiRequest generateDirectionsRequest(String origin, String[] poiStrings) {
+    GeoApiContext distCalcer = new GeoApiContext.Builder()
 		    .apiKey(Config.API_KEY)
 		    .build();
 
@@ -80,27 +102,32 @@ public class TripServlet extends HttpServlet {
         .optimizeWaypoints(true)
         .mode(TravelMode.DRIVING);
 
-    // Calculate route and save travelTimes and waypointOrder to two ArrayLists
-    try {
-      DirectionsResult dirResult = directionsRequest.await();
-      int[] waypointOrder = dirResult.routes[0].waypointOrder;
-      List<Integer> travelTimes = new ArrayList<>();
-      for (DirectionsLeg leg : dirResult.routes[0].legs) {
-        int travelTime = (int) leg.duration.inSeconds / 60;
-        travelTimes.add(travelTime);
-      }
+    return directionsRequest;
+  }
 
-      // Generate an ordered list of location Strings from waypointOrder
-      List<String> orderedLocationStrings = new ArrayList<>();
-      for (int i = 0; i < waypointOrder.length; i++) {
-        orderedLocationStrings.add(pois.get(waypointOrder[i]));
-      }
+  public static List<Integer> getTravelTimes(DirectionsResult dirResult) {
+    int secondsInMinute = 60;
 
-      // Print out results on page for now
-      response.getWriter().println(travelTimes.toString());
-      response.getWriter().println(orderedLocationStrings.toString());
-    } catch (ApiException | InterruptedException e) {
-      throw new IOException(e);
-    } 
+    List<Integer> travelTimes = new ArrayList<>();
+    // Take the first route, usually the optimal.
+    for (DirectionsLeg leg : dirResult.routes[ROUTE_INDEX].legs) {
+      int travelTime = (int) leg.duration.inSeconds / secondsInMinute;
+      travelTimes.add(travelTime);
+    }
+
+    return travelTimes;
+  }
+
+  public static List<String> getOrderedWaypoints(DirectionsResult dirResult) {
+    // Take the first route, usually the optimal.
+    int[] waypointOrder = dirResult.routes[ROUTE_INDEX].waypointOrder;
+
+    // Generate an ordered list of location Strings from waypointOrder.
+    List<String> orderedLocationStrings = new ArrayList<>();
+    for (int i = 0; i < waypointOrder.length; i++) {
+      orderedLocationStrings.add(pois.get(waypointOrder[i]));
+    }
+
+    return orderedLocationStrings;
   }
 }
