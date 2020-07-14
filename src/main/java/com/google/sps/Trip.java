@@ -143,7 +143,8 @@ public class Trip {
     String imageSrc = (String) tripEntity.getProperty(IMAGE_SRC);
     String startDate = (String) tripEntity.getProperty(START_DATE);
     String endDate = (String) tripEntity.getProperty(END_DATE);
-    Trip trip = new Trip(tripName, destinationName, tripKey, startDate, endDate);
+    Trip trip = new Trip(tripName, destinationName, tripKey, imageSrc, 
+      startDate, endDate);
     return trip;
   }
 
