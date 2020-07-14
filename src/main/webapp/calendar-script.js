@@ -24,9 +24,31 @@ $(document).ready(() => {
     initialView: 'timeGridWeek',
     navLinks: true,
     dayMaxEvents: true, //alow "more" link when too many events on one day
+
+    eventMouseEnter: function (eventObj, $el) {
+        $el.popover({
+            title: 'titleTest',
+            content: 'content holder',
+            trigger: 'hover',
+            placement: 'top',
+            container: 'body'
+        });
+    },
+
+    eventClick: function(info) {
+      var eventObj = info.event;
+
+      alert(
+          'title: ' + eventObj.title + '.\n' +
+          'Address: ' + eventObj.extendedProps.address + '.\n' +
+          'Opening hours: ' + eventObj.extendedProps.openTime + '.\n' +
+          'Closing hours: ' + eventObj.extendedProps.closeTime + '.\n'
+        );
+    }
   });
   getEvents(calendar);
   calendar.render();
+  //createPopOver();
 });
 
 /**
@@ -35,12 +57,31 @@ $(document).ready(() => {
 function getEvents(calendar) {
   fetch('/get-calendar').then(response => response.json()).then((events) => {
     events.forEach((event) => {
+      console.log(event.address);
       calendar.addEvent({     
         title: event.name,
         start: event.strStartTime,
         end: event.strEndTime,
-        allDay: false
+        allDay: false,
+        extendedProps: {
+          address: event.address,
+          openTime: '9AM',
+          closeTime: '5PM',
+        }
       });
     });
   });
+}
+
+/**
+ * Create popover functions
+ */
+function createPopOver() {
+  const cal = document.getElementById('practiceContent');
+  const prac = document.createElement('a');
+  prac.id = 'temp123';
+  prac.modal = 'popover';
+  prac.title = 'Title ex';
+  prac.content = 'to display';
+  $(prac.id).modal('toggle');
 }

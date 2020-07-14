@@ -118,7 +118,7 @@ public class TripServlet extends HttpServlet {
       }
 
       // redirect to home page
-      response.sendRedirect("/");
+      response.sendRedirect("/trips/");
     }
   }
 
