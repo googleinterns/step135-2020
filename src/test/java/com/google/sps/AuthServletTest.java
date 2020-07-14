@@ -1,4 +1,3 @@
-
 // Copyright 2019 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -29,7 +28,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
 @RunWith(JUnit4.class)
-public final class UserTest {
+public final class AuthServletTest {
 
   // Add constants for testing User class.
   public static final String EMAIL = "testemail@gmail.com";
@@ -47,14 +46,6 @@ public final class UserTest {
   @After
   public void tearDown() {
     helper.tearDown();
-  }
-
-  @Test
-  public void testUserSetup() {
-    User user = new User(EMAIL);
-
-    // Confirm email variable.
-    Assert.assertEquals(EMAIL, user.getEmail());
   }
 
   @Test
