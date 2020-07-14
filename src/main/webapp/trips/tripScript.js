@@ -72,7 +72,8 @@ function buildTripCard(tripTitle, destinationName, imageSrc, startDate, endDate,
   const cardBodyContainer = document.createElement('div');
   cardBodyContainer.className = 'card-body';
 
-  // Create a title, dates, and action buttons (calendar and maps) for the card.
+  // Create a title, destination and dates, and action buttons (calendar and 
+  // maps) for the card.
   const titleElement = document.createElement('h5');
   titleElement.className = 'card-title';
   titleElement.innerText = tripTitle;
