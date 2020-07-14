@@ -12,6 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+let script = document.createElement('script');
+script.src = 'https://maps.googleapis.com/maps/api/js?key=' + config.API_KEY + 
+  '&libraries=places&callback=initScript';
+script.defer = true;
+script.async = true;
+
 // Triggered upon DOM load.
 $(document).ready(() => {
   var calendarEl = document.getElementById('calendar');
@@ -24,16 +30,18 @@ $(document).ready(() => {
     initialView: 'timeGridWeek',
     navLinks: true,
     dayMaxEvents: true, //alow "more" link when too many events on one day
-
     eventClick: function(info) {
       var eventObj = info.event;
 
+      // title of pop-up
       const modalLabel = document.getElementById('exampleModalLabel');
-      modalLabel.innerText = 'Title: ' + eventObj.title;
+      modalLabel.innerHTML = eventObj.title;
+
+      //body of pop-up
       const modalBody = document.getElementById('exampleModalBody');
-      modalBody.innerText = 'Address: ' + eventObj.extendedProps.address + '.\n' +
-          'Opening hours: ' + eventObj.extendedProps.openTime + '.\n' +
-          'Closing hours: ' + eventObj.extendedProps.closeTime + '.\n'
+      modalBody.innerHTML = '<b>Address: </b>' + eventObj.extendedProps.address + '<br>' +
+          '<b>Opening hours: </b>' + eventObj.extendedProps.openTime + '<br>' +
+          '<b>Closing hours: </b>' + eventObj.extendedProps.closeTime
       $('#exampleModal').modal('show');
     }
   });
@@ -62,3 +70,37 @@ function getEvents(calendar) {
     });
   });
 }
+
+/**
+ * function that initializes map for popup, w specific address as marker
+ */
+function createMap(address) {
+  var geocoder = new google.maps.Geocoder();
+
+  geocoder.geocode( { 'address': address}, function(results, status) {
+
+  if (status == google.maps.GeocoderStatus.OK) {
+    var latitude = results[0].geometry.location.lat();
+    var longitude = results[0].geometry.location.lng();
+  }
+
+  console.log(latitude);
+  console.log(longitude);
+
+  var coords = {lat: latitude, lng: longitude};
+
+  var map = new google.maps.Map(document.getElementById('map'), {
+    zoom: 4,
+    center: coords
+  });
+
+  var marker = new google.maps.Marker({
+    position: coords,
+    map: map,
+    title: 'Hello World!'
+    });
+  });
+}
+
+// Append the 'script' element to the document head.
+document.head.appendChild(script);
