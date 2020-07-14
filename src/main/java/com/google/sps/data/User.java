@@ -21,7 +21,6 @@ import java.util.List;
 public class User {
 
   // Identification information for the user.
-  private String userId;
   private String email;
 
   // Constants to create user entity for datastore.
@@ -43,10 +42,7 @@ public class User {
     return userEntity;
   }
 
-  /**
-   * Getter functions for private User variables.
-   */
-
+  // Get the private email field.
   public String getEmail() {
     return this.email;
   }
