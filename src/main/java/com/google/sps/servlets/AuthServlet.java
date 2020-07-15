@@ -105,7 +105,6 @@ public class AuthServlet extends HttpServlet {
 
   /**
    * Inner class that holds relevant login/logout and user information.
-   * Class and constructors are public to enable testing.
    */
   class UserAuth {
     // Fields that hold relevant login data.
