@@ -71,14 +71,18 @@ public class TripServlet extends HttpServlet {
     String[] poiStrings = new String[pois.size()]; 
     poiStrings = pois.toArray(poiStrings); 
 
-    DirectionsApiRequest directionsRequest = generateDirectionsRequest(origin, poiStrings);
+    GeoApiContext distCalcer = new GeoApiContext.Builder()
+      .apiKey(Config.API_KEY)
+      .build();
+
+    DirectionsApiRequest directionsRequest = generateDirectionsRequest(origin, poiStrings, distCalcer);
 
     // Calculate route and save travelTimes and waypointOrder to two ArrayLists.
     try {
       DirectionsResult dirResult = directionsRequest.await();
 
       List<Integer> travelTimes = getTravelTimes(dirResult);
-      List<String> orderedLocationStrings = getOrderedWaypoints(dirResult);
+      List<String> orderedLocationStrings = getOrderedWaypoints(dirResult, pois);
 
       // Print out results on page for now
       response.getWriter().println(travelTimes.toString());
@@ -89,13 +93,9 @@ public class TripServlet extends HttpServlet {
     } 
   }
 
-  public static DirectionsApiRequest generateDirectionsRequest(String origin, String[] poiStrings) {
-    GeoApiContext distCalcer = new GeoApiContext.Builder()
-		    .apiKey(Config.API_KEY)
-		    .build();
-
+  public static DirectionsApiRequest generateDirectionsRequest(String origin, String[] poiStrings, GeoApiContext context) {
     // Generate directions request
-    DirectionsApiRequest directionsRequest = DirectionsApi.newRequest(distCalcer)
+    DirectionsApiRequest directionsRequest = DirectionsApi.newRequest(context)
         .origin(origin)
         .destination(origin)
         .waypoints(poiStrings)
@@ -118,7 +118,7 @@ public class TripServlet extends HttpServlet {
     return travelTimes;
   }
 
-  public static List<String> getOrderedWaypoints(DirectionsResult dirResult) {
+  public static List<String> getOrderedWaypoints(DirectionsResult dirResult, List<String> pois) {
     // Take the first route, usually the optimal.
     int[] waypointOrder = dirResult.routes[ROUTE_INDEX].waypointOrder;
 
