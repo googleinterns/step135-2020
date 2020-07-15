@@ -68,7 +68,7 @@ public class TripServlet extends HttpServlet {
    * put TripDay into Datastore
    * @return tripDay entity, needed for event creation
    */
-  private Entity putTripDayInDatastore(HttpServletRequest request, HttpServletResponse response,
+  public Entity putTripDayInDatastore(HttpServletRequest request, HttpServletResponse response,
       DatastoreService datastore, String date) throws IOException {
     
     String origin = request.getParameter("inputDestination");
@@ -85,7 +85,7 @@ public class TripServlet extends HttpServlet {
    * Searches through the parameters and creates the events and puts them into
    * datastore with associated tripDayEntity as a parent
    */
-  private void putEventsInDatastore(HttpServletRequest request, HttpServletResponse response, 
+  public void putEventsInDatastore(HttpServletRequest request, HttpServletResponse response, 
       Enumeration<String> params, Entity tripDayEntity, String date, DatastoreService datastore)
       throws IOException { 
 
