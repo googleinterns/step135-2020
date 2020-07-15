@@ -73,9 +73,8 @@ public class AuthServlet extends HttpServlet {
 
   /**
    * Converts a UserAuth object into a JSON string using the Gson library.
-   * Public method to allow test use.
    */
-  public static String convertToJson(UserAuth userAuth) {
+  private static String convertToJson(UserAuth userAuth) {
     Gson gson = new Gson();
     String json = gson.toJson(userAuth);
     return json;
