@@ -167,7 +167,6 @@ public final class AuthServletTest {
 
     // Confirm that the Entity in the database matches the method return.
     Assert.assertEquals(listResults.get(0), userEntityReturn);
-    Assert.assertEquals(listResults.get(1), userEntitySecondReturn);
   }
 
   @Test
