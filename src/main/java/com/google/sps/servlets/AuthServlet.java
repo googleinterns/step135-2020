@@ -45,7 +45,7 @@ public class AuthServlet extends HttpServlet {
   }
 
   /**
-   * 
+   * Write the UserAuth object in JSON form through response.
    */
   public void getUserAuthJson(HttpServletResponse response, UserService userService) throws IOException {
     // Create UserAuth object with relevant login / logout information.
@@ -84,7 +84,7 @@ public class AuthServlet extends HttpServlet {
   /**
    * If the user is not in database already, add them.
    */
-  private void addUserToDatabase(String email) {
+  public void addUserToDatabase(String email) {
     // Query database to see if User has already been added.
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
     Query query = new Query(User.USER);
@@ -107,19 +107,19 @@ public class AuthServlet extends HttpServlet {
    * Inner class that holds relevant login/logout and user information.
    * Class and constructors are public to enable testing.
    */
-  public class UserAuth {
+  class UserAuth {
     // Fields that hold relevant login data.
     private String url;
     private String email;
 
     // Constructor to create UserAuth object with no user logged in.
     // Null represents no value.
-    public UserAuth(String url) {
+    private UserAuth(String url) {
       this(url, null);
     }
 
     // Full constructor to assign values to all fields.
-    public UserAuth(String url, String email) {
+    private UserAuth(String url, String email) {
       this.url = url;
       this.email = email;
     }

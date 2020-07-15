@@ -14,13 +14,18 @@
 
 package com.google.sps;
 
+import com.google.appengine.api.datastore.DatastoreService;
+import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
-import com.google.appengine.api.users.User;
+import com.google.appengine.api.datastore.FetchOptions;
+import com.google.appengine.api.datastore.PreparedQuery;
+import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
 import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
 import com.google.gson.Gson;
+import com.google.sps.data.User;
 import com.google.sps.servlets.AuthServlet;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -44,8 +49,12 @@ import org.powermock.modules.junit4.PowerMockRunner;
 @PrepareForTest({Gson.class,UserService.class,User.class})
 public final class AuthServletTest {
 
+  // Create AuthServlet object.
+  AuthServlet authServlet;
+
   // Add constants for testing User class.
   public static final String EMAIL = "testemail@gmail.com";
+  public static final String SECOND_EMAIL = "testemail2@gmail.com";
   public static final String AUTH_DOMAIN = "gmail.com";
   public static final String LOGOUT_URL = "/_ah/logout?continue=%2F";
   public static final String LOGIN_URL = "/_ah/login?continue=%2F";
@@ -57,7 +66,12 @@ public final class AuthServletTest {
   // Add helper to allow datastore testing in local JUnit tests.
   // See https://cloud.google.com/appengine/docs/standard/java/tools/localunittesting.
   private final LocalServiceTestHelper helper =
-      new LocalServiceTestHelper(new LocalDatastoreServiceTestConfig());
+    new LocalServiceTestHelper(new LocalDatastoreServiceTestConfig());
+
+  @Before
+  public void initAuthServlet() {
+    authServlet = new AuthServlet();
+  }
 
   @Before
   public void setUp() {
@@ -77,11 +91,11 @@ public final class AuthServletTest {
     // Mock UserService methods as logged-in user.
     UserService userServiceMock = mock(UserService.class);
     when(userServiceMock.isUserLoggedIn()).thenReturn(true);
-    when(userServiceMock.getCurrentUser()).thenReturn(new User(EMAIL, AUTH_DOMAIN));
+    // This is the User object from Google Appengine (full path given to avoid
+    // conflict with local User.java file).
+    when(userServiceMock.getCurrentUser()).thenReturn(
+        new com.google.appengine.api.users.User(EMAIL, AUTH_DOMAIN));
     when(userServiceMock.createLogoutURL(AuthServlet.redirectUrl)).thenReturn(LOGOUT_URL);
-
-    // Initialize AuthServlet object.
-    AuthServlet authServlet = new AuthServlet();
 
     // Create writers to check against actual output.
     StringWriter stringWriter = new StringWriter();
@@ -92,7 +106,7 @@ public final class AuthServletTest {
     String expectedJson = "{\"url\":\"" + LOGOUT_URL_UNICODE + "\",\"email\":\"" 
       + EMAIL + "\"}";
 
-    // Run doGet(...), and test whether output matches expected.
+    // Run getUserAuthJson(...), and test whether output matches expected.
     authServlet.getUserAuthJson(responseMock, userServiceMock);
     writer.flush();
     Assert.assertTrue(stringWriter.toString().contains(expectedJson));
@@ -108,21 +122,90 @@ public final class AuthServletTest {
     when(userServiceMock.isUserLoggedIn()).thenReturn(false);
     when(userServiceMock.createLoginURL(AuthServlet.redirectUrl)).thenReturn(LOGIN_URL);
 
-    // Initialize AuthServlet object.
-    AuthServlet authServlet = new AuthServlet();
-
     // Create writers to check against actual output.
     StringWriter stringWriter = new StringWriter();
     PrintWriter writer = new PrintWriter(stringWriter);
     when(responseMock.getWriter()).thenReturn(writer);
 
-    // Create the expected JSON logged-in string.
+    // Create the expected JSON logged-out string.
     String expectedJson = "{\"url\":\"" + LOGIN_URL_UNICODE + "\"}";
 
-    // Run doGet(...), and test whether output matches expected.
+    // Run getUserAuthJson()(...), and test whether output matches expected.
     authServlet.getUserAuthJson(responseMock, userServiceMock);
     writer.flush();
     Assert.assertTrue(stringWriter.toString().contains(expectedJson));
+  }
+
+  @Test
+  public void testAddUserToDatabaseNotPresent() throws Exception {
+    // Run addUserToDatabase(...), with the User not present in datastore.
+    authServlet.addUserToDatabase(EMAIL);
+
+    // Retrieve the datastore results.
+    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+    Query query = new Query(User.USER);
+    PreparedQuery results = datastore.prepare(query);
+    List<Entity> listResults = results.asList(FetchOptions.Builder.withDefaults());
+
+    // Check whether the proper Entity and count were returned.
+    Assert.assertEquals(1, listResults.size());
+    Assert.assertEquals(EMAIL, listResults.get(0).getProperty(User.USER_EMAIL));
+  }
+
+  @Test
+  public void testAddUserToDatabaseNotPresentRunTwiceSameEmails() throws Exception {
+    // Run addUserToDatabase(...), with the User not present in datastore.
+    authServlet.addUserToDatabase(EMAIL);
+    authServlet.addUserToDatabase(EMAIL);
+
+    // Retrieve the datastore results.
+    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+    Query query = new Query(User.USER);
+    PreparedQuery results = datastore.prepare(query);
+    List<Entity> listResults = results.asList(FetchOptions.Builder.withDefaults());
+
+    // Check whether the proper Entity and count were returned.
+    Assert.assertEquals(1, listResults.size());
+    Assert.assertEquals(EMAIL, listResults.get(0).getProperty(User.USER_EMAIL));
+  }
+
+  @Test
+  public void testAddUserToDatabaseNotPresentRunTwiceDifferentEmails() throws Exception {
+    // Run addUserToDatabase(...), with the User not present in datastore.
+    authServlet.addUserToDatabase(EMAIL);
+    authServlet.addUserToDatabase(SECOND_EMAIL);
+
+    // Retrieve the datastore results.
+    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+    Query query = new Query(User.USER);
+    PreparedQuery results = datastore.prepare(query);
+    List<Entity> listResults = results.asList(FetchOptions.Builder.withDefaults());
+
+    // Check whether the proper Entity and count were returned.
+    Assert.assertEquals(2, listResults.size());
+    Assert.assertEquals(EMAIL, listResults.get(0).getProperty(User.USER_EMAIL));
+    Assert.assertEquals(SECOND_EMAIL, listResults.get(1).getProperty(User.USER_EMAIL));
+  }
+
+  @Test
+  public void testAddUserToDatabasePresent() throws Exception {
+    // Add a User to the database.
+    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+    Entity userEntity = new Entity(User.USER);
+    userEntity.setProperty(User.USER_EMAIL, EMAIL);
+    datastore.put(userEntity);
+
+    // Run addUserToDatabase(...), with the User already present in datastore.
+    authServlet.addUserToDatabase(EMAIL);
+
+    // Retrieve the datastore results.
+    Query query = new Query(User.USER);
+    PreparedQuery results = datastore.prepare(query);
+    List<Entity> listResults = results.asList(FetchOptions.Builder.withDefaults());
+
+    // Check whether the proper Entity and count were returned.
+    Assert.assertEquals(1, listResults.size());
+    Assert.assertEquals(EMAIL, listResults.get(0).getProperty(User.USER_EMAIL));
   }
 
 }
