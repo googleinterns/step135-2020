@@ -133,7 +133,7 @@ public final class AuthServletTest {
   @Test
   public void testAddUserToDatabaseNotPresent() throws Exception {
     // Run addUserToDatabase(...), with the User not present in datastore.
-    AuthServlet.addUserToDatabase(EMAIL);
+    Entity userEntityReturn = AuthServlet.addUserToDatabase(EMAIL);
 
     // Retrieve the datastore results.
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
@@ -144,13 +144,16 @@ public final class AuthServletTest {
     // Check whether the proper Entity and count were returned.
     Assert.assertEquals(1, listResults.size());
     Assert.assertEquals(EMAIL, listResults.get(0).getProperty(User.USER_EMAIL));
+    
+    // Confirm that the Entity in the database matches the method return.
+    Assert.assertEquals(listResults.get(0), userEntityReturn);
   }
 
   @Test
   public void testAddUserToDatabaseNotPresentRunTwiceSameEmails() throws Exception {
     // Run addUserToDatabase(...), with the User not present in datastore.
-    AuthServlet.addUserToDatabase(EMAIL);
-    AuthServlet.addUserToDatabase(EMAIL);
+    Entity userEntityReturn = AuthServlet.addUserToDatabase(EMAIL);
+    Entity userEntitySecondReturn = AuthServlet.addUserToDatabase(EMAIL);
 
     // Retrieve the datastore results.
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
@@ -161,13 +164,17 @@ public final class AuthServletTest {
     // Check whether the proper Entity and count were returned.
     Assert.assertEquals(1, listResults.size());
     Assert.assertEquals(EMAIL, listResults.get(0).getProperty(User.USER_EMAIL));
+
+    // Confirm that the Entity in the database matches the method return.
+    Assert.assertEquals(listResults.get(0), userEntityReturn);
+    Assert.assertEquals(listResults.get(1), userEntitySecondReturn);
   }
 
   @Test
   public void testAddUserToDatabaseNotPresentRunTwiceDifferentEmails() throws Exception {
     // Run addUserToDatabase(...), with the User not present in datastore.
-    AuthServlet.addUserToDatabase(EMAIL);
-    AuthServlet.addUserToDatabase(SECOND_EMAIL);
+    Entity userEntityReturn = AuthServlet.addUserToDatabase(EMAIL);
+    Entity userEntitySecondReturn = AuthServlet.addUserToDatabase(SECOND_EMAIL);
 
     // Retrieve the datastore results.
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
@@ -179,6 +186,10 @@ public final class AuthServletTest {
     Assert.assertEquals(2, listResults.size());
     Assert.assertEquals(EMAIL, listResults.get(0).getProperty(User.USER_EMAIL));
     Assert.assertEquals(SECOND_EMAIL, listResults.get(1).getProperty(User.USER_EMAIL));
+
+    // Confirm that the Entity in the database matches the method return.
+    Assert.assertEquals(listResults.get(0), userEntityReturn);
+    Assert.assertEquals(listResults.get(1), userEntitySecondReturn);
   }
 
   @Test
@@ -190,7 +201,7 @@ public final class AuthServletTest {
     datastore.put(userEntity);
 
     // Run addUserToDatabase(...), with the User already present in datastore.
-    AuthServlet.addUserToDatabase(EMAIL);
+    Entity userEntityReturn = AuthServlet.addUserToDatabase(EMAIL);
 
     // Retrieve the datastore results.
     Query query = new Query(User.USER);
@@ -200,6 +211,9 @@ public final class AuthServletTest {
     // Check whether the proper Entity and count were returned.
     Assert.assertEquals(1, listResults.size());
     Assert.assertEquals(EMAIL, listResults.get(0).getProperty(User.USER_EMAIL));
+
+    // Confirm that the Entity in the database matches the method return.
+    Assert.assertEquals(listResults.get(0), userEntityReturn);
   }
 
   @Test
