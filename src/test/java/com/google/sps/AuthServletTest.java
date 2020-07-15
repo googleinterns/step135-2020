@@ -79,7 +79,7 @@ public final class AuthServletTest {
 
   @Test
   public void testGetUserAuthJsonLoggedInReturn() throws Exception {
-    // Mock request and response.      
+    // Mock response.      
     HttpServletResponse responseMock = mock(HttpServletResponse.class);
 
     // Mock UserService methods as logged-in user.
@@ -108,7 +108,7 @@ public final class AuthServletTest {
 
   @Test
   public void testGetUserAuthJsonNotLoggedInReturn() throws Exception {
-    // Mock request and response.      
+    // Mock response.      
     HttpServletResponse responseMock = mock(HttpServletResponse.class);
 
     // Mock UserService methods as logged-out user.
