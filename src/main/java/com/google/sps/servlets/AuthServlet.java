@@ -41,9 +41,15 @@ public class AuthServlet extends HttpServlet {
 
     // Set up user auth objects.
     UserService userService = UserServiceFactory.getUserService();
-    UserAuth userAuth;
+    getUserAuthJson(response, userService);
+  }
 
+  /**
+   * 
+   */
+  public void getUserAuthJson(HttpServletResponse response, UserService userService) throws IOException {
     // Create UserAuth object with relevant login / logout information.
+    UserAuth userAuth;
     if (userService.isUserLoggedIn()) {
       String userEmail = userService.getCurrentUser().getEmail();
       String logoutUrl = userService.createLogoutURL(redirectUrl);
@@ -67,8 +73,9 @@ public class AuthServlet extends HttpServlet {
 
   /**
    * Converts a UserAuth object into a JSON string using the Gson library.
+   * Public method to allow test use.
    */
-  private String convertToJson(UserAuth userAuth) {
+  public static String convertToJson(UserAuth userAuth) {
     Gson gson = new Gson();
     String json = gson.toJson(userAuth);
     return json;
@@ -98,20 +105,21 @@ public class AuthServlet extends HttpServlet {
 
   /**
    * Inner class that holds relevant login/logout and user information.
+   * Class and constructors are public to enable testing.
    */
-  class UserAuth {
+  public class UserAuth {
     // Fields that hold relevant login data.
     private String url;
     private String email;
 
     // Constructor to create UserAuth object with no user logged in.
     // Null represents no value.
-    private UserAuth(String url) {
+    public UserAuth(String url) {
       this(url, null);
     }
 
     // Full constructor to assign values to all fields.
-    private UserAuth(String url, String email) {
+    public UserAuth(String url, String email) {
       this.url = url;
       this.email = email;
     }
