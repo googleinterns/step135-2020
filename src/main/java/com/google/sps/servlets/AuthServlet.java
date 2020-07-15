@@ -17,13 +17,19 @@ package com.google.sps.servlets;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.datastore.FetchOptions;
 import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
+import com.google.appengine.api.datastore.Query.Filter;
+import com.google.appengine.api.datastore.Query.FilterOperator;
+import com.google.appengine.api.datastore.Query.FilterPredicate;
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
 import com.google.gson.Gson;
 import com.google.sps.data.User;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -82,24 +88,80 @@ public class AuthServlet extends HttpServlet {
   
   /**
    * If the user is not in database already, add them.
+   * This method returns the Entity object in the database (or the newly-created
+   * user Entity, if none previously existed).
    */
-  public void addUserToDatabase(String email) {
-    // Query database to see if User has already been added.
+  public static Entity addUserToDatabase(String email) {
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-    Query query = new Query(User.USER);
-    PreparedQuery results = datastore.prepare(query);
 
-    // If user is already in database, return.
-    for (Entity entity : results.asIterable()) {
-      if (entity.getProperty(User.USER_EMAIL).equals(email)) {
-        return;
-      }
+    // Only add User to database if they are not already present there.
+    Entity userEntity = getUserEntityFromEmail(email);
+    if (userEntity == null) {
+      // User is not in database, create and add user object.
+      User newUser = new User(email);
+      Entity newUserEntity = newUser.buildEntity();
+      datastore.put(newUserEntity);
+
+      // Return the new user object.
+      return newUserEntity;
     }
 
-    // User is not in database, create and add user object.
-    User user = new User(email);
-    Entity userEntity = user.buildEntity();
-    datastore.put(userEntity);
+    // Return the user already in the database.
+    return userEntity;
+  }
+
+  /**
+   * Creates a new UserService object.
+   */
+  public static UserService getUserService() {
+    return UserServiceFactory.getUserService();
+  }
+
+  /**
+   * Get the Entity object of the current user that is signed in. If not already
+   * in database, this method adds them and returns the newly-added Entity object.
+   * If no user is signed in, return null.
+   *
+   * In order for this method to work, an up-to-date UserService object must be
+   * passed in. The getUserService(...) method can be used for this.
+   */
+  public static Entity getCurrentUserEntity(UserService userService) {
+    // Return null if no user is logged in.
+    if (!userService.isUserLoggedIn()) {
+      return null;
+    }
+
+    // Get user email from UserService.
+    String email = userService.getCurrentUser().getEmail();
+
+    // Get user from datastore; if not present, add the user and return that.
+    Entity userEntity = getUserEntityFromEmail(email);
+    if (userEntity == null) {
+      Entity newUserEntity = addUserToDatabase(email);
+      return newUserEntity;
+    }
+
+    return userEntity;
+  }
+
+  // Return Entity object of user from database using email, or null if user 
+  // email is not in db.
+  public static Entity getUserEntityFromEmail(String email) {
+    // Query database to see if User has already been added.
+    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+    Filter emailFilter =
+      new FilterPredicate(User.USER_EMAIL, FilterOperator.EQUAL, email);
+    Query query = new Query(User.USER).setFilter(emailFilter);
+    PreparedQuery results = datastore.prepare(query);
+
+    // Get the list of results. If empty, return null; otherwise, return true.
+    List<Entity> listResults = results.asList(FetchOptions.Builder.withDefaults());
+    if (listResults.isEmpty()) {
+      return null;
+    }
+
+    // Return the Entity object of the User.
+    return listResults.get(0);
   }
 
   /**

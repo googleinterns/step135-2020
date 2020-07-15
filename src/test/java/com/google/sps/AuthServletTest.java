@@ -133,7 +133,7 @@ public final class AuthServletTest {
   @Test
   public void testAddUserToDatabaseNotPresent() throws Exception {
     // Run addUserToDatabase(...), with the User not present in datastore.
-    authServlet.addUserToDatabase(EMAIL);
+    AuthServlet.addUserToDatabase(EMAIL);
 
     // Retrieve the datastore results.
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
@@ -149,8 +149,8 @@ public final class AuthServletTest {
   @Test
   public void testAddUserToDatabaseNotPresentRunTwiceSameEmails() throws Exception {
     // Run addUserToDatabase(...), with the User not present in datastore.
-    authServlet.addUserToDatabase(EMAIL);
-    authServlet.addUserToDatabase(EMAIL);
+    AuthServlet.addUserToDatabase(EMAIL);
+    AuthServlet.addUserToDatabase(EMAIL);
 
     // Retrieve the datastore results.
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
@@ -166,8 +166,8 @@ public final class AuthServletTest {
   @Test
   public void testAddUserToDatabaseNotPresentRunTwiceDifferentEmails() throws Exception {
     // Run addUserToDatabase(...), with the User not present in datastore.
-    authServlet.addUserToDatabase(EMAIL);
-    authServlet.addUserToDatabase(SECOND_EMAIL);
+    AuthServlet.addUserToDatabase(EMAIL);
+    AuthServlet.addUserToDatabase(SECOND_EMAIL);
 
     // Retrieve the datastore results.
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
@@ -190,7 +190,7 @@ public final class AuthServletTest {
     datastore.put(userEntity);
 
     // Run addUserToDatabase(...), with the User already present in datastore.
-    authServlet.addUserToDatabase(EMAIL);
+    AuthServlet.addUserToDatabase(EMAIL);
 
     // Retrieve the datastore results.
     Query query = new Query(User.USER);
@@ -200,6 +200,121 @@ public final class AuthServletTest {
     // Check whether the proper Entity and count were returned.
     Assert.assertEquals(1, listResults.size());
     Assert.assertEquals(EMAIL, listResults.get(0).getProperty(User.USER_EMAIL));
+  }
+
+  @Test
+  public void testGetUserEntityFromEmailNotPresent() throws Exception {
+    // Run getUserEntityFromEmail(...), with the User not present in datastore.
+    Entity userEntityReturn = AuthServlet.getUserEntityFromEmail(EMAIL);
+
+    // Retrieve the datastore results.
+    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+    Query query = new Query(User.USER);
+    PreparedQuery results = datastore.prepare(query);
+    List<Entity> listResults = results.asList(FetchOptions.Builder.withDefaults());
+
+    // Verify that the Entity is not in the database, and the null method return.
+    Assert.assertNull(userEntityReturn);
+    Assert.assertTrue(listResults.isEmpty());
+  }
+
+  @Test
+  public void testGetUserEntityFromEmailPresent() throws Exception {
+    // Add a User to the database.
+    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+    Entity userEntity = new Entity(User.USER);
+    userEntity.setProperty(User.USER_EMAIL, EMAIL);
+    datastore.put(userEntity);
+
+    // Run getUserEntityFromEmail(...), with the User present in datastore.
+    Entity userEntityReturn = AuthServlet.getUserEntityFromEmail(EMAIL);
+
+    // Retrieve the datastore results.
+    Query query = new Query(User.USER);
+    PreparedQuery results = datastore.prepare(query);
+    List<Entity> listResults = results.asList(FetchOptions.Builder.withDefaults());
+
+    // Verify that the Entity is in the database, and the Entity method return.
+    Assert.assertEquals(EMAIL, userEntityReturn.getProperty(User.USER_EMAIL));
+    Assert.assertEquals(1, listResults.size());
+
+    // Confirm that the Entity in the database matches the method return.
+    Assert.assertEquals(listResults.get(0), userEntityReturn);
+  }
+
+  @Test
+  public void testGetCurrentUserEntityNotLoggedIn() throws Exception {
+    // Mock UserService methods as logged-out user.
+    UserService userServiceMock = mock(UserService.class);
+    when(userServiceMock.isUserLoggedIn()).thenReturn(false);
+    when(userServiceMock.createLogoutURL(AuthServlet.redirectUrl)).thenReturn(LOGIN_URL);
+    
+    // Run getCurrentUserEntity(...).
+    Entity userEntityReturn = AuthServlet.getCurrentUserEntity(userServiceMock);
+    
+    // Confirm that the method returns null, as there is no "current" user.
+    Assert.assertNull(userEntityReturn);
+  }
+
+  @Test
+  public void testGetCurrentUserEntityLoggedInNotPresent() throws Exception {
+    // Mock UserService methods as logged-in user.
+    UserService userServiceMock = mock(UserService.class);
+    when(userServiceMock.isUserLoggedIn()).thenReturn(true);
+    // This is the User object from Google Appengine (full path given to avoid
+    // conflict with local User.java file).
+    when(userServiceMock.getCurrentUser()).thenReturn(
+        new com.google.appengine.api.users.User(EMAIL, AUTH_DOMAIN));
+    when(userServiceMock.createLogoutURL(AuthServlet.redirectUrl)).thenReturn(LOGOUT_URL);
+
+    // Run getCurrentUserEntity(...), with the User present in datastore.
+    Entity userEntityReturn = AuthServlet.getCurrentUserEntity(userServiceMock);
+
+    // Retrieve the datastore results.
+    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+    Query query = new Query(User.USER);
+    PreparedQuery results = datastore.prepare(query);
+    List<Entity> listResults = results.asList(FetchOptions.Builder.withDefaults());
+
+    // Verify that the Entity is in the database, and the Entity method return.
+    Assert.assertEquals(EMAIL, userEntityReturn.getProperty(User.USER_EMAIL));
+    Assert.assertEquals(1, listResults.size());
+
+    // Confirm that the Entity in the database matches the method return.
+    Assert.assertEquals(listResults.get(0), userEntityReturn);
+  }
+
+  @Test
+  public void testGetCurrentUserEntityLoggedInPresent() throws Exception {
+    // Mock UserService methods as logged-in user.
+    UserService userServiceMock = mock(UserService.class);
+    when(userServiceMock.isUserLoggedIn()).thenReturn(true);
+    // This is the User object from Google Appengine (full path given to avoid
+    // conflict with local User.java file).
+    when(userServiceMock.getCurrentUser()).thenReturn(
+        new com.google.appengine.api.users.User(EMAIL, AUTH_DOMAIN));
+    when(userServiceMock.createLogoutURL(AuthServlet.redirectUrl)).thenReturn(LOGOUT_URL);
+
+    // Add a User to the database.
+    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+    Entity userEntity = new Entity(User.USER);
+    userEntity.setProperty(User.USER_EMAIL, EMAIL);
+    datastore.put(userEntity);
+
+    // Run getCurrentUserEntity(...), with the User present in datastore.
+    Entity userEntityReturn = AuthServlet.getCurrentUserEntity(userServiceMock);
+
+    // Retrieve the datastore results.
+    Query query = new Query(User.USER);
+    PreparedQuery results = datastore.prepare(query);
+    List<Entity> listResults = results.asList(FetchOptions.Builder.withDefaults());
+
+    // Verify that the Entity is in the database, and the Entity method return.
+    Assert.assertEquals(EMAIL, userEntityReturn.getProperty(User.USER_EMAIL));
+    Assert.assertEquals(1, listResults.size());
+
+    // Confirm that the Entity in the database matches the method return.
+    Assert.assertEquals(listResults.get(0), userEntityReturn);
   }
 
 }
