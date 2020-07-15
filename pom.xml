@@ -58,25 +58,20 @@
 
     <dependency>
       <groupId>org.mockito</groupId>
-      <artifactId>mockito-all</artifactId>
-      <version>1.9.5</version>
-      <scope>test</scope>
+      <artifactId>mockito-core</artifactId>
+      <version>2.18.0</version>
     </dependency>
 
-		<!-- PowerMock JUnit 4.4+ Module -->
-		<dependency>
-			<groupId>org.powermock</groupId>
-			<artifactId>powermock-module-junit4</artifactId>
-			<version>2.0.0</version>
-			<scope>test</scope>
-		</dependency>
-		<!-- PowerMock Mockito2 API -->
-		<dependency>
-			<groupId>org.powermock</groupId>
-			<artifactId>powermock-api-mockito2</artifactId>
-			<version>2.0.0</version>
-			<scope>test</scope>
-		</dependency>
+    <dependency>
+      <groupId>org.powermock</groupId>
+      <artifactId>powermock-api-mockito2</artifactId>
+      <version>2.0.0-beta.5</version>
+    </dependency>
+    <dependency>
+      <groupId>org.powermock</groupId>
+      <artifactId>powermock-module-junit4</artifactId>
+      <version>2.0.0-beta.5</version>
+    </dependency>
 
   </dependencies>
 
