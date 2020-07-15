@@ -40,16 +40,15 @@ window.initMod = function() {
       const modalLabel = document.getElementById('exampleModalLabel');
       modalLabel.innerHTML = eventObj.title;
 
-      //body of pop-up
+      // body of pop-up
+      $('#exampleModalBody').empty();
       const modalBody = document.getElementById('exampleModalBody');
-      modalBody.innerHTML = '<b>Address: </b>' + eventObj.extendedProps.address + '<br>' +
-          '<b>Opening hours: </b>' + eventObj.extendedProps.openTime + '<br>' +
-          '<b>Closing hours: </b>' + eventObj.extendedProps.closeTime
+
+      createMap2(modalBody, eventObj);
       $('#exampleModal').modal('show');
     }
   });
   getEvents(calendar);
-  createMap2();
   calendar.render();
 };
 
@@ -88,10 +87,6 @@ function createMap(address) {
       coords = {lat: latitude, lng: longitude};
     }
 
-    console.log(latitude);
-    console.log(longitude);
-
-
     var map = new google.maps.Map(document.getElementById('map'), {
       zoom: 4,
       center: coords
@@ -105,16 +100,25 @@ function createMap(address) {
   });
 }
 
-function createMap2() {
+function createMap2(modalBody, eventObj) {
 
-  console.log("here");
+  let infoDisplay = document.createElement('p');
+  infoDisplay.innerHTML = '<b>Address: </b>' + eventObj.extendedProps.address + '<br>' +
+  '<b>Opening hours: </b>' + eventObj.extendedProps.openTime + '<br>' +
+  '<b>Closing hours: </b>' + eventObj.extendedProps.closeTime + '<br>';
+  modalBody.appendChild(infoDisplay)
+
+  const mapDis = document.createElement('div');
+  mapDis.id = 'map'
+  modalBody.appendChild(mapDis);
+
   // The location of Uluru
-  var uluru = {lat: -25.344, lng: 131.036};
+  var uluru = {lat: 40.7484, lng: -73.9857};
 
   map = new google.maps.Map(document.getElementById('map'), {
-      zoom: 13,
+      zoom: 14,
       center: uluru
-    });
+  });
 
   var marker = new google.maps.Marker({
     position: uluru,
