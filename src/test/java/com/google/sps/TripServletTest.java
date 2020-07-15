@@ -16,8 +16,14 @@ import com.google.maps.DirectionsApi;
 import com.google.maps.DirectionsApiRequest;
 import com.google.maps.GeoApiContext;
 import com.google.maps.model.DirectionsResult;
+import com.google.maps.model.DirectionsRoute;
+import com.google.maps.model.DirectionsLeg;
+import com.google.maps.model.Duration;
+import com.google.maps.model.TravelMode;
 import com.google.sps.data.Config;
 import com.google.sps.servlets.TripServlet;
+import java.util.ArrayList;
+import java.util.List;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -25,27 +31,18 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+import org.mockito.ArgumentMatchers;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
+
 import static org.mockito.Mockito.*;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.mockito.ArgumentMatchers;
-
-import com.google.maps.model.DirectionsRoute;
-import com.google.maps.model.DirectionsLeg;
-import com.google.maps.model.Duration;
-import com.google.maps.model.TravelMode;
-
-
-// @RunWith(JUnit4.class)
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(DirectionsApi.class)
 public final class TripServletTest {
 
+  // Test directionsRequest generation with mocks.
   @Test
   public void generateDirectionsRequestTest() {
     PowerMockito.mockStatic(DirectionsApi.class);
@@ -65,8 +62,9 @@ public final class TripServletTest {
     
     String origin = "The Westin Bellevue, Bellevue Way Northeast, Bellevue, WA, USA";
 
-    DirectionsApiRequest testRequest = TripServlet.generateDirectionsRequest(origin, waypoints, mockGeoApiContext);
+    DirectionsApiRequest request = TripServlet.generateDirectionsRequest(origin, waypoints, mockGeoApiContext);
 
+    // Verify that proper methods and parameters are called to generate directionsRequest.
     verify(mockRequest).origin(origin);
     verify(mockRequest).destination(origin);
     verify(mockRequest).waypoints(waypoints);
@@ -74,15 +72,16 @@ public final class TripServletTest {
     verify(mockRequest).mode(TravelMode.DRIVING);
   }
 
+  // Test waypoint order parsing from a DirectionsResult object.
   @Test
   public void getOrderedWaypointsTest() {
-    // Manually create directions result object
+    // Manually create directions result object.
     DirectionsResult dirResult = new DirectionsResult();
     dirResult.routes = new DirectionsRoute[1];
     dirResult.routes[0] = new DirectionsRoute();
     dirResult.routes[0].waypointOrder = new int[]{ 1, 2, 0 };
     
-    // Manually create user input
+    // Manually create user input.
     List<String> pois = new ArrayList<>();
     pois.add("Alki Beach, Seattle, WA, USA");
     pois.add("MoPOP, 5th Avenue North, Seattle, WA, USA");
@@ -98,6 +97,7 @@ public final class TripServletTest {
     Assert.assertEquals(orderedWaypoints, expectedWaypointOrder);
   }
 
+  // Test travel time parsing from a DirectionsResult object.
   @Test
   public void getTravelTimesTest() {
     // Manually create directions result object
@@ -125,31 +125,8 @@ public final class TripServletTest {
     Assert.assertEquals(travelTimes, expectedTravelTimes);
   }
 
-  // public void testServlet() {
-  //   HttpServletRequest mockRequest = mock(HttpServletRequest.class);
-  //   HttpServletResponse mockResponse = mock(HttpServletResponse.class);
-
-  //   when(mockRequest.getParameter("inputTripName")).thenReturn("My Trip");
-  //   when(mockRequest.getParameter("inputDestination")).
-  //       thenReturn("The Westin Bellevue, Bellevue Way Northeast, Bellevue, WA, USA");
-  //   when(mockRequest.getParameter("inputDayOfTravel")).thenReturn("2020-07-10");
-  //   when(mockRequest.getParameterNames()).thenReturn(new String[]{ "poi-1", "poi-2", "poi-3"});
-  //   when(mockRequest.getParameter("poi-1")).thenReturn("MoPOP, 5th Avenue North, Seattle, WA, USA");
-  //   when(mockRequest.getParameter("poi-2")).thenReturn("Space Needle, Broad Street, Seattle, WA, USA");
-  //   when(mockRequest.getParameter("poi-3")).thenReturn("Alki Beach, Seattle, WA, USA");
-
-  //   PowerMockito.mockStatic(DirectionsApi.class);
-
-  //   GeoApiContext distCalcer = new GeoApiContext.Builder()
-	// 	    .apiKey(Config.API_KEY)
-	// 	    .build();
-    
-  //   DirectionsApiRequest mockDirectionsApiRequest = mock(DirectionsApiRequest.class);
-  //   when(DirectionsApi.newRequest(distCalcer)).thenReturn(mockDirectionsApiRequest);
-
-
-  // }
-
+  @Test
+  public void doPostTest() {
+    // TODO: eshika to add an integration test post-MVP
+  }
 }
-
-
