@@ -13,10 +13,13 @@
 // limitations under the License.
 
 let script = document.createElement('script');
-script.src = 'https://maps.googleapis.com/maps/api/js?key=' + config.API_KEY + 
-  '&libraries=&callback=initMod';
+script.src = 'https://maps.googleapis.com/maps/api/js?key=' + config.API_KEY + '&callback=initMod&libraries=&v=weekly';
+// 'https://maps.googleapis.com/maps/api/js?key=' + config.API_KEY + 
+  //'&libraries=&callback=initMod';
 script.defer = true;
 script.async = true;
+
+var map;
 
 // Triggered upon DOM load.
 window.initMod = function() {
@@ -46,8 +49,8 @@ window.initMod = function() {
     }
   });
   getEvents(calendar);
+  createMap2();
   calendar.render();
-  createMap('Sutro Tower, La Avanzada Street, San Francisco, CA, USA');
 };
 
 /**
@@ -56,7 +59,6 @@ window.initMod = function() {
 function getEvents(calendar) {
   fetch('/get-calendar').then(response => response.json()).then((events) => {
     events.forEach((event) => {
-      console.log(event.address);
       calendar.addEvent({     
         title: event.name,
         start: event.strStartTime,
@@ -80,27 +82,44 @@ function createMap(address) {
   var coords;
 
   geocoder.geocode( { 'address': address}, function(results, status) {
+    if (status == google.maps.GeocoderStatus.OK) {
+      var latitude = results[0].geometry.location.lat();
+      var longitude = results[0].geometry.location.lng();
+      coords = {lat: latitude, lng: longitude};
+    }
 
-  if (status == google.maps.GeocoderStatus.OK) {
-    var latitude = results[0].geometry.location.lat();
-    var longitude = results[0].geometry.location.lng();
-    coords = {lat: latitude, lng: longitude};
-  }
-
-  console.log(latitude);
-  console.log(longitude);
+    console.log(latitude);
+    console.log(longitude);
 
 
-  var map = new google.maps.Map(document.getElementById('map'), {
-    zoom: 4,
-    center: coords
+    var map = new google.maps.Map(document.getElementById('map'), {
+      zoom: 4,
+      center: coords
+    });
+
+    var marker = new google.maps.Marker({
+      position: coords,
+      map: map,
+      title: 'Title'
+    });
   });
+}
+
+function createMap2() {
+
+  console.log("here");
+  // The location of Uluru
+  var uluru = {lat: -25.344, lng: 131.036};
+
+  map = new google.maps.Map(document.getElementById('map'), {
+      zoom: 13,
+      center: uluru
+    });
 
   var marker = new google.maps.Marker({
-    position: coords,
+    position: uluru,
     map: map,
     title: 'Title'
-    });
   });
 }
 
