@@ -44,7 +44,7 @@ window.initMod = function() {
       $('#exampleModalBody').empty();
       const modalBody = document.getElementById('exampleModalBody');
 
-      createMap2(modalBody, eventObj);
+      createMap(modalBody, eventObj);
       $('#exampleModal').modal('show');
     }
   });
@@ -76,11 +76,23 @@ function getEvents(calendar) {
 /**
  * function that initializes map for popup, w specific address as marker
  */
-function createMap(address) {
+function createMap(modalBody, eventObj) {
   var geocoder = new google.maps.Geocoder();
   var coords;
 
-  geocoder.geocode( { 'address': address}, function(results, status) {
+  // text to dispaly in popover
+  let infoDisplay = document.createElement('p');
+  infoDisplay.innerHTML = '<b>Address: </b>' + eventObj.extendedProps.address + '<br>' +
+  '<b>Opening hours: </b>' + eventObj.extendedProps.openTime + '<br>' +
+  '<b>Closing hours: </b>' + eventObj.extendedProps.closeTime + '<br>';
+  modalBody.appendChild(infoDisplay)
+
+  // create new div to hold map
+  const mapDis = document.createElement('div');
+  mapDis.id = 'map'
+  modalBody.appendChild(mapDis);
+
+  geocoder.geocode( { 'address': eventObj.extendedProps.address}, function(results, status) {
     if (status == google.maps.GeocoderStatus.OK) {
       var latitude = results[0].geometry.location.lat();
       var longitude = results[0].geometry.location.lng();
@@ -95,7 +107,7 @@ function createMap(address) {
     var marker = new google.maps.Marker({
       position: coords,
       map: map,
-      title: 'Title'
+      title: eventObj.title
     });
   });
 }
