@@ -117,9 +117,4 @@ public class TripServlet extends HttpServlet {
       response.sendRedirect("/");
     }
   }
-
-  // function to set time, need to do only once
-  public void setDateTime(String date) {
-    startDateTime = LocalDateTime.of(LocalDate.parse(date), LocalTime.of(10, 0));
-  }
 }
