@@ -14,8 +14,13 @@
 
 package com.google.sps;
 
+import com.google.appengine.api.datastore.Entity;
 import com.google.sps.TripDay;
+import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
+import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
+import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -24,6 +29,8 @@ import java.util.ArrayList;
 @RunWith(JUnit4.class)
 public final class TripDayTest {
 
+  // locations and strings to be added
+  private ArrayList<String> locations;
   private static final String TIMES_SQUARE_ID = "ChIJmQJIxlVYwokRLgeuocVOGVU";
   private static final String CENTRAL_PARK_ID = "ChIJ4zGFAZpYwokRGUGph3Mf37k";
   private static final String WORLD_TRADE_ID = "ChIJy7cGfBlawokR5l2e93hsoEA";
@@ -32,7 +39,18 @@ public final class TripDayTest {
 
   private static final String DATE = "2020-07-08";
 
-  private ArrayList<String> locations;
+  private final LocalServiceTestHelper helper =
+      new LocalServiceTestHelper(new LocalDatastoreServiceTestConfig());
+
+   @Before
+  public void setUp() {
+    helper.setUp();
+  }
+
+   @After
+  public void tearDown() {
+    helper.tearDown();
+  }
 
   // Test TripDay constructor and get functions
   @Test
@@ -85,5 +103,23 @@ public final class TripDayTest {
   @Test(expected = IllegalArgumentException.class)
   public void testTripDayConstructorEmptyDate() {
     TripDay tripDay = new TripDay(HOTEL_ID, HOTEL_ID, locations, "");
+  }
+
+   @Test
+  public void testbuildEntityAndFromEntity() {
+    // create TripDay
+    locations = new ArrayList<>();
+    TripDay tripDayOriginal = new TripDay(HOTEL_ID, HOTEL_ID, locations, DATE);
+
+    // create entity from TripDay
+    Entity tripDayEntity = tripDayOriginal.buildEntity();
+
+    // convert back to TripDay object 
+    TripDay tripDayAfterMethods = TripDay.tripDayFromEntity(tripDayEntity);
+
+    Assert.assertEquals(tripDayOriginal.getOrigin(), tripDayAfterMethods.getOrigin());
+    Assert.assertEquals(tripDayOriginal.getDestination(), tripDayAfterMethods.getDestination());
+    Assert.assertEquals(tripDayOriginal.getLocations(), tripDayAfterMethods.getLocations());
+    Assert.assertEquals(tripDayOriginal.getDate(), tripDayAfterMethods.getDate());
   }
 }

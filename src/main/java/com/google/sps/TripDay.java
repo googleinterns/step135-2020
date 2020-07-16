@@ -103,6 +103,13 @@ public class TripDay {
   }
 
   /**
+   * Add locations
+   */
+  public void addLocations(ArrayList<String> locations) {
+    this.locations = locations;
+  }
+
+  /**
    * Builds entity corresponds to current TripDay
    */
   public Entity buildEntity() {
@@ -127,7 +134,7 @@ public class TripDay {
 
   /**
    * Build tripDay from entity. Not needed for this CL but will be necessary 
-   * later
+   * later. NOTE: Unsure how to handle locations. Cannot store in datastore
    */
   public static TripDay tripDayFromEntity(Entity entity) {
     String origin = (String) entity.getProperty(ORIGIN);
