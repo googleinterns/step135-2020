@@ -118,6 +118,8 @@ public class TripServlet extends HttpServlet {
     String[] poiStrings = new String[pois.size()]; 
     poiStrings = pois.toArray(poiStrings); 
 
+    response.getWriter().println("original POI order: " + pois.toString());
+
     //do post for maps
     mapDoPost(request, response, origin, poiStrings);
 
@@ -146,8 +148,8 @@ public class TripServlet extends HttpServlet {
       List<String> orderedLocationStrings = getOrderedWaypoints(dirResult, pois);
 
       // Print out results on page for now
-      response.getWriter().println(travelTimes.toString());
-      response.getWriter().println(orderedLocationStrings.toString());
+      response.getWriter().println("travel times: " + travelTimes.toString());
+      response.getWriter().println("ordered POIs: " + orderedLocationStrings.toString());
     } catch (ApiException | InterruptedException e) {
       // If no directions are found or API throws an error.
       throw new IOException(e);
