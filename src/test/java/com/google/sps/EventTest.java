@@ -146,4 +146,25 @@ public final class EventTest {
 
     Assert.assertEquals(eventEntity, listResults.get(0));
   }
+
+   @Test
+  public void testEventFromEntity() {
+    // create eventEntity
+    Entity eventEntity = new Entity(Event.QUERY_STRING);
+    eventEntity.setProperty("name", GOLDEN_GATE_PARK);
+    eventEntity.setProperty("address", ADDRESS);
+    eventEntity.setProperty("start-time", 
+        DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(DEF_LDT));
+    eventEntity.setProperty("travel-time", Integer.toString(HALF_HOUR));
+
+    // create event w same fields for comparison
+    Event expected = new Event (GOLDEN_GATE_PARK, ADDRESS, DEF_LDT, HALF_HOUR);
+    Event actual = Event.eventFromEntity(eventEntity);
+ 
+    Assert.assertEquals(expected.getName(), actual.getName());
+    Assert.assertEquals(expected.getAddress(), actual.getAddress());
+    Assert.assertEquals(expected.getStartTime(), actual.getStartTime());
+    Assert.assertEquals(expected.getEndTime(), actual.getEndTime());
+    Assert.assertEquals(expected.getTravelTime(), actual.getTravelTime());
+  }
 }
