@@ -14,9 +14,15 @@
 
 package com.google.sps.servlets;
 
+import com.google.appengine.api.datastore.DatastoreService;
+import com.google.appengine.api.datastore.DatastoreServiceFactory;
+import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.datastore.PreparedQuery;
+import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
 import com.google.gson.Gson;
+import com.google.sps.data.User;
 import java.io.IOException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -41,10 +47,12 @@ public class AuthServlet extends HttpServlet {
     if (userService.isUserLoggedIn()) {
       String userEmail = userService.getCurrentUser().getEmail();
       String logoutUrl = userService.createLogoutURL(redirectUrl);
-      String id = userService.getCurrentUser().getUserId();
 
       // Create UserAuth object to represent logged-in user.
       userAuth = new UserAuth(logoutUrl, userEmail);
+
+      // Add user to database (if not already present).
+      addUserToDatabase(userEmail);
     } else {
       String loginUrl = userService.createLoginURL(redirectUrl);
 
@@ -70,12 +78,34 @@ public class AuthServlet extends HttpServlet {
   }
 
   /**
-  * Converts a UserAuth object into a JSON string using the Gson library.
-  */
+   * Converts a UserAuth object into a JSON string using the Gson library.
+   */
   private String convertToJson(UserAuth userAuth) {
     Gson gson = new Gson();
     String json = gson.toJson(userAuth);
     return json;
+  }
+  
+  /**
+   * If the user is not in database already, add them.
+   */
+  private void addUserToDatabase(String email) {
+    // Query database to see if User has already been added.
+    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+    Query query = new Query(User.USER);
+    PreparedQuery results = datastore.prepare(query);
+
+    // If user is already in database, return.
+    for (Entity entity : results.asIterable()) {
+      if (entity.getProperty(User.USER_EMAIL).equals(email)) {
+        return;
+      }
+    }
+
+    // User is not in database, create and add user object.
+    User user = new User(email);
+    Entity userEntity = user.buildEntity();
+    datastore.put(userEntity);
   }
 
   /**

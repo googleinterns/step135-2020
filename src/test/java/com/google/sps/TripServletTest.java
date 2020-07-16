@@ -82,11 +82,10 @@ public final class TripServletTest {
     dirResult.routes[0].waypointOrder = new int[]{ 1, 2, 0 };
     
     // Manually create user input.
-    List<String> pois = new ArrayList<>();
-    pois.add("Alki Beach, Seattle, WA, USA");
-    pois.add("MoPOP, 5th Avenue North, Seattle, WA, USA");
-    pois.add("Space Needle, Broad Street, Seattle, WA, USA");
-    
+    String[] pois = new String[]{"Alki Beach, Seattle, WA, USA",
+                                  "MoPOP, 5th Avenue North, Seattle, WA, USA",
+                                  "Space Needle, Broad Street, Seattle, WA, USA"};
+
     List<String> orderedWaypoints = TripServlet.getOrderedWaypoints(dirResult, pois);
 
     List<String> expectedWaypointOrder = new ArrayList<>();
