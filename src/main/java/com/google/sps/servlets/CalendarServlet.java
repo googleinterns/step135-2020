@@ -42,6 +42,14 @@ public class CalendarServlet extends HttpServlet {
     response.setContentType("application/json;");
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 
+    doGetEvents(response, datastore);
+  }
+
+  /**
+   * Gets the events and prints them to writer, necessary break up for testing
+   */
+  public void doGetEvents(HttpServletResponse response, 
+      DatastoreService datastore) throws IOException {
     // will add logic so that the Trip is gotten first and then all the tripDays
     Query tripDayQuery = new Query("trip-day");
     PreparedQuery tripDayResults = datastore.prepare(tripDayQuery);

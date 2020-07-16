@@ -22,9 +22,14 @@ import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
 import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
+import com.google.sps.data.Event;
 import com.google.sps.servlets.CalendarServlet;
-// import java.io.PrintWriter;
-// import java.io.StringWriter;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -43,26 +48,68 @@ import static org.mockito.Mockito.*;
 @RunWith(JUnit4.class)
 public final class CalendarServletTest {
 
+  private CalendarServlet calendarServlet;
+
+  // class constants
+  private static final String INPUT_DESTINATION = 
+      "4265 24th Street San Francisco, CA, 94114";
+  private static final String INPUT_DATE = "2020-07-15";
+  private static final String TEST_NAME = "testName";
+  private static final String EMPIRE_ADDRESS = "20 W 34th St, New York, NY 10001";
+  private static final int HALF_HOUR = 30;
+  private static final LocalDateTime DEF_START_TIME = 
+      LocalDateTime.of(LocalDate.parse(INPUT_DATE), LocalTime.of(10, 0));
+
+  private final LocalServiceTestHelper helper =
+      new LocalServiceTestHelper(new LocalDatastoreServiceTestConfig());
+
+  @Before
+  public void initCalendarServlet() {
+    calendarServlet = new CalendarServlet();
+  }
+
+   @Before
+  public void setUp() {
+    helper.setUp();
+  }
+
+  @After
+  public void tearDown() {
+    helper.tearDown();
+  }
+
   @Test
-  public void testGetEventsCorrectly() {
+  public void testWriteEventsCorrectly() throws Exception {
     HttpServletRequest request = mock(HttpServletRequest.class);       
     HttpServletResponse response = mock(HttpServletResponse.class);    
-
-    when(request.getParameter("username")).thenReturn("me");
-    when(request.getParameter("password")).thenReturn("secret");
 
     // Create writers to check against actual output.
     StringWriter stringWriter = new StringWriter();
     PrintWriter writer = new PrintWriter(stringWriter);
     when(response.getWriter()).thenReturn(writer);
 
-    new CalendarServlet().doGet(request, response);
+    // initialize datastore
+    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 
-    verify(request, atLeast(1)).getParameter("username"); // only if you want to verify username was called...
+    // create tripDay entity, needed for put events in datastore
+    Entity tripDayEntity = new Entity("trip-day");
+    tripDayEntity.setProperty("origin", INPUT_DESTINATION);
+    tripDayEntity.setProperty("destination", INPUT_DESTINATION);
+    tripDayEntity.setProperty("date", INPUT_DATE);
+    datastore.put(tripDayEntity);
+
+    Event e = new Event(TEST_NAME, EMPIRE_ADDRESS, DEF_START_TIME, HALF_HOUR);
+    Entity event = e.eventToEntity(tripDayEntity.getKey());
+
+    // CalendarServlet.doGetEvents(response, datastore);
+
+    // create expected JSON arrays
+    String expectedJson;
+
     writer.flush(); // it may not have been flushed yet...
-    assertTrue(stringWriter.toString().contains("My expected string"));
+    //Assert.assertTrue(stringWriter.toString().contains(expectedJson));
 
-    HttpServletResponse response = mock(HttpServletResponse.class);
+    // HttpServletResponse response = mock(HttpServletResponse.class);
 
     // // Mock UserService methods as logged-in user.
     // UserService userServiceMock = mock(UserService.class);

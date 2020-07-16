@@ -43,7 +43,7 @@ import static org.mockito.Mockito.*;
 @RunWith(JUnit4.class)
 public final class TripServletTest {
 
-  // Address to return from inputDestination.
+  // class constants
   private static final String INPUT_DESTINATION = 
     "4265 24th Street San Francisco, CA, 94114";
   private static final String INPUT_DATE = "2020-07-15";
