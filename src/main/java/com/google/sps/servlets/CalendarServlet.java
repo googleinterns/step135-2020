@@ -24,7 +24,6 @@ import com.google.gson.Gson;
 import com.google.sps.data.Event;
 import com.google.sps.TripDay;
 import java.io.IOException;
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 

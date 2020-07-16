@@ -22,6 +22,7 @@ import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
 import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
+import com.google.sps.data.Event;
 import com.google.sps.servlets.TripServlet;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -120,7 +121,7 @@ public final class TripServletTest {
 
     // put entities in datastore and query them
     List<Entity> eventEntities = tripServlet.putEventsInDatastore(request, response, params, tripDayEntity, INPUT_DATE, datastore);
-    Query query = new Query("event");
+    Query query = new Query(Event.QUERY_STRING);
     PreparedQuery results = datastore.prepare(query);
     List<Entity> listResults = results.asList(FetchOptions.Builder.withDefaults());
 
