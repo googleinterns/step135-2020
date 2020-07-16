@@ -101,13 +101,19 @@ public final class CalendarServletTest {
     Event e = new Event(TEST_NAME, EMPIRE_ADDRESS, DEF_START_TIME, HALF_HOUR);
     Entity event = e.eventToEntity(tripDayEntity.getKey());
 
-    // CalendarServlet.doGetEvents(response, datastore);
+    CalendarServlet.doGetEvents(response, datastore);
 
     // create expected JSON arrays
-    String expectedJson;
+    String expectedJson = "[{\"name\":\"testName\",\"address\":\"20 W 34th St, New York, NY 10001\"," + 
+            "\"startTime\":{\"date\":{\"year\":2020,\"month\":7,\"day\":15}," + 
+            "\"time\":{\"hour\":10,\"minute\":0,\"second\":0,\"nano\":0}}," + 
+            "\"endTime\":{\"date\":{\"year\":2020,\"month\":7,\"day\":15}," +
+            "\"time\":{\"hour\":11,\"minute\":0,\"second\":0,\"nano\":0}}," +
+            "\"strStartTime\":\"2020-07-15T10:00:00\",\"strEndTime\":\"2020-07-15T11:00:00\"," +
+            "\"travelTime\":30}]";
 
     writer.flush(); // it may not have been flushed yet...
-    //Assert.assertTrue(stringWriter.toString().contains(expectedJson));
+    Assert.assertTrue(stringWriter.toString().contains(expectedJson));
 
     // HttpServletResponse response = mock(HttpServletResponse.class);
 
