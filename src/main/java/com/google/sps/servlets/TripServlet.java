@@ -33,67 +33,53 @@ import javax.servlet.http.HttpServletResponse;
 @WebServlet("/calculate-trip")
 public class TripServlet extends HttpServlet {
 
+  // Create the GeoApiContext object.
+  GeoApiContext context;
+
   // Constants to get form inputs.
   private static final String INPUT_TRIP_NAME = "inputTripName";
   private static final String INPUT_DESTINATION = "inputDestination";
   private static final String INPUT_DAY_OF_TRAVEL = "inputDayOfTravel";
 
-  // Trip attributes
+  // Trip attributes needed to store the Trip Entity in datastore.
+  private String tripName;
+  private String tripDestination;
+  private String tripDayOfTravel;
+  private String destinationName;
+  private String photoSrc;
+
+  @Override
+  public void init() {
+    this.context = new GeoApiContext.Builder()
+      .apiKey(Config.API_KEY)
+      .build();
+  }
 
   @Override
   public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
     response.setContentType("application/json;");
 
     // Retrieve form inputs to define the Trip object.
-    String tripName = request.getParameter(INPUT_TRIP_NAME);
-    String tripDestination = request.getParameter(INPUT_DESTINATION);
-    String tripDayOfTravel = request.getParameter(INPUT_DAY_OF_TRAVEL);
+    this.tripName = request.getParameter(INPUT_TRIP_NAME);
+    this.tripDestination = request.getParameter(INPUT_DESTINATION);
+    this.tripDayOfTravel = request.getParameter(INPUT_DAY_OF_TRAVEL);
 
-    GeoApiContext context = new GeoApiContext.Builder()
-      .apiKey(Config.API_KEY)
-      .build();
+    // Populate the destinationName and photoSrc fields using Google Maps API.
+    populateDestinationAndPhoto(context, tripDestination);
 
-    // Get place ID from search of trip destination. Get photo and destination 
-    // if not null; otherwise, use a placeholder photo and destination.
-    String destinationPlaceId = getPlaceIdFromTextSearch(context, tripDestination);
-    String destinationName;
-    String photoSrc;
-    if (destinationPlaceId == null) {
-      destinationName = tripDestination;
-      photoSrc = "images/placeholder_image.png";
-    } else {
-      PlaceDetails placeDetailsResult = getPlaceDetailsFromPlaceId(context, destinationPlaceId);
+    // Store the Trip Entity in datastore with the User Entity as an ancestor.
+    storeTripEntity(response, this.tripName, this.destinationName, 
+      this.tripDayOfTravel, this.photoSrc);
 
-      // Get the name of the location from the place details result.
-      destinationName = placeDetailsResult.name;
-
-      // Get a photo of the location from the place details result.
-      if (placeDetailsResult.photos == null) {
-        photoSrc = "images/placeholder_image.png";
-      } else {
-        Photo photoObject = placeDetailsResult.photos[0];
-        photoSrc = getUrlFromPhotoReference(400, photoObject.photoReference);
-      }
-    }
-
-    // Get User Entity. If user not logged in, redirect to homepage.
-    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-    Entity userEntity = AuthServlet.getCurrentUserEntity(AuthServlet.getUserService());
-    if (userEntity == null) {
-      response.sendRedirect("/");
-    }
-
-    // Put Trip Entity into datastore.
-    Entity tripEntity = Trip.buildEntity(tripName, destinationName, photoSrc,
-      tripDayOfTravel, tripDayOfTravel, userEntity.getKey());
-    datastore.put(tripEntity);
-
-    // Print out params to site to verify retrieval of "start trip" user input.
-    Enumeration<String> params = request.getParameterNames();
-    while (params.hasMoreElements()) {
-      String paramName = params.nextElement();
-      response.getWriter().println(paramName + ": " + request.getParameter(paramName));
-    }
+    /**
+     * TODO: Remaining code for storing Event and TripDay objects should 
+     * go here, below the above code, as the Trip has to be set first in order
+     * to maintain Entity hierarchy / ancestor paths. 
+     * 
+     * Below methods can also use the field variables fetched from request in 
+     * the above code.
+     */
+    
   }
 
   /**
@@ -108,6 +94,8 @@ public class TripServlet extends HttpServlet {
 
     try {
       FindPlaceFromText findPlaceResult = findPlaceRequest.await();
+
+      System.err.println(findPlaceRequest);
 
       // Return place ID of the first candidate result.
       if (findPlaceResult.candidates != null) {
@@ -134,6 +122,55 @@ public class TripServlet extends HttpServlet {
     } catch(ApiException | InterruptedException e) {
       throw new IOException(e);
     }
+  }
+
+  /**
+   * Populate the destinationName and photoSrc fields using the Google Maps API.
+   */
+  public void populateDestinationAndPhoto(GeoApiContext context, String tripDestination)
+    throws IOException {
+
+    // Get place ID from search of trip destination. Get photo and destination 
+    // if not null; otherwise, use a placeholder photo and destination.
+    String destinationPlaceId = getPlaceIdFromTextSearch(context, this.tripDestination);
+    if (destinationPlaceId == null) {
+      this.destinationName = tripDestination;
+      this.photoSrc = "images/placeholder_image.png";
+    } else {
+      PlaceDetails placeDetailsResult = getPlaceDetailsFromPlaceId(context, destinationPlaceId);
+
+      // Get the name of the location from the place details result.
+      this.destinationName = placeDetailsResult.name;
+
+      // Get a photo of the location from the place details result.
+      if (placeDetailsResult.photos == null) {
+        this.photoSrc = "images/placeholder_image.png";
+      } else {
+        Photo photoObject = placeDetailsResult.photos[0];
+        this.photoSrc = getUrlFromPhotoReference(400, photoObject.photoReference);
+      }
+    }
+  }
+
+  /**
+   * Store the Trip Entity in datastore with the User Entity as an ancestor.
+   * Return the Trip Entity object.
+   */
+  public Entity storeTripEntity(HttpServletResponse response, String tripName, 
+    String destinationName, String tripDayOfTravel, String photoSrc) throws IOException {
+    // Get User Entity. If user not logged in, redirect to homepage.
+    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+    Entity userEntity = AuthServlet.getCurrentUserEntity(AuthServlet.getUserService());
+    if (userEntity == null) {
+      response.sendRedirect("/");
+      return null;
+    }
+
+    // Put Trip Entity into datastore.
+    Entity tripEntity = Trip.buildEntity(tripName, destinationName, photoSrc,
+      tripDayOfTravel, tripDayOfTravel, userEntity.getKey());
+    datastore.put(tripEntity);
+    return tripEntity;
   }
 
   /**
