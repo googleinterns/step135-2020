@@ -14,11 +14,21 @@
 
 package com.google.sps;
 
+import com.google.appengine.api.datastore.DatastoreService;
+import com.google.appengine.api.datastore.DatastoreServiceFactory;
+import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.datastore.FetchOptions;
+import com.google.appengine.api.datastore.PreparedQuery;
+import com.google.appengine.api.datastore.Query;
+import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
+import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
 import com.google.sps.data.Event;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -36,11 +46,29 @@ public final class EventTest {
   private final static int HOUR_FIFTY_FIVE = 115;
   private final static int THREE_HOURS = 180;
 
-  // files for event 1
+  // constants for tripDay entity
+  private static final String INPUT_DESTINATION = 
+      "4265 24th Street San Francisco, CA, 94114";
+  private static final String INPUT_DATE = "2020-07-15";
+
+  // constants for event
   private static final String GOLDEN_GATE_PARK = "GGPark";
   private static final String ADDRESS =  "4265 24th Street San Francisco, CA, 94114";
 
   private static final LocalDateTime DEF_LDT = LocalDateTime.of(LocalDate.parse("2020-06-25"), LocalTime.of(10, 0));
+
+  private final LocalServiceTestHelper helper =
+      new LocalServiceTestHelper(new LocalDatastoreServiceTestConfig());
+
+   @Before
+  public void setUp() {
+    helper.setUp();
+  }
+
+   @After
+  public void tearDown() {
+    helper.tearDown();
+  }
 
   @Test(expected = IllegalArgumentException.class)
   public void testTravelTimeBelowMinPossible() {
@@ -95,8 +123,27 @@ public final class EventTest {
   }
 
    @Test
-  public void testEventToEntity() {
-    // build tripDay Entity
+  public void testEventToEntityCorrectParent() {
+    // initialize datastore
+    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 
+    // build tripDay Entity
+    Entity tripDayEntity = new Entity(TripDay.QUERY_STRING);
+    tripDayEntity.setProperty("origin", INPUT_DESTINATION);
+    tripDayEntity.setProperty("destination", INPUT_DESTINATION);
+    tripDayEntity.setProperty("date", INPUT_DATE);
+    datastore.put(tripDayEntity);
+
+    // build eventEntity using fcn
+    Event e = new Event (GOLDEN_GATE_PARK, ADDRESS, DEF_LDT, HALF_HOUR);
+    Entity eventEntity = e.eventToEntity(tripDayEntity.getKey());
+    datastore.put(eventEntity);
+
+    // get results from datastore w/ tripDay entity as parent
+    Query query = new Query(Event.QUERY_STRING, tripDayEntity.getKey());
+    PreparedQuery results = datastore.prepare(query);
+    List<Entity> listResults = results.asList(FetchOptions.Builder.withDefaults());
+
+    Assert.assertEquals(eventEntity, listResults.get(0));
   }
 }
