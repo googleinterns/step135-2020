@@ -73,7 +73,10 @@ public class TripServlet extends HttpServlet {
   private static final String DATE = "date";
   private static final String START_TIME = "start-time";
   private static final String TRAVEL_TIME = "travel-time";
-
+ 
+  /**
+   * Iterate through the entities and create the events and write them to json.
+   */
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) 
       throws IOException {
@@ -83,6 +86,11 @@ public class TripServlet extends HttpServlet {
     eventDoGet(response);
   }
 
+  /**
+   * Get user input.
+   * Generate directionsRequest from user input and parse optimized route.
+   * Create and store events in Datastore.
+   */
   @Override
   public void doPost(HttpServletRequest request, HttpServletResponse response) 
       throws IOException {
