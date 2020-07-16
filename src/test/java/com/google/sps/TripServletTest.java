@@ -53,6 +53,10 @@ public final class TripServletTest {
   // create TripServlet object
   TripServlet tripServlet;
 
+  // initialize mock objects
+  HttpServletRequest request = mock(HttpServletRequest.class);
+  HttpServletResponse response = mock(HttpServletResponse.class);
+
   // Add helper to allow datastore testing in local JUnit tests.
   // See https://cloud.google.com/appengine/docs/standard/java/tools/localunittesting.
   private final LocalServiceTestHelper helper =
@@ -75,31 +79,29 @@ public final class TripServletTest {
 
   @Test
   public void testPutTripDayInDatastore() throws Exception {
-    HttpServletRequest request = mock(HttpServletRequest.class);
-    HttpServletResponse response = mock(HttpServletResponse.class);
-
+    // set mock object behavior
     when(request.getParameter("inputDestination")).thenReturn(INPUT_DESTINATION);
 
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 
-    Entity tripDayEntity = tripServlet.putTripDayInDatastore(request, response, datastore, INPUT_DATE);
-
+    // put entity in datastore and query it
+    Entity tripDayEntity = tripServlet.putTripDayInDatastore(request, datastore, INPUT_DATE);
     Query query = new Query("trip-day");
     PreparedQuery results = datastore.prepare(query);
     List<Entity> listResults = results.asList(FetchOptions.Builder.withDefaults());
 
+    // check size, tripDayEntity is correctly added
     Assert.assertEquals(1, listResults.size());
     Assert.assertEquals(listResults.get(0), tripDayEntity);
   }
 
   @Test
   public void testPutEventsInDatastore() throws Exception {
-    HttpServletRequest request = mock(HttpServletRequest.class);
-    HttpServletResponse response = mock(HttpServletResponse.class);
-
+    // set mock object behavior
     when(request.getParameter("poi-1")).thenReturn(POI_ONE);
     when(request.getParameter("poi-2")).thenReturn(POI_TWO);
 
+    // manually create params list
     List<String> paramsList = new ArrayList<>();
     paramsList.add("inputDestination");
     paramsList.add("inputDayOfTravel");
@@ -108,22 +110,26 @@ public final class TripServletTest {
     paramsList.add("poi-2");
     Enumeration<String> params = Collections.enumeration(paramsList);
 
+    // initialize datastore
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 
+    // create tripDay entity, needed for put events in datastore
     Entity tripDayEntity = new Entity("trip-day");
     tripDayEntity.setProperty("origin", INPUT_DESTINATION);
     tripDayEntity.setProperty("destination", INPUT_DESTINATION);
     tripDayEntity.setProperty("date", INPUT_DATE);
-
     datastore.put(tripDayEntity);
 
-    tripServlet.putEventsInDatastore(request, response, params, tripDayEntity, INPUT_DATE, datastore);
-
+    // put entities in datastore and query them
+    List<Entity> eventEntities = tripServlet.putEventsInDatastore(request, response, params, tripDayEntity, INPUT_DATE, datastore);
     Query query = new Query("event");
     PreparedQuery results = datastore.prepare(query);
     List<Entity> listResults = results.asList(FetchOptions.Builder.withDefaults());
 
+    // check that size is correct, added in correct order, entities match
     Assert.assertEquals(2, listResults.size());
+    Assert.assertEquals(listResults.get(0), eventEntities.get(0));
+    Assert.assertEquals(listResults.get(1), eventEntities.get(1));
   }
 
 }

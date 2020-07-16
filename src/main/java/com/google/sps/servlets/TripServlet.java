@@ -58,7 +58,7 @@ public class TripServlet extends HttpServlet {
     String date = request.getParameter("inputDayOfTravel");
 
     // put TripDay entity into datastore
-    Entity tripDayEntity = putTripDayInDatastore(request, response, datastore, date);
+    Entity tripDayEntity = putTripDayInDatastore(request, datastore, date);
 
     // put Event entities in datastore
     putEventsInDatastore(request, response, params, tripDayEntity, date, datastore);
@@ -68,7 +68,7 @@ public class TripServlet extends HttpServlet {
    * put TripDay into Datastore
    * @return tripDay entity, needed for event creation
    */
-  public Entity putTripDayInDatastore(HttpServletRequest request, HttpServletResponse response,
+  public Entity putTripDayInDatastore(HttpServletRequest request, 
       DatastoreService datastore, String date) throws IOException {
     
     String origin = request.getParameter("inputDestination");
@@ -85,9 +85,12 @@ public class TripServlet extends HttpServlet {
    * Searches through the parameters and creates the events and puts them into
    * datastore with associated tripDayEntity as a parent
    */
-  public void putEventsInDatastore(HttpServletRequest request, HttpServletResponse response, 
+  public List<Entity> putEventsInDatastore(HttpServletRequest request, HttpServletResponse response, 
       Enumeration<String> params, Entity tripDayEntity, String date, DatastoreService datastore)
       throws IOException { 
+
+    // entities to return, needed for testing
+    List<Entity> eventEntities = new ArrayList<>();    
 
     // set startDateTime
     LocalDateTime startDateTime = LocalDateTime.of(LocalDate.parse(date), LocalTime.of(10, 0));
@@ -105,6 +108,7 @@ public class TripServlet extends HttpServlet {
         String name = address.split(",")[0];
         Event event = new Event(name, address, startDateTime, HALF_HOUR);
         Entity eventEntity = event.eventToEntity(tripDayEntity.getKey());
+        eventEntities.add(eventEntity);
 
         // put entity in datastore     
         datastore.put(eventEntity);
@@ -116,5 +120,7 @@ public class TripServlet extends HttpServlet {
       // redirect to home page
       response.sendRedirect("/");
     }
+
+    return eventEntities;
   }
 }
