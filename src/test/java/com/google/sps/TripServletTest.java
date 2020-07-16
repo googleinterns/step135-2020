@@ -23,8 +23,6 @@ import com.google.appengine.api.datastore.Query;
 import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
 import com.google.sps.servlets.TripServlet;
-// import java.io.PrintWriter;
-// import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;

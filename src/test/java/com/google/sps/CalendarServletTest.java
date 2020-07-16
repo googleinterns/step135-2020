@@ -17,9 +17,6 @@ package com.google.sps;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
-import com.google.appengine.api.datastore.FetchOptions;
-import com.google.appengine.api.datastore.PreparedQuery;
-import com.google.appengine.api.datastore.Query;
 import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
 import com.google.sps.data.Event;
@@ -29,11 +26,6 @@ import java.io.StringWriter;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.List;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -98,12 +90,15 @@ public final class CalendarServletTest {
     tripDayEntity.setProperty("date", INPUT_DATE);
     datastore.put(tripDayEntity);
 
+    // create event entity and put it into datastore
     Event e = new Event(TEST_NAME, EMPIRE_ADDRESS, DEF_START_TIME, HALF_HOUR);
     Entity event = e.eventToEntity(tripDayEntity.getKey());
+    datastore.put(event);
 
-    CalendarServlet.doGetEvents(response, datastore);
+    // run do Get
+    calendarServlet.doGetEvents(response, datastore);
 
-    // create expected JSON arrays
+    // create expected JSON array
     String expectedJson = "[{\"name\":\"testName\",\"address\":\"20 W 34th St, New York, NY 10001\"," + 
             "\"startTime\":{\"date\":{\"year\":2020,\"month\":7,\"day\":15}," + 
             "\"time\":{\"hour\":10,\"minute\":0,\"second\":0,\"nano\":0}}," + 
@@ -112,33 +107,7 @@ public final class CalendarServletTest {
             "\"strStartTime\":\"2020-07-15T10:00:00\",\"strEndTime\":\"2020-07-15T11:00:00\"," +
             "\"travelTime\":30}]";
 
-    writer.flush(); // it may not have been flushed yet...
+    writer.flush();
     Assert.assertTrue(stringWriter.toString().contains(expectedJson));
-
-    // HttpServletResponse response = mock(HttpServletResponse.class);
-
-    // // Mock UserService methods as logged-in user.
-    // UserService userServiceMock = mock(UserService.class);
-    // when(userServiceMock.isUserLoggedIn()).thenReturn(true);
-    // // This is the User object from Google Appengine (full path given to avoid
-    // // conflict with local User.java file).
-    // when(userServiceMock.getCurrentUser()).thenReturn(
-    //     new com.google.appengine.api.users.User(EMAIL, AUTH_DOMAIN));
-    // when(userServiceMock.createLogoutURL(AuthServlet.redirectUrl)).thenReturn(LOGOUT_URL);
-
-    // // Create writers to check against actual output.
-    // StringWriter stringWriter = new StringWriter();
-    // PrintWriter writer = new PrintWriter(stringWriter);
-    // when(responseMock.getWriter()).thenReturn(writer);
-
-    // // Create the expected JSON logged-in string.
-    // String expectedJson = "{\"url\":\"" + LOGOUT_URL_UNICODE + "\",\"email\":\"" 
-    //   + EMAIL + "\"}";
-
-    // // Run getUserAuthJson(...), and test whether output matches expected.
-    // authServlet.getUserAuthJson(responseMock, userServiceMock);
-    // writer.flush();
-    // Assert.assertTrue(stringWriter.toString().contains(expectedJson));
   }
-
 }
