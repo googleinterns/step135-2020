@@ -125,7 +125,7 @@ public final class TripServletTest {
   }
 
   @Test
-  public void doPostTest() {
+  public void mapDoPostTest() {
     // TODO: eshika to add an integration test post-MVP
   }
 }
