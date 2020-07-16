@@ -106,7 +106,7 @@ public final class TripDayTest {
   }
 
    @Test
-  public void testbuildEntityAndFromEntity() {
+  public void testBuildEntityAndFromEntity() {
     // create TripDay
     locations = new ArrayList<>();
     TripDay tripDayOriginal = new TripDay(HOTEL_ID, HOTEL_ID, locations, DATE);
