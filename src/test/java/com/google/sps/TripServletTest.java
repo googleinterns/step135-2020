@@ -49,11 +49,11 @@ public final class TripServletTest {
   private static final String POI_TWO = "two";
 
   // create TripServlet object
-  TripServlet tripServlet;
+  private TripServlet tripServlet;
 
   // initialize mock objects
-  HttpServletRequest request = mock(HttpServletRequest.class);
-  HttpServletResponse response = mock(HttpServletResponse.class);
+  private HttpServletRequest request = mock(HttpServletRequest.class);
+  private HttpServletResponse response = mock(HttpServletResponse.class);
 
   // Add helper to allow datastore testing in local JUnit tests.
   // See https://cloud.google.com/appengine/docs/standard/java/tools/localunittesting.
@@ -84,7 +84,7 @@ public final class TripServletTest {
 
     // put entity in datastore and query it
     Entity tripDayEntity = tripServlet.putTripDayInDatastore(request, datastore, INPUT_DATE);
-    Query query = new Query("trip-day");
+    Query query = new Query(TripDay.QUERY_STRING);
     PreparedQuery results = datastore.prepare(query);
     List<Entity> listResults = results.asList(FetchOptions.Builder.withDefaults());
 
@@ -112,7 +112,7 @@ public final class TripServletTest {
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 
     // create tripDay entity, needed for put events in datastore
-    Entity tripDayEntity = new Entity("trip-day");
+    Entity tripDayEntity = new Entity(TripDay.QUERY_STRING);
     tripDayEntity.setProperty("origin", INPUT_DESTINATION);
     tripDayEntity.setProperty("destination", INPUT_DESTINATION);
     tripDayEntity.setProperty("date", INPUT_DATE);
@@ -128,5 +128,10 @@ public final class TripServletTest {
     Assert.assertEquals(2, listResults.size());
     Assert.assertEquals(listResults.get(0), eventEntities.get(0));
     Assert.assertEquals(listResults.get(1), eventEntities.get(1));
+  }
+
+   @Test
+  public void testFullDoPost() {
+    // TODO: Adam to add full integration test
   }
 }

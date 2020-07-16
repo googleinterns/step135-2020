@@ -55,6 +55,9 @@ public class Event {
   private static final String START_TIME = "start-time";
   private static final String TRAVEL_TIME = "travel-time";
 
+  // query string
+  public static final String QUERY_STRING = "event";
+
   /**
    * Constructor that takes in time spent at location
    * 
@@ -110,6 +113,7 @@ public class Event {
 
   /**
    * Build entity from event to be put in datastore off event attributes
+   * parentKeyID is from tripDay Entity
    */
   public Entity eventToEntity(Key parentKeyID) {
     Entity eventEntity = new Entity("event", parentKeyID);

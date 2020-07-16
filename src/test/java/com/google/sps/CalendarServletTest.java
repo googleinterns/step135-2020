@@ -84,7 +84,7 @@ public final class CalendarServletTest {
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 
     // create tripDay entity, needed for put events in datastore
-    Entity tripDayEntity = new Entity("trip-day");
+    Entity tripDayEntity = new Entity(TripDay.QUERY_STRING);
     tripDayEntity.setProperty("origin", INPUT_DESTINATION);
     tripDayEntity.setProperty("destination", INPUT_DESTINATION);
     tripDayEntity.setProperty("date", INPUT_DATE);

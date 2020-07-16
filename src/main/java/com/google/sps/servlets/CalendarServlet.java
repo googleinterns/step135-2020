@@ -52,14 +52,14 @@ public class CalendarServlet extends HttpServlet {
   public void doGetEvents(HttpServletResponse response, 
       DatastoreService datastore) throws IOException {
     // will add logic so that the Trip is gotten first and then all the tripDays
-    Query tripDayQuery = new Query("trip-day");
+    Query tripDayQuery = new Query(TripDay.QUERY_STRING);
     PreparedQuery tripDayResults = datastore.prepare(tripDayQuery);
 
     List<Event> events = new ArrayList<>();
 
     // iterate through all the TripDays and get events for each one
     for (Entity tripDayEntity : tripDayResults.asIterable()) {
-      Query eventsQuery = new Query("event", tripDayEntity.getKey());
+      Query eventsQuery = new Query(Event.QUERY_STRING, tripDayEntity.getKey());
       PreparedQuery eventResults = datastore.prepare(eventsQuery);
 
       for (Entity eventEntity : eventResults.asIterable()) {

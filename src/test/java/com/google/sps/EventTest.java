@@ -93,4 +93,10 @@ public final class EventTest {
     Assert.assertEquals("2020-06-25T11:00:00", 
               DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(e.getEndTime()));
   }
+
+   @Test
+  public void testEventToEntity() {
+    // build tripDay Entity
+
+  }
 }

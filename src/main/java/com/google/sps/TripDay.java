@@ -16,7 +16,6 @@ package com.google.sps;
 
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.Key;
-import com.google.sps.data.Event;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,6 +32,9 @@ public class TripDay {
   private static final String ORIGIN = "origin";
   private static final String DESTINATION = "destination";
   private static final String DATE = "date";
+  
+  // query string
+  public static final String QUERY_STRING = "trip-day";
 
   /**
    * Creates a new TripDay.
@@ -104,7 +106,7 @@ public class TripDay {
    * Builds entity corresponds to current TripDay
    */
   public Entity buildEntity() {
-    Entity tripDayEntity = new Entity("trip-day");
+    Entity tripDayEntity = new Entity(QUERY_STRING);
     tripDayEntity.setProperty(ORIGIN, this.origin);
     tripDayEntity.setProperty(DESTINATION, this.destination);
     tripDayEntity.setProperty(DATE, this.date);
@@ -112,10 +114,11 @@ public class TripDay {
   }
 
   /**
-   * Builds entity corresponds to current TripDay with parent ID
+   * Builds entity corresponds to current TripDay with parent ID (from
+   *  Trip Entity)
    */
   public Entity buildEntity(Key parentKeyID) {
-    Entity tripDayEntity = new Entity("trip-day", parentKeyID);
+    Entity tripDayEntity = new Entity(QUERY_STRING, parentKeyID);
     tripDayEntity.setProperty(ORIGIN, this.origin);
     tripDayEntity.setProperty(DESTINATION, this.destination);
     tripDayEntity.setProperty(DATE, this.date);
