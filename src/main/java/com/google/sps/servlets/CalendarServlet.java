@@ -42,6 +42,7 @@ public class CalendarServlet extends HttpServlet {
     response.setContentType("application/json;");
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 
+    // gets the events from datastore and writes them to .../get-calendar
     doGetEvents(response, datastore);
   }
 
@@ -65,7 +66,6 @@ public class CalendarServlet extends HttpServlet {
         events.add(Event.eventFromEntity(eventEntity));
       }
     }
-    
     response.getWriter().println(convertToJson(events));
   }
 

@@ -129,5 +129,4 @@ public final class TripServletTest {
     Assert.assertEquals(listResults.get(0), eventEntities.get(0));
     Assert.assertEquals(listResults.get(1), eventEntities.get(1));
   }
-
 }
