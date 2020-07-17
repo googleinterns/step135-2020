@@ -34,7 +34,8 @@ import javax.servlet.http.HttpServletResponse;
 public class TripServlet extends HttpServlet {
 
   // Create the GeoApiContext object.
-  GeoApiContext context;
+  private GeoApiContext context;
+  private int photoSrcSize = 400;
 
   // Constants to get form inputs.
   private static final String INPUT_TRIP_NAME = "inputTripName";
@@ -147,7 +148,7 @@ public class TripServlet extends HttpServlet {
         this.photoSrc = "../images/placeholder_image.png";
       } else {
         Photo photoObject = placeDetailsResult.photos[0];
-        this.photoSrc = getUrlFromPhotoReference(400, photoObject.photoReference);
+        this.photoSrc = getUrlFromPhotoReference(this.photoSrcSize, photoObject.photoReference);
       }
     }
   }
@@ -177,6 +178,10 @@ public class TripServlet extends HttpServlet {
    * Get a URL to show the photo from the photoreference.
    * See https://developers.google.com/places/web-service/photos#place_photo_requests
    * for more info.
+   * 
+   * @param maxWidth This is the maximum width of the image.
+   * @param photoReference This is the photo reference String stored in the 
+   * Google Maps Photo object; this is used to retrieve the actual photo URL.
    */
   public String getUrlFromPhotoReference(int maxWidth, String photoReference) {
     final String baseUrl = "https://maps.googleapis.com/maps/api/place/photo?";

@@ -271,5 +271,4 @@ public final class TripServletTest {
     Assert.assertEquals(0, listResults.size());
     Assert.assertNull(tripEntityReturn);
   }
-
 }
