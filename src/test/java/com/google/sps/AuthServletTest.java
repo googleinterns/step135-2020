@@ -107,12 +107,12 @@ public final class AuthServletTest {
 
     // Create the expected JSON logged-in string.
     String expectedJson = "{\"url\":\"" + LOGOUT_URL_UNICODE + "\",\"email\":\"" 
-      + EMAIL + "\"}";
+      + EMAIL + "\"}\n";
 
     // Run getUserAuthJson(...), and test whether output matches expected.
     authServlet.getUserAuthJson(responseMock, userServiceMock);
     writer.flush();
-    Assert.assertTrue(stringWriter.toString().contains(expectedJson));
+    Assert.assertEquals(expectedJson, stringWriter.toString());
   }
 
   @Test
@@ -131,12 +131,12 @@ public final class AuthServletTest {
     when(responseMock.getWriter()).thenReturn(writer);
 
     // Create the expected JSON logged-out string.
-    String expectedJson = "{\"url\":\"" + LOGIN_URL_UNICODE + "\"}";
+    String expectedJson = "{\"url\":\"" + LOGIN_URL_UNICODE + "\"}\n";
 
     // Run getUserAuthJson()(...), and test whether output matches expected.
     authServlet.getUserAuthJson(responseMock, userServiceMock);
     writer.flush();
-    Assert.assertTrue(stringWriter.toString().contains(expectedJson));
+    Assert.assertEquals(expectedJson, stringWriter.toString());
   }
 
   @Test
