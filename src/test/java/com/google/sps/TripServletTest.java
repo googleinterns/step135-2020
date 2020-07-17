@@ -113,7 +113,7 @@ public final class TripServletTest {
     dirResult.routes[0].legs[2].duration.inSeconds = 1500;
     dirResult.routes[0].legs[3].duration.inSeconds = 2100;
     
-    List<Integer> travelTimes  = TripServlet.getTravelTimes(dirResult);
+    List<Integer> actualTravelTimes  = TripServlet.getTravelTimes(dirResult);
 
     List<Integer> expectedTravelTimes = new ArrayList<>();
     expectedTravelTimes.add(18);
@@ -121,7 +121,7 @@ public final class TripServletTest {
     expectedTravelTimes.add(25);
     expectedTravelTimes.add(35);
 
-    Assert.assertEquals(travelTimes, expectedTravelTimes);
+    Assert.assertEquals(actualTravelTimes, expectedTravelTimes);
   }
 
   @Test
