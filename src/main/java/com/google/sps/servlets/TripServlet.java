@@ -138,7 +138,7 @@ public class TripServlet extends HttpServlet {
       .apiKey(Config.API_KEY)
       .build();
 
-    DirectionsApiRequest directionsRequest = generateDirectionsRequest(origin, pois, distCalcer);
+    DirectionsApiRequest directionsRequest = generateDirectionsRequest(origin, origin, pois, distCalcer);
 
     // Calculate route and save travelTimes and waypointOrder to two ArrayLists.
     try {
@@ -211,13 +211,13 @@ public class TripServlet extends HttpServlet {
   /**
    * Generates directionsRequest from user input.
    */
-  public static DirectionsApiRequest generateDirectionsRequest(String origin, String[] poiStrings, 
-      GeoApiContext context) {
+  public static DirectionsApiRequest generateDirectionsRequest(String origin, String destination, 
+      String[] poiStrings, GeoApiContext context) {
 
     // Generate directions request
     DirectionsApiRequest directionsRequest = DirectionsApi.newRequest(context)
         .origin(origin)
-        .destination(origin)
+        .destination(destination)
         .waypoints(poiStrings)
         .optimizeWaypoints(true)
         .mode(TravelMode.DRIVING);

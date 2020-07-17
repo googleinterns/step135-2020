@@ -62,7 +62,7 @@ public final class TripServletTest {
     
     String origin = "The Westin Bellevue, Bellevue Way Northeast, Bellevue, WA, USA";
 
-    DirectionsApiRequest request = TripServlet.generateDirectionsRequest(origin, waypoints, mockGeoApiContext);
+    DirectionsApiRequest request = TripServlet.generateDirectionsRequest(origin, origin, waypoints, mockGeoApiContext);
 
     // Verify that proper methods and parameters are called to generate directionsRequest.
     verify(mockRequest).origin(origin);
