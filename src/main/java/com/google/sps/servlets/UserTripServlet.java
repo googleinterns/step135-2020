@@ -47,7 +47,7 @@ public class UserTripServlet extends HttpServlet {
     response.setContentType("application/json;");
 
     // If no user is signed in, return null.
-    Entity userEntity = AuthServlet.getCurrentUserEntity(AuthServlet.getUserService());
+    Entity userEntity = AuthServlet.getCurrentUserEntity();
     if (userEntity == null) {
       response.getWriter().println(nullReturn);
       return;
