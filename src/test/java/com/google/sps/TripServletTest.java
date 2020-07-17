@@ -20,7 +20,6 @@ import com.google.maps.model.DirectionsRoute;
 import com.google.maps.model.DirectionsLeg;
 import com.google.maps.model.Duration;
 import com.google.maps.model.TravelMode;
-import com.google.sps.data.Config;
 import com.google.sps.servlets.TripServlet;
 import java.util.ArrayList;
 import java.util.List;
