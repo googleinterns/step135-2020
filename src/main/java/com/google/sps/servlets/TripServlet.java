@@ -137,7 +137,7 @@ public class TripServlet extends HttpServlet {
     String destinationPlaceId = getPlaceIdFromTextSearch(context, this.tripDestination);
     if (destinationPlaceId == null) {
       this.destinationName = tripDestination;
-      this.photoSrc = "images/placeholder_image.png";
+      this.photoSrc = "../images/placeholder_image.png";
     } else {
       PlaceDetails placeDetailsResult = getPlaceDetailsFromPlaceId(context, destinationPlaceId);
 
