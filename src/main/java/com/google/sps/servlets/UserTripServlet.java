@@ -77,5 +77,4 @@ public class UserTripServlet extends HttpServlet {
     String json = gson.toJson(tripList);
     return json;
   }
-
 }

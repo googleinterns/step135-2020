@@ -44,14 +44,14 @@ import org.powermock.modules.junit4.PowerMockRunner;
 public final class UserTripServletTest {
 
   // Add constants necessary to testing retrieval of the current User.
-  public static final String EMAIL = "testemail@gmail.com";
-  public static final String AUTH_DOMAIN = "gmail.com";
-  public static final String LOGOUT_URL = "/_ah/logout?continue=%2F";
-  public static final String LOGIN_URL = "/_ah/login?continue=%2F";
+  private static final String EMAIL = "testemail@gmail.com";
+  private static final String AUTH_DOMAIN = "gmail.com";
+  private static final String LOGOUT_URL = "/_ah/logout?continue=%2F";
+  private static final String LOGIN_URL = "/_ah/login?continue=%2F";
 
   // Create UserTripServlet and TripServlet objects.
-  UserTripServlet userTripServlet;
-  TripServlet tripServlet;
+  private UserTripServlet userTripServlet;
+  private TripServlet tripServlet;
 
   // Add helper to allow datastore testing in local JUnit tests.
   // See https://cloud.google.com/appengine/docs/standard/java/tools/localunittesting.
@@ -89,6 +89,7 @@ public final class UserTripServletTest {
     // Mock UserService methods as logged-in user.
     UserService userServiceMock = mock(UserService.class);
     when(userServiceMock.isUserLoggedIn()).thenReturn(true);
+
     // This is the User object from Google Appengine (full path given to avoid
     // confusion with local User.java file).
     when(userServiceMock.getCurrentUser()).thenReturn(
