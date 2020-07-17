@@ -14,18 +14,31 @@
 
 package com.google.sps;
 
+import com.google.appengine.api.datastore.DatastoreService;
+import com.google.appengine.api.datastore.DatastoreServiceFactory;
+import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.KeyFactory;
+import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
+import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
 import com.google.sps.Trip;
 import com.google.sps.TripDay;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
+import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
 @RunWith(JUnit4.class)
 public final class TripTest {
+
+  // Constants for creating Key of Trip Entity ancestor.
+  private static final String PARENT_KEY_KIND = "trip_entity_parent_kind";
+  private static final String PARENT_KEY_NAME = "trip_entity_parent_name";
 
   // Cosntants to represent different Trip attributes.
   private static final String TRIP_NAME = "Trip to California";
@@ -39,6 +52,21 @@ public final class TripTest {
   private static final int NUM_DAYS = 6;
   private static final LocalDate START_DATE = LocalDate.parse(START_DATE_STRING);
   private static final LocalDate END_DATE = LocalDate.parse(END_DATE_STRING);
+
+  // Add helper to allow datastore testing in local JUnit tests.
+  // See https://cloud.google.com/appengine/docs/standard/java/tools/localunittesting.
+  private final LocalServiceTestHelper helper =
+    new LocalServiceTestHelper(new LocalDatastoreServiceTestConfig());
+
+  @Before
+  public void setUp() {
+      helper.setUp();
+  }
+
+  @After
+  public void tearDown() {
+      helper.tearDown();
+  }
 
   // Test the trip constructor which allows for multiple days
   @Test
@@ -67,6 +95,36 @@ public final class TripTest {
     Assert.assertEquals(trip.getImageSrc(), IMAGE_SRC);
     Assert.assertEquals(trip.getStartDate(), START_DATE);
     Assert.assertEquals(trip.getNumDays(), 1);
+  }
+
+  // Test the trip build entity
+  @Test
+  public void testTripBuildEntity() {
+    Entity tripEntity = Trip.buildEntity(TRIP_NAME, DESTINATION_NAME, IMAGE_SRC, 
+      START_DATE_STRING, END_DATE_STRING, KeyFactory.createKey(PARENT_KEY_KIND, PARENT_KEY_NAME));
+
+    Assert.assertEquals(TRIP_NAME, tripEntity.getProperty(Trip.TRIP_NAME));
+    Assert.assertEquals(DESTINATION_NAME, tripEntity.getProperty(Trip.DESTINATION_NAME));
+    Assert.assertEquals(IMAGE_SRC, tripEntity.getProperty(Trip.IMAGE_SRC));
+    Assert.assertEquals(START_DATE_STRING, tripEntity.getProperty(Trip.START_DATE));
+    Assert.assertEquals(END_DATE_STRING, tripEntity.getProperty(Trip.END_DATE));
+  }
+
+  // Test the trip build trip from entity
+  @Test
+  public void testBuildTripFromEntity() {
+    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+    Entity tripEntity = Trip.buildEntity(TRIP_NAME, DESTINATION_NAME, IMAGE_SRC, 
+      START_DATE_STRING, END_DATE_STRING, KeyFactory.createKey(PARENT_KEY_KIND, 
+      PARENT_KEY_NAME));
+    datastore.put(tripEntity);
+    Trip trip = Trip.buildTripFromEntity(tripEntity);
+
+    Assert.assertEquals(trip.getTripName(), TRIP_NAME);
+    Assert.assertEquals(trip.getDestinationName(), DESTINATION_NAME);
+    Assert.assertEquals(trip.getImageSrc(), IMAGE_SRC);
+    Assert.assertEquals(trip.getStartDate(), START_DATE);
+    Assert.assertEquals(trip.getEndDate(), END_DATE);
   }
 
   // Test multiple day constructor with null trip name
