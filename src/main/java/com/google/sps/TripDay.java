@@ -43,6 +43,7 @@ public class TripDay {
    * @param destination The final destination (Google Maps Place ID string) for this day. Must be non-null.
    * @param locations The list of POIs (list of Google Maps Place ID strings) 
                       that are stopovers for this day. Must be non-null.
+   * @param date The date of when this TripDay occurs.
    */
   public TripDay(String origin, String destination, List<String> locations, String date) {
     if (origin == null) {
@@ -105,7 +106,7 @@ public class TripDay {
   /**
    * Add locations
    */
-  public void addLocations(ArrayList<String> locations) {
+  public void setLocations(ArrayList<String> locations) {
     this.locations = locations;
   }
 
@@ -122,7 +123,7 @@ public class TripDay {
 
   /**
    * Builds entity corresponds to current TripDay with parent ID (from
-   *  Trip Entity)
+   * Trip Entity)
    */
   public Entity buildEntity(Key parentKeyID) {
     Entity tripDayEntity = new Entity(QUERY_STRING, parentKeyID);
@@ -133,8 +134,9 @@ public class TripDay {
   }
 
   /**
-   * Build tripDay from entity. Not needed for this CL but will be necessary 
-   * later. NOTE: Unsure how to handle locations. Cannot store in datastore
+   * Build tripDay from entity.
+   * NOTE: Since Lists cannot be stored in datastore, must call setLocations()
+   * after.
    */
   public static TripDay tripDayFromEntity(Entity entity) {
     String origin = (String) entity.getProperty(ORIGIN);
