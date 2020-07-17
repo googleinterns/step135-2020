@@ -140,9 +140,9 @@ public final class AuthServletTest {
   }
 
   @Test
-  public void testAddUserToDatabaseNotPresent() throws Exception {
-    // Run addUserToDatabase(...), with the User not present in datastore.
-    Entity userEntityReturn = AuthServlet.addUserToDatabase(EMAIL);
+  public void testGetOrCreateUserInDatabaseNotPresent() throws Exception {
+    // Run getOrCreateUserInDatabase(...), with the User not present in datastore.
+    Entity userEntityReturn = AuthServlet.getOrCreateUserInDatabase(EMAIL);
 
     // Retrieve the datastore results.
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
@@ -159,10 +159,10 @@ public final class AuthServletTest {
   }
 
   @Test
-  public void testAddUserToDatabaseNotPresentRunTwiceSameEmails() throws Exception {
-    // Run addUserToDatabase(...), with the User not present in datastore.
-    Entity userEntityReturn = AuthServlet.addUserToDatabase(EMAIL);
-    Entity userEntitySecondReturn = AuthServlet.addUserToDatabase(EMAIL);
+  public void testGetOrCreateUserInDatabaseNotPresentRunTwiceSameEmails() throws Exception {
+    // Run getOrCreateUserInDatabase(...), with the User not present in datastore.
+    Entity userEntityReturn = AuthServlet.getOrCreateUserInDatabase(EMAIL);
+    Entity userEntitySecondReturn = AuthServlet.getOrCreateUserInDatabase(EMAIL);
 
     // Retrieve the datastore results.
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
@@ -179,10 +179,10 @@ public final class AuthServletTest {
   }
 
   @Test
-  public void testAddUserToDatabaseNotPresentRunTwiceDifferentEmails() throws Exception {
-    // Run addUserToDatabase(...), with the User not present in datastore.
-    Entity userEntityReturn = AuthServlet.addUserToDatabase(EMAIL);
-    Entity userEntitySecondReturn = AuthServlet.addUserToDatabase(SECOND_EMAIL);
+  public void testGetOrCreateUserInDatabaseNotPresentRunTwiceDifferentEmails() throws Exception {
+    // Run getOrCreateUserInDatabase(...), with the User not present in datastore.
+    Entity userEntityReturn = AuthServlet.getOrCreateUserInDatabase(EMAIL);
+    Entity userEntitySecondReturn = AuthServlet.getOrCreateUserInDatabase(SECOND_EMAIL);
 
     // Retrieve the datastore results.
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
@@ -201,15 +201,15 @@ public final class AuthServletTest {
   }
 
   @Test
-  public void testAddUserToDatabasePresent() throws Exception {
+  public void testGetOrCreateUserInDatabasePresent() throws Exception {
     // Add a User to the database.
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
     Entity userEntity = new Entity(User.USER);
     userEntity.setProperty(User.USER_EMAIL, EMAIL);
     datastore.put(userEntity);
 
-    // Run addUserToDatabase(...), with the User already present in datastore.
-    Entity userEntityReturn = AuthServlet.addUserToDatabase(EMAIL);
+    // Run getOrCreateUserInDatabase(...), with the User already present in datastore.
+    Entity userEntityReturn = AuthServlet.getOrCreateUserInDatabase(EMAIL);
 
     // Retrieve the datastore results.
     Query query = new Query(User.USER);
