@@ -66,6 +66,7 @@ public class TripServlet extends HttpServlet {
   // time class constants
   private static final int HALF_HOUR = 30;
   private static final int NINETY_MINS = 90;
+  private static final int SECONDS_IN_MIN = 60;
 
   // event fields for entity
   private static final String NAME = "name";
@@ -229,12 +230,10 @@ public class TripServlet extends HttpServlet {
    * Gets list of travel times for each route leg from a DirectionsResult object.
    */
   public static List<Integer> getTravelTimes(DirectionsResult dirResult) {
-    int secondsInMinute = 60;
-
     List<Integer> travelTimes = new ArrayList<>();
     // Take the first route, usually the optimal.
     for (DirectionsLeg leg : dirResult.routes[ROUTE_INDEX].legs) {
-      int travelTime = (int) leg.duration.inSeconds / secondsInMinute;
+      int travelTime = (int) leg.duration.inSeconds / SECONDS_IN_MIN;
       travelTimes.add(travelTime);
     }
 
