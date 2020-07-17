@@ -41,9 +41,15 @@ public class AuthServlet extends HttpServlet {
 
     // Set up user auth objects.
     UserService userService = UserServiceFactory.getUserService();
-    UserAuth userAuth;
+    writeToUserAuthResponse(response, userService);
+  }
 
+  /**
+   * Write the UserAuth object in JSON form through response.
+   */
+  public void writeToUserAuthResponse(HttpServletResponse response, UserService userService) throws IOException {
     // Create UserAuth object with relevant login / logout information.
+    UserAuth userAuth;
     if (userService.isUserLoggedIn()) {
       String userEmail = userService.getCurrentUser().getEmail();
       String logoutUrl = userService.createLogoutURL(redirectUrl);
@@ -66,21 +72,9 @@ public class AuthServlet extends HttpServlet {
   }
 
   /**
-   * @return the request parameter, or the default value if the parameter
-   *         was not specified by the client
-   */
-  private String getParameter(HttpServletRequest request, String name, String defaultValue) {
-    String value = request.getParameter(name);
-    if (value == null) {
-      return defaultValue;
-    }
-    return value;
-  }
-
-  /**
    * Converts a UserAuth object into a JSON string using the Gson library.
    */
-  private String convertToJson(UserAuth userAuth) {
+  private static String convertToJson(UserAuth userAuth) {
     Gson gson = new Gson();
     String json = gson.toJson(userAuth);
     return json;
@@ -89,7 +83,7 @@ public class AuthServlet extends HttpServlet {
   /**
    * If the user is not in database already, add them.
    */
-  private void addUserToDatabase(String email) {
+  public void addUserToDatabase(String email) {
     // Query database to see if User has already been added.
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
     Query query = new Query(User.USER);
