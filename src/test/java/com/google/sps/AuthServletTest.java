@@ -78,7 +78,7 @@ public final class AuthServletTest {
   }
 
   @Test
-  public void testGetUserAuthJsonLoggedInReturn() throws Exception {
+  public void testWriteToUserAuthResponseLoggedInReturn() throws Exception {
     // Mock response.      
     HttpServletResponse responseMock = mock(HttpServletResponse.class);
 
@@ -100,14 +100,14 @@ public final class AuthServletTest {
     String expectedJson = "{\"url\":\"" + LOGOUT_URL_UNICODE + "\",\"email\":\"" 
       + EMAIL + "\"}";
 
-    // Run getUserAuthJson(...), and test whether output matches expected.
-    authServlet.getUserAuthJson(responseMock, userServiceMock);
+    // Run writeToUserAuthResponse(...), and test whether output matches expected.
+    authServlet.writeToUserAuthResponse(responseMock, userServiceMock);
     writer.flush();
     Assert.assertTrue(stringWriter.toString().contains(expectedJson));
   }
 
   @Test
-  public void testGetUserAuthJsonNotLoggedInReturn() throws Exception {
+  public void testWriteToUserAuthResponseNotLoggedInReturn() throws Exception {
     // Mock response.      
     HttpServletResponse responseMock = mock(HttpServletResponse.class);
 
@@ -124,8 +124,8 @@ public final class AuthServletTest {
     // Create the expected JSON logged-out string.
     String expectedJson = "{\"url\":\"" + LOGIN_URL_UNICODE + "\"}";
 
-    // Run getUserAuthJson()(...), and test whether output matches expected.
-    authServlet.getUserAuthJson(responseMock, userServiceMock);
+    // Run writeToUserAuthResponse()(...), and test whether output matches expected.
+    authServlet.writeToUserAuthResponse(responseMock, userServiceMock);
     writer.flush();
     Assert.assertTrue(stringWriter.toString().contains(expectedJson));
   }
