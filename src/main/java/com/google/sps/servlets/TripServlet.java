@@ -160,7 +160,7 @@ public class TripServlet extends HttpServlet {
     String destinationName, String tripDayOfTravel, String photoSrc) throws IOException {
     // Get User Entity. If user not logged in, redirect to homepage.
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-    Entity userEntity = AuthServlet.getCurrentUserEntity(AuthServlet.getUserService());
+    Entity userEntity = AuthServlet.getCurrentUserEntity();
     if (userEntity == null) {
       response.sendRedirect("/");
       return null;

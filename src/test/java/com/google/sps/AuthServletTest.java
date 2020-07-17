@@ -21,6 +21,7 @@ import com.google.appengine.api.datastore.FetchOptions;
 import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.users.UserService;
+import com.google.appengine.api.users.UserServiceFactory;
 import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
 import com.google.sps.data.User;
@@ -39,8 +40,12 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 import static org.mockito.Mockito.*;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
-@RunWith(JUnit4.class)
+@RunWith(PowerMockRunner.class)
+@PrepareForTest(UserServiceFactory.class)
 public final class AuthServletTest {
 
   // Create AuthServlet object.
@@ -90,6 +95,10 @@ public final class AuthServletTest {
     when(userServiceMock.getCurrentUser()).thenReturn(
         new com.google.appengine.api.users.User(EMAIL, AUTH_DOMAIN));
     when(userServiceMock.createLogoutURL(AuthServlet.redirectUrl)).thenReturn(LOGOUT_URL);
+
+    // PowerMock static getUserService() method, which is used to get the user.
+    PowerMockito.mockStatic(UserServiceFactory.class);
+    when(UserServiceFactory.getUserService()).thenReturn(userServiceMock);
 
     // Create writers to check against actual output.
     StringWriter stringWriter = new StringWriter();
@@ -144,7 +153,7 @@ public final class AuthServletTest {
     // Check whether the proper Entity and count were returned.
     Assert.assertEquals(1, listResults.size());
     Assert.assertEquals(EMAIL, listResults.get(0).getProperty(User.USER_EMAIL));
-    
+
     // Confirm that the Entity in the database matches the method return.
     Assert.assertEquals(listResults.get(0), userEntityReturn);
   }
@@ -261,9 +270,13 @@ public final class AuthServletTest {
     UserService userServiceMock = mock(UserService.class);
     when(userServiceMock.isUserLoggedIn()).thenReturn(false);
     when(userServiceMock.createLogoutURL(AuthServlet.redirectUrl)).thenReturn(LOGIN_URL);
+
+    // PowerMock static getUserService() method, which is used to get the user.
+    PowerMockito.mockStatic(UserServiceFactory.class);
+    when(UserServiceFactory.getUserService()).thenReturn(userServiceMock);
     
     // Run getCurrentUserEntity(...).
-    Entity userEntityReturn = AuthServlet.getCurrentUserEntity(userServiceMock);
+    Entity userEntityReturn = AuthServlet.getCurrentUserEntity();
     
     // Confirm that the method returns null, as there is no "current" user.
     Assert.assertNull(userEntityReturn);
@@ -280,8 +293,12 @@ public final class AuthServletTest {
         new com.google.appengine.api.users.User(EMAIL, AUTH_DOMAIN));
     when(userServiceMock.createLogoutURL(AuthServlet.redirectUrl)).thenReturn(LOGOUT_URL);
 
+    // PowerMock static getUserService() method, which is used to get the user.
+    PowerMockito.mockStatic(UserServiceFactory.class);
+    when(UserServiceFactory.getUserService()).thenReturn(userServiceMock);
+
     // Run getCurrentUserEntity(...), with the User present in datastore.
-    Entity userEntityReturn = AuthServlet.getCurrentUserEntity(userServiceMock);
+    Entity userEntityReturn = AuthServlet.getCurrentUserEntity();
 
     // Retrieve the datastore results.
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
@@ -308,6 +325,10 @@ public final class AuthServletTest {
         new com.google.appengine.api.users.User(EMAIL, AUTH_DOMAIN));
     when(userServiceMock.createLogoutURL(AuthServlet.redirectUrl)).thenReturn(LOGOUT_URL);
 
+    // PowerMock static getUserService() method, which is used to get the user.
+    PowerMockito.mockStatic(UserServiceFactory.class);
+    when(UserServiceFactory.getUserService()).thenReturn(userServiceMock);
+
     // Add a User to the database.
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
     Entity userEntity = new Entity(User.USER);
@@ -315,7 +336,7 @@ public final class AuthServletTest {
     datastore.put(userEntity);
 
     // Run getCurrentUserEntity(...), with the User present in datastore.
-    Entity userEntityReturn = AuthServlet.getCurrentUserEntity(userServiceMock);
+    Entity userEntityReturn = AuthServlet.getCurrentUserEntity();
 
     // Retrieve the datastore results.
     Query query = new Query(User.USER);
