@@ -79,7 +79,9 @@ public class TripServlet extends HttpServlet {
      * Below methods can also use the field variables fetched from request in 
      * the above code.
      */
-    
+
+    // Redirect to the "/trips/" page to show the trip that was added.
+    response.sendRedirect("/trips/");
   }
 
   /**
@@ -144,7 +146,7 @@ public class TripServlet extends HttpServlet {
 
       // Get a photo of the location from the place details result.
       if (placeDetailsResult.photos == null) {
-        this.photoSrc = "images/placeholder_image.png";
+        this.photoSrc = "../images/placeholder_image.png";
       } else {
         Photo photoObject = placeDetailsResult.photos[0];
         this.photoSrc = getUrlFromPhotoReference(400, photoObject.photoReference);
