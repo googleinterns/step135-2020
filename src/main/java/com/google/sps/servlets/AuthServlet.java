@@ -64,7 +64,7 @@ public class AuthServlet extends HttpServlet {
       userAuth = new UserAuth(logoutUrl, userEmail);
 
       // Add user to database (if not already present).
-      addUserToDatabase(userEmail);
+      getOrCreateUserInDatabase(userEmail);
     } else {
       String loginUrl = userService.createLoginURL(redirectUrl);
 
@@ -91,7 +91,7 @@ public class AuthServlet extends HttpServlet {
    * This method returns the Entity object in the database (or the newly-created
    * user Entity, if none previously existed).
    */
-  public static Entity addUserToDatabase(String email) {
+  public static Entity getOrCreateUserInDatabase(String email) {
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 
     // Only add User to database if they are not already present there.
@@ -126,12 +126,8 @@ public class AuthServlet extends HttpServlet {
     // Get user email from UserService.
     String email = userService.getCurrentUser().getEmail();
 
-    // Get user from datastore; if not present, add the user and return that.
-    Entity userEntity = getUserEntityFromEmail(email);
-    if (userEntity == null) {
-      Entity newUserEntity = addUserToDatabase(email);
-      return newUserEntity;
-    }
+    // Return user from datastore; if not present, add the user and return that.
+    Entity userEntity = getOrCreateUserInDatabase(email);
     return userEntity;
   }
 
@@ -147,7 +143,7 @@ public class AuthServlet extends HttpServlet {
     Query query = new Query(User.USER).setFilter(emailFilter);
     PreparedQuery results = datastore.prepare(query);
 
-    // Get the list of results. If empty, return null; otherwise, return true.
+    // Get the list of results.
     List<Entity> listResults = results.asList(FetchOptions.Builder.withDefaults());
     if (listResults.isEmpty()) {
       return null;
