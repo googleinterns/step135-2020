@@ -132,12 +132,13 @@ public class AuthServlet extends HttpServlet {
       Entity newUserEntity = addUserToDatabase(email);
       return newUserEntity;
     }
-
     return userEntity;
   }
 
-  // Return Entity object of user from database using email, or null if user 
-  // email is not in db.
+  /**
+   * Return Entity object of user from database using email, or null if user 
+   * email is not in db.
+   */
   public static Entity getUserEntityFromEmail(String email) {
     // Query database to see if User has already been added.
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
