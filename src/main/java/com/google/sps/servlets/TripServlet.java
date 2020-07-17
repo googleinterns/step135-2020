@@ -126,6 +126,9 @@ public class TripServlet extends HttpServlet {
 
     // do post for events
     eventDoPost(request, response, startDate, poiStrings); 
+
+    // redirect to trips page
+    response.sendRedirect("/trips/");
   }
 
   /**
@@ -204,9 +207,6 @@ public class TripServlet extends HttpServlet {
       // sets start time for next event 2 hours after start of prev
       startDateTime = startDateTime.plusMinutes(Long.valueOf(NINETY_MINS));
     }
-
-    // // redirect to home page
-    // response.sendRedirect("/");
   }
 
   /**
