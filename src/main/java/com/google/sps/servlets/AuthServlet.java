@@ -41,13 +41,13 @@ public class AuthServlet extends HttpServlet {
 
     // Set up user auth objects.
     UserService userService = UserServiceFactory.getUserService();
-    getUserAuthJson(response, userService);
+    writeToUserAuthResponse(response, userService);
   }
 
   /**
    * Write the UserAuth object in JSON form through response.
    */
-  public void getUserAuthJson(HttpServletResponse response, UserService userService) throws IOException {
+  public void writeToUserAuthResponse(HttpServletResponse response, UserService userService) throws IOException {
     // Create UserAuth object with relevant login / logout information.
     UserAuth userAuth;
     if (userService.isUserLoggedIn()) {
