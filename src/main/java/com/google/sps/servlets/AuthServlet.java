@@ -111,21 +111,13 @@ public class AuthServlet extends HttpServlet {
   }
 
   /**
-   * Creates a new UserService object.
-   */
-  public static UserService getUserService() {
-    return UserServiceFactory.getUserService();
-  }
-
-  /**
    * Get the Entity object of the current user that is signed in. If not already
    * in database, this method adds them and returns the newly-added Entity object.
    * If no user is signed in, return null.
-   *
-   * In order for this method to work, an up-to-date UserService object must be
-   * passed in. The getUserService(...) method can be used for this.
    */
-  public static Entity getCurrentUserEntity(UserService userService) {
+  public static Entity getCurrentUserEntity() {
+    UserService userService = UserServiceFactory.getUserService();
+
     // Return null if no user is logged in.
     if (!userService.isUserLoggedIn()) {
       return null;
