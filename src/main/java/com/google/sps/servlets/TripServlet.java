@@ -97,8 +97,6 @@ public class TripServlet extends HttpServlet {
     try {
       FindPlaceFromText findPlaceResult = findPlaceRequest.await();
 
-      System.err.println(findPlaceRequest);
-
       // Return place ID of the first candidate result.
       if (findPlaceResult.candidates != null) {
         return findPlaceResult.candidates[0].placeId;

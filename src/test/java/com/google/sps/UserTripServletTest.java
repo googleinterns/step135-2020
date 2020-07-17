@@ -75,7 +75,7 @@ public final class UserTripServletTest {
   }
 
   @Test
-  public void testDoGetResponse() throws Exception {
+  public void testDoGetResponseLoggedIn() throws Exception {
     // Mock request and response.  
     HttpServletRequest requestMock = mock(HttpServletRequest.class);    
     HttpServletResponse responseMock = mock(HttpServletResponse.class);
@@ -103,7 +103,7 @@ public final class UserTripServletTest {
     tripServlet.storeTripEntity(responseMock,
       tripName, destinationName, tripDayOfTravel, photoSrc);
 
-    // Create writers to pass into 
+    // Create writers to pass into the mock response object.
     StringWriter stringWriter = new StringWriter();
     PrintWriter writer = new PrintWriter(stringWriter);
     when(responseMock.getWriter()).thenReturn(writer);
@@ -121,6 +121,46 @@ public final class UserTripServletTest {
 
     writer.flush(); // Flush the writer.
     Assert.assertTrue(stringWriter.toString().contains(expectedJson));
+  }
+
+  @Test
+  public void testDoGetResponseNotLoggedIn() throws Exception {
+    // Mock request and response.  
+    HttpServletRequest requestMock = mock(HttpServletRequest.class);    
+    HttpServletResponse responseMock = mock(HttpServletResponse.class);
+    
+    // Create Trip Entity properties.
+    final String tripName = "Family Vacation";
+    final String destinationName = "Island of Hawai'i";
+    final String tripDayOfTravel = "2020-07-17";
+    final String photoSrc = "../images/placeholder_image.png";
+
+    // Mock UserService methods as logged-in user.
+    UserService userServiceMock = mock(UserService.class);
+    when(userServiceMock.isUserLoggedIn()).thenReturn(false);
+    when(userServiceMock.createLoginURL(AuthServlet.redirectUrl)).thenReturn(LOGIN_URL);
+
+    // PowerMock static getUserService() method, which is used to get the user.
+    PowerMockito.mockStatic(UserServiceFactory.class);
+    when(UserServiceFactory.getUserService()).thenReturn(userServiceMock);
+
+    // Run storeTripEntity(...), with the User logged in (so trip is stored).
+    tripServlet.storeTripEntity(responseMock,
+      tripName, destinationName, tripDayOfTravel, photoSrc);
+
+    // Create writers to pass into the mock response object.
+    StringWriter stringWriter = new StringWriter();
+    PrintWriter writer = new PrintWriter(stringWriter);
+    when(responseMock.getWriter()).thenReturn(writer);
+
+    // Run the UserServlet doGet(...) method with request and response mocks. 
+    userTripServlet.doGet(requestMock, responseMock); 
+
+    // Create the expected JSON String outputted from the doGet(...) function (null).
+    String expectedJson = "null\n";
+
+    writer.flush(); // Flush the writer.
+    Assert.assertEquals(expectedJson, stringWriter.toString());
   }
 
 }
