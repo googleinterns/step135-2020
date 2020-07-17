@@ -83,12 +83,12 @@ public class TripServlet extends HttpServlet {
   private static final String INPUT_DAY_OF_TRAVEL = "inputDayOfTravel";
   private static final String INPUT_POI_LIST = "poiList";
 
-  // Datastore 
+  // Datastore and API context
   private DatastoreService datastore;
   private GeoApiContext context;
 
   /**
-   * Initializes datastore.
+   * Initializes datastore and API.
    */
   @Override
   public void init() {
@@ -133,8 +133,8 @@ public class TripServlet extends HttpServlet {
     response.getWriter().println(poiStrings.toString());
 
     //do post for maps
-    DirectionsResult dirResult = mapDoPost(request, response, origin, poiStrings);
-
+    DirectionsApiRequest dirRequest = generateDirectionsRequest(origin, origin, poiStrings, this.context);
+    DirectionsResult dirResult = getDirectionsResult(dirRequest);
     List<Integer> travelTimes = getTravelTimes(dirResult);
     List<String> orderedLocationStrings = getOrderedWaypoints(dirResult, pois);
 
@@ -155,28 +155,7 @@ public class TripServlet extends HttpServlet {
   }
 
   /**
-   * Make servlet cleaner
-   * Generate directionsRequest from user input and parse optimized route.
-   */
-  private DirectionsResult mapDoPost(HttpServletRequest request, HttpServletResponse response, 
-                        String origin, String[] pois) 
-      throws IOException {
-
-    DirectionsApiRequest directionsRequest = generateDirectionsRequest(origin, origin, pois, this.context);
-
-    // Calculate route and save travelTimes and waypointOrder to two ArrayLists.
-    try {
-      DirectionsResult dirResult = directionsRequest.await();
-      return dirResult;
-    } catch (ApiException | InterruptedException e) {
-      // If no directions are found or API throws an error.
-      throw new IOException(e);
-    } 
-  }
-
-  /**
-   * Make the servlet cleaner
-   * Iterate through the entities and create the events and write them to json
+   * Iterate through the entities and create the events and write them to json.
    */
   private void eventDoGet(HttpServletResponse response) throws IOException { 
     
@@ -195,12 +174,12 @@ public class TripServlet extends HttpServlet {
   }
 
   /**
-   * Make the servlet cleaner.
-   * Searches through the parameters and creates the events and puts them into
-   * datastore.
+   * Creates the events and puts them into datastore.
+   * @param date Trip date
+   * @param pois String array of pois
+   * @param travelTimes List<Integer> of travel times in minutes
    */
-  private void eventDoPost(HttpServletRequest request, HttpServletResponse response,
-                          String date, String[] pois, List<Integer> travelTimes) 
+  private void eventDoPost(String date, String[] pois, List<Integer> travelTimes) 
       throws IOException { 
     
     // set startDateTime
@@ -221,7 +200,27 @@ public class TripServlet extends HttpServlet {
   }
 
   /**
+   * Generate directionsResult from directionsRequest.
+   * @param directionsRequest DirectionsApiRequest object generated from user input
+   */
+  private DirectionsResult getDirectionsResult(DirectionsApiRequest directionsRequest) 
+      throws IOException {
+    // Calculate route and save travelTimes and waypointOrder to two ArrayLists.
+    try {
+      DirectionsResult dirResult = directionsRequest.await();
+      return dirResult;
+    } catch (ApiException | InterruptedException e) {
+      // If no directions are found or API throws an error.
+      throw new IOException(e);
+    } 
+  }
+
+  /**
    * Generates directionsRequest from user input.
+   * @param origin route starting point
+   * @param destination route ending point
+   * @param poiStrings String array of poi stops along the route
+   * @param context API context
    */
   public static DirectionsApiRequest generateDirectionsRequest(String origin, String destination, 
       String[] poiStrings, GeoApiContext context) {
@@ -239,6 +238,7 @@ public class TripServlet extends HttpServlet {
 
   /**
    * Gets list of travel times for each route leg from a DirectionsResult object.
+   * @param dirResult DirectionsResult object containing optimal route
    */
   public static List<Integer> getTravelTimes(DirectionsResult dirResult) {
     List<Integer> travelTimes = new ArrayList<>();
@@ -253,6 +253,8 @@ public class TripServlet extends HttpServlet {
 
   /**
    * Gets list of poi addresses in optimized route order from a DirectionsResult object.
+   * @param dirResult DirectionsResult object containing optimal route
+   * @param pois String array of poi names (in any order)
    */
   public static List<String> getOrderedWaypoints(DirectionsResult dirResult, String[] pois) {
     // Take the first route, usually the optimal.
@@ -269,6 +271,7 @@ public class TripServlet extends HttpServlet {
 
   /**
    * Converts list of Event objects into a JSON string using the Gson library.
+   * @param events List of event objects
    */
   private String convertToJson(List<Event> events) {
     Gson gson = new Gson();
