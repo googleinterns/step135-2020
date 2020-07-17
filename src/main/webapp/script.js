@@ -25,9 +25,6 @@ window.initScript = function() {
   addInputPoiLocationAutofill();
   addInputDestinationLocationAutofill();
 
-  // Set up trigger to add hidden POI form elements upon submission.
-  addHiddenPoiFormTrigger();
-
   getAuthObject().then((authObject) => {
     // Display the sign-in page or "start trip" form depending on sign in status.
     if (authObject.hasOwnProperty('email')) {
@@ -179,16 +176,13 @@ function addHiddenPoiFormTrigger() {
   $('#startTripForm').submit(() => {
     // Fetch the current POI inputs, and add them to the form.
     const poiInputs = document.getElementsByClassName('poi-input');
-    let count = 1;
     Array.prototype.forEach.call(poiInputs, (poiInput) => {
-      let poiNumber = 'poi-' + count;
       // Add hidden input to the "start trip" form.
       $('<input>').attr('type', 'hidden')
-        .attr('name', poiNumber)
-        .attr('id', poiNumber)
+        .attr('name', 'poiList')
+        .attr('id', 'poiList')
         .attr('value', poiInput.name)
         .appendTo('#startTripForm');
-      count++;
     });
     return true;
   });

@@ -14,6 +14,9 @@
 
 package com.google.sps;
 
+import com.google.appengine.api.datastore.DatastoreService;
+import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.datastore.Key;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,6 +27,11 @@ public class TripDay {
   private String origin;
   private String destination;
   private List<String> locations;
+
+  // constants for entity construction
+  private static final String LOCATION_ENTITY_TYPE = "location";
+  private static final String NAME = "name";
+  private static final String ORDER = "order";
 
   /**
    * Creates a new TripDay.
@@ -75,5 +83,33 @@ public class TripDay {
     List<String> locationsCopy = new ArrayList<>();
     locationsCopy.addAll(this.locations);
     return locationsCopy;
+  }
+
+  /**
+   * Build location entity to be put in datastore 
+   */
+  public static List<Entity> locationsToEntities(List<String> locations, Key parentKeyId) {
+    List<Entity> locationEntities = new ArrayList<>();
+    for (int i = 0; i < locations.size(); i++) {
+      Entity locationEntity = new Entity(LOCATION_ENTITY_TYPE, parentKeyId);
+      locationEntity.setProperty(NAME, locations.get(i));
+      locationEntity.setProperty(ORDER, i);
+      locationEntities.add(locationEntity);
+    }
+    return locationEntities;
+  } 
+
+  public static void storeLocationsInDatastore(List<String> locations, Key parentKeyId, DatastoreService datastore) {
+    List<Entity> locationEntities = locationsToEntities(locations, parentKeyId);
+    for (Entity locationEntity : locationEntities) {
+      datastore.put(locationEntity);
+    }
+  }
+
+  /**
+   * Get location name from a location entity
+   */
+  public static String eventFromEntity(Entity locationEntity) {
+    return (String) locationEntity.getProperty(NAME);
   }
 }

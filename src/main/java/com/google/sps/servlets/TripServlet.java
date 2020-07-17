@@ -17,6 +17,8 @@ package com.google.sps.servlets;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
 import com.google.maps.DirectionsApi;
@@ -74,6 +76,27 @@ public class TripServlet extends HttpServlet {
   private static final String DATE = "date";
   private static final String START_TIME = "start-time";
   private static final String TRAVEL_TIME = "travel-time";
+
+  // Constants to get form inputs.
+  private static final String INPUT_TRIP_NAME = "inputTripName";
+  private static final String INPUT_DESTINATION = "inputDestination";
+  private static final String INPUT_DAY_OF_TRAVEL = "inputDayOfTravel";
+  private static final String INPUT_POI_LIST = "poiList";
+
+  // Datastore 
+  private DatastoreService datastore;
+  private GeoApiContext context;
+
+  /**
+   * Initializes datastore.
+   */
+  @Override
+  public void init() {
+    this.datastore = DatastoreServiceFactory.getDatastoreService();  
+    this.context = new GeoApiContext.Builder()
+      .apiKey(Config.API_KEY)
+      .build();
+  }
  
   /**
    * Iterate through the entities and create the events and write them to json.
@@ -98,34 +121,34 @@ public class TripServlet extends HttpServlet {
     response.setContentType("application/json;");
 
     Enumeration<String> params = request.getParameterNames();
-    String tripName = request.getParameter("inputTripName");
-    String origin = request.getParameter("inputDestination");
-    String startDate = request.getParameter("inputDayOfTravel");
+    String tripName = request.getParameter(INPUT_TRIP_NAME);
+    String origin = request.getParameter(INPUT_DESTINATION);
+    String startDate = request.getParameter(INPUT_DAY_OF_TRAVEL);
+    String[] poiStrings = request.getParameterValues(INPUT_POI_LIST);
 
     // Print user input for now
     response.getWriter().println("startDate: " + startDate);
     response.getWriter().println("tripName: " + tripName);
     response.getWriter().println("origin: " + origin);
-
-    // Save POIs to an array
-    List<String> pois = new ArrayList<>(); 
-    while (params.hasMoreElements()) {
-      String paramName = params.nextElement();
-      if (paramName.contains("poi")) {
-        String newPOI = request.getParameter(paramName);
-        pois.add(newPOI);
-      }
-    }
-    String[] poiStrings = new String[pois.size()]; 
-    poiStrings = pois.toArray(poiStrings); 
-
-    response.getWriter().println("original POI order: " + pois.toString());
+    response.getWriter().println(poiStrings.toString());
 
     //do post for maps
-    mapDoPost(request, response, origin, poiStrings);
+    DirectionsResult dirResult = mapDoPost(request, response, origin, poiStrings);
+
+    List<Integer> travelTimes = getTravelTimes(dirResult);
+    List<String> orderedLocationStrings = getOrderedWaypoints(dirResult, pois);
+
+    // Print out results on page for now
+    response.getWriter().println("travel times: " + travelTimes.toString());
+    response.getWriter().println("ordered POIs: " + orderedLocationStrings.toString());
+
+    // TODO: replace testKey with key of TripDay entity
+    long test = 123;
+    Key testKey = KeyFactory.createKey("test", test);
+    TripDay.storeLocationsInDatastore(orderedLocationStrings, testKey, this.datastore);
 
     // do post for events
-    eventDoPost(request, response, startDate, poiStrings); 
+    eventDoPost(request, response, startDate, orderedLocationStrings, travelTimes); 
 
     // redirect to trips page
     response.sendRedirect("/trips/");
@@ -135,25 +158,16 @@ public class TripServlet extends HttpServlet {
    * Make servlet cleaner
    * Generate directionsRequest from user input and parse optimized route.
    */
-  private void mapDoPost(HttpServletRequest request, HttpServletResponse response, 
+  private DirectionsResult mapDoPost(HttpServletRequest request, HttpServletResponse response, 
                         String origin, String[] pois) 
       throws IOException {
-    GeoApiContext distCalcer = new GeoApiContext.Builder()
-      .apiKey(Config.API_KEY)
-      .build();
 
-    DirectionsApiRequest directionsRequest = generateDirectionsRequest(origin, origin, pois, distCalcer);
+    DirectionsApiRequest directionsRequest = generateDirectionsRequest(origin, origin, pois, this.context);
 
     // Calculate route and save travelTimes and waypointOrder to two ArrayLists.
     try {
       DirectionsResult dirResult = directionsRequest.await();
-
-      List<Integer> travelTimes = getTravelTimes(dirResult);
-      List<String> orderedLocationStrings = getOrderedWaypoints(dirResult, pois);
-
-      // Print out results on page for now
-      response.getWriter().println("travel times: " + travelTimes.toString());
-      response.getWriter().println("ordered POIs: " + orderedLocationStrings.toString());
+      return dirResult;
     } catch (ApiException | InterruptedException e) {
       // If no directions are found or API throws an error.
       throw new IOException(e);
@@ -168,7 +182,6 @@ public class TripServlet extends HttpServlet {
     
     Query query = new Query("events");
 
-    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
     PreparedQuery results = datastore.prepare(query);
 
     List<Event> events = new ArrayList<>();
@@ -187,7 +200,7 @@ public class TripServlet extends HttpServlet {
    * datastore.
    */
   private void eventDoPost(HttpServletRequest request, HttpServletResponse response,
-                          String date, String[] pois) 
+                          String date, String[] pois, List<Integer> travelTimes) 
       throws IOException { 
     
     // set startDateTime
@@ -199,9 +212,7 @@ public class TripServlet extends HttpServlet {
       Event event = new Event(name, address, startDateTime, HALF_HOUR);
       Entity eventEntity = event.eventToEntity();
 
-      // put entity in datastore
-      DatastoreService datastore = 
-                              DatastoreServiceFactory.getDatastoreService();      
+      // put entity in datastore   
       datastore.put(eventEntity);
 
       // sets start time for next event 2 hours after start of prev
