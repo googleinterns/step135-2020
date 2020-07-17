@@ -20,6 +20,7 @@ import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.FetchOptions;
 import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
+import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
 import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
@@ -193,6 +194,47 @@ public final class TripServletTest {
     
     // Confirm that the Entity in the database matches the method return.
     Assert.assertEquals(listResults.get(0), tripEntityReturn);
+  }
+
+  @Test
+  public void testStoreTripEntityLoggedInCheckUser() throws Exception {
+    // Mock response.      
+    HttpServletResponse responseMock = mock(HttpServletResponse.class);
+    
+    // Create Trip Entity properties.
+    final String tripName = "Family Vacation";
+    final String destinationName = "Island of Hawai'i";
+    final String tripDayOfTravel = "2020-07-17";
+    final String photoSrc = "../images/placeholder_image.png";
+
+    // Mock UserService methods as logged-in user.
+    UserService userServiceMock = mock(UserService.class);
+    when(userServiceMock.isUserLoggedIn()).thenReturn(true);
+    // This is the User object from Google Appengine (full path given to avoid
+    // confusion with local User.java file).
+    when(userServiceMock.getCurrentUser()).thenReturn(
+        new com.google.appengine.api.users.User(EMAIL, AUTH_DOMAIN));
+    when(userServiceMock.createLogoutURL(AuthServlet.redirectUrl)).thenReturn(LOGOUT_URL);
+
+    // PowerMock static getUserService() method, which is used to get the user.
+    PowerMockito.mockStatic(UserServiceFactory.class);
+    when(UserServiceFactory.getUserService()).thenReturn(userServiceMock);
+
+    // Run storeTripEntity(...), with the User logged in (so trip is stored).
+    tripServlet.storeTripEntity(responseMock, tripName, destinationName, 
+      tripDayOfTravel, photoSrc);
+
+    // Retrieve the datastore results.
+    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+    Query query = new Query(Trip.TRIP);
+    PreparedQuery results = datastore.prepare(query);
+    List<Entity> listResults = results.asList(FetchOptions.Builder.withDefaults());
+
+    // Check that the Trip Entity has the User as an ancestor / parent.
+    Key userAncestorKey = listResults.get(0).getParent();
+    Entity userEntity = datastore.get(userAncestorKey);
+    Assert.assertEquals(User.USER, userEntity.getKind());
+    Assert.assertEquals(EMAIL, userEntity.getProperty(User.USER_EMAIL));
   }
 
   @Test
