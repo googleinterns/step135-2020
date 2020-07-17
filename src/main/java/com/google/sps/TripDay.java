@@ -86,7 +86,9 @@ public class TripDay {
   }
 
   /**
-   * Build location entity to be put in datastore 
+   * Build location entities to be put in datastore. 
+   * @param locations ArrayList of locations (in optimized order) as strings
+   * @param parentKeyId Key of TripDay entity that these locations are a part of  
    */
   public static List<Entity> locationsToEntities(List<String> locations, Key parentKeyId) {
     List<Entity> locationEntities = new ArrayList<>();
@@ -99,17 +101,14 @@ public class TripDay {
     return locationEntities;
   } 
 
-  public static void storeLocationsInDatastore(List<String> locations, Key parentKeyId, DatastoreService datastore) {
-    List<Entity> locationEntities = locationsToEntities(locations, parentKeyId);
+  /**
+   * Store list location entities to be put in datastore.
+   * @param locationEntities ArrayList of Entities to be put in Datastore
+   * @param datastore Datastore for storing 
+   */
+  public static void storeLocationsInDatastore(List<Entity> locationEntities, DatastoreService datastore) {
     for (Entity locationEntity : locationEntities) {
       datastore.put(locationEntity);
     }
-  }
-
-  /**
-   * Get location name from a location entity
-   */
-  public static String eventFromEntity(Entity locationEntity) {
-    return (String) locationEntity.getProperty(NAME);
   }
 }
