@@ -129,15 +129,15 @@ public class TripDay {
   }
 
   /**
-   * Build tripDay from entity.
+   * Build tripDay from tripDay entity. Set origin, destination, and date
    * NOTE: Since Lists cannot be stored in datastore, must call setLocations()
-   * after.
+   * after!
    */
-  public static TripDay tripDayFromEntity(Entity entity) {
-    String origin = (String) entity.getProperty(ORIGIN);
-    String destination = (String) entity.getProperty(DESTINATION);
+  public static TripDay tripDayFromEntity(Entity tripDayEntity) {
+    String origin = (String) tripDayEntity.getProperty(ORIGIN);
+    String destination = (String) tripDayEntity.getProperty(DESTINATION);
     List<String> locations = new ArrayList<>();
-    String date = (String) entity.getProperty(DATE);
+    String date = (String) tripDayEntity.getProperty(DATE);
 
     TripDay tripDay = new TripDay(origin, destination, locations, LocalDate.parse(date));
     return tripDay;

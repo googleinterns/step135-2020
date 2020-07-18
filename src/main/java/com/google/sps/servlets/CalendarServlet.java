@@ -31,6 +31,10 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+/**
+ * Servlet that gets events from datastore and writes them to json
+ * used from frontend to create events
+ */
 @WebServlet("/get-calendar")
 public class CalendarServlet extends HttpServlet {
 
@@ -49,7 +53,12 @@ public class CalendarServlet extends HttpServlet {
    */
   public void doGetEvents(HttpServletResponse response, 
       DatastoreService datastore) throws IOException {
-    // will add logic so that the Trip is gotten first and then all the tripDays
+    
+     /** 
+     * Adam TODO: Get current user, specific trip associated with tripCard clicked,
+     * and get all evnets associated with the tripDay(s) in that trip
+     */
+
     Query tripDayQuery = new Query(TripDay.QUERY_STRING);
     PreparedQuery tripDayResults = datastore.prepare(tripDayQuery);
 

@@ -112,7 +112,7 @@ public class Event {
   }
 
   /**
-   * Build entity from event to be put in datastore off event attributes
+   * Build entity from event to be put in datastore off event attributes.
    * parentKeyID is from tripDay Entity
    */
   public Entity eventToEntity(Key parentKeyID) {
