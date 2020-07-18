@@ -24,6 +24,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+import java.time.LocalDate;
 import java.util.ArrayList;
 
 @RunWith(JUnit4.class)
@@ -37,7 +38,7 @@ public final class TripDayTest {
   private static final String EMPIRE_STATE_ID = "ChIJtcaxrqlZwokRfwmmibzPsTU";
   private static final String HOTEL_ID = "ChIJ68J3tfpYwokR2HaRoBcB4xg";
 
-  private static final String DATE = "2020-07-08";
+  private static final LocalDate DATE = LocalDate.parse("2020-07-08");
 
   private final LocalServiceTestHelper helper =
       new LocalServiceTestHelper(new LocalDatastoreServiceTestConfig());
@@ -102,7 +103,7 @@ public final class TripDayTest {
   // Test TripDay empty date
   @Test(expected = IllegalArgumentException.class)
   public void testTripDayConstructorEmptyDate() {
-    TripDay tripDay = new TripDay(HOTEL_ID, HOTEL_ID, locations, "");
+    TripDay tripDay = new TripDay(HOTEL_ID, HOTEL_ID, locations, LocalDate.parse("        ;
   }
 
    @Test

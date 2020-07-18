@@ -58,10 +58,10 @@ public class TripServlet extends HttpServlet {
     String date = request.getParameter("inputDayOfTravel");
 
     // put TripDay entity into datastore
-    Entity tripDayEntity = putTripDayInDatastore(request, datastore, date);
+    Entity tripDayEntity = putTripDayInDatastore(request, datastore, LocalDate.parse(date));
 
     // put Event entities in datastore
-    putEventsInDatastore(request, response, params, tripDayEntity, date, datastore);
+    putEventsInDatastore(request, response, params, tripDayEntity, LocalDate.parse(date), datastore);
   }
 
   /**
@@ -69,7 +69,7 @@ public class TripServlet extends HttpServlet {
    * @return tripDay entity, needed for event creation
    */
   public Entity putTripDayInDatastore(HttpServletRequest request, 
-      DatastoreService datastore, String date) throws IOException {
+      DatastoreService datastore, LocalDate date) throws IOException {
     
     String origin = request.getParameter("inputDestination");
     String destination = origin; // may change if user can differentiate b/t the two
@@ -86,14 +86,14 @@ public class TripServlet extends HttpServlet {
    * datastore with associated tripDayEntity as a parent
    */
   public List<Entity> putEventsInDatastore(HttpServletRequest request, HttpServletResponse response, 
-      Enumeration<String> params, Entity tripDayEntity, String date, DatastoreService datastore)
+      Enumeration<String> params, Entity tripDayEntity, LocalDate date, DatastoreService datastore)
       throws IOException { 
 
     // entities to return, needed for testing
     List<Entity> eventEntities = new ArrayList<>();    
 
     // set startDateTime
-    LocalDateTime startDateTime = LocalDateTime.of(LocalDate.parse(date), LocalTime.of(10, 0));
+    LocalDateTime startDateTime = LocalDateTime.of(date, LocalTime.of(10, 0));
 
     // search through all the parameters looking for pois
     while (params.hasMoreElements()) {

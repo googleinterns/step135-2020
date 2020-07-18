@@ -16,6 +16,7 @@ package com.google.sps;
 
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.Key;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,7 +27,7 @@ public class TripDay {
   private String origin;
   private String destination;
   private List<String> locations;
-  private String date;
+  private LocalDate date;
 
   // Entity params
   private static final String ORIGIN = "origin";
@@ -45,7 +46,7 @@ public class TripDay {
                       that are stopovers for this day. Must be non-null.
    * @param date The date of when this TripDay occurs.
    */
-  public TripDay(String origin, String destination, List<String> locations, String date) {
+  public TripDay(String origin, String destination, List<String> locations, LocalDate date) {
     if (origin == null) {
       throw new IllegalArgumentException("origin cannot be null");
     }
@@ -56,12 +57,6 @@ public class TripDay {
 
     if (locations == null) {
       throw new IllegalArgumentException("locations cannot be null. Use empty array instead.");
-    }
-
-    if (date == null) {
-      throw new IllegalArgumentException("date cannot be null");
-    } else if (date.equals("")) {
-      throw new IllegalArgumentException("date cannot be empty string");
     }
 
     this.origin = origin;
@@ -90,7 +85,7 @@ public class TripDay {
   /**
    * Returns the date for this TripDay.
    */
-  public String getDate() {
+  public LocalDate getDate() {
     return this.date;
   }
 
@@ -144,7 +139,7 @@ public class TripDay {
     List<String> locations = new ArrayList<>();
     String date = (String) entity.getProperty(DATE);
 
-    TripDay tripDay = new TripDay(origin, destination, locations, date);
+    TripDay tripDay = new TripDay(origin, destination, locations, LocalDate.parse(date));
     return tripDay;
   }
 }
