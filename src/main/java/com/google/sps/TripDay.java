@@ -112,7 +112,7 @@ public class TripDay {
     Entity tripDayEntity = new Entity(QUERY_STRING);
     tripDayEntity.setProperty(ORIGIN, this.origin);
     tripDayEntity.setProperty(DESTINATION, this.destination);
-    tripDayEntity.setProperty(DATE, this.date);
+    tripDayEntity.setProperty(DATE, this.date.toString());
     return tripDayEntity;
   }
 

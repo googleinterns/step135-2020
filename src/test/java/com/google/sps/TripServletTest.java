@@ -24,6 +24,7 @@ import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestC
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
 import com.google.sps.data.Event;
 import com.google.sps.servlets.TripServlet;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -45,7 +46,7 @@ public final class TripServletTest {
   // class constants
   private static final String INPUT_DESTINATION = 
     "4265 24th Street San Francisco, CA, 94114";
-  private static final String INPUT_DATE = "2020-07-15";
+  private static final LocalDate INPUT_DATE = LocalDate.parse("2020-07-15");
   private static final String POI_ONE = "one";
   private static final String POI_TWO = "two";
 
@@ -116,7 +117,7 @@ public final class TripServletTest {
     Entity tripDayEntity = new Entity(TripDay.QUERY_STRING);
     tripDayEntity.setProperty("origin", INPUT_DESTINATION);
     tripDayEntity.setProperty("destination", INPUT_DESTINATION);
-    tripDayEntity.setProperty("date", INPUT_DATE);
+    tripDayEntity.setProperty("date", INPUT_DATE.toString());
     datastore.put(tripDayEntity);
 
     // put entities in datastore and query them

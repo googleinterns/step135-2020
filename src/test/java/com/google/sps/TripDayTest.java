@@ -100,12 +100,6 @@ public final class TripDayTest {
     TripDay tripDay = new TripDay(HOTEL_ID, HOTEL_ID, locations, null);
   }
 
-  // Test TripDay empty date
-  @Test(expected = IllegalArgumentException.class)
-  public void testTripDayConstructorEmptyDate() {
-    TripDay tripDay = new TripDay(HOTEL_ID, HOTEL_ID, locations, LocalDate.parse("        ;
-  }
-
    @Test
   public void testBuildEntityAndFromEntity() {
     // create TripDay
