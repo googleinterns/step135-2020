@@ -52,6 +52,11 @@ public class AuthServlet extends HttpServlet {
 
   /**
    * Write the UserAuth object in JSON form through response.
+   *
+   * @param response The HttpServletResponse used to write the user 
+   * authentication information.
+   * @param userService The UserService object that holds the user's current
+   * login information.
    */
   public void writeToUserAuthResponse(HttpServletResponse response, UserService userService) throws IOException {
     // Create UserAuth object with relevant login / logout information.
@@ -90,6 +95,8 @@ public class AuthServlet extends HttpServlet {
    * If the user is not in database already, add them.
    * This method returns the Entity object in the database (or the newly-created
    * user Entity, if none previously existed).
+   *
+   * @param email The email of the user in the database, or to-be-added.
    */
   public static Entity getOrCreateUserInDatabase(String email) {
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
@@ -134,6 +141,8 @@ public class AuthServlet extends HttpServlet {
   /**
    * Return Entity object of user from database using email, or null if user 
    * email is not in db.
+   *
+   * @param email The email of the user potentially in the database.
    */
   public static Entity getUserEntityFromEmail(String email) {
     // Query database to see if User has already been added.

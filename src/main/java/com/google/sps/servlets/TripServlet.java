@@ -131,6 +131,11 @@ public class TripServlet extends HttpServlet {
   /**
    * Get the place ID of the text search. Return null if no place ID matches
    * the search.
+   * 
+   * @param context The entry point for making requests against the Google Geo 
+   * APIs (googlemaps.github.io/google-maps-services-java/v0.1.2/javadoc/com/google/maps/GeoApiContext.html).
+   * @param textSearch The text query to be entered in the findPlaceFromText(...)
+   * API call. Must be non-null.
    */ 
   public String getPlaceIdFromTextSearch(GeoApiContext context, String textSearch) 
     throws IOException {
@@ -261,6 +266,16 @@ public class TripServlet extends HttpServlet {
   /**
    * Store the Trip Entity in datastore with the User Entity as an ancestor.
    * Return the Trip Entity object.
+   * 
+   * @param response The HttpServletResponse used to redirect to homepage if
+   * no user is logged in. 
+   * @param tripName The human-readable name for the trip. Must be non-null.
+   * @param destinationName The name of the destination the user is heading to.
+   * This destination should be verified by the Google Maps API.
+   * @param tripDayOfTravel The date of the trip. Must be in yyyy-MM-dd date format.
+   * @param photoSrc The image source / URL to represent the trip. This is 
+   * typically retrieved using the Places API to get a photo from the destination
+   * name, but can also be the placeholder image source if no photo exists.
    */
   public Entity storeTripEntity(HttpServletResponse response, String tripName, 
     String destinationName, String tripDayOfTravel, String photoSrc) throws IOException {
