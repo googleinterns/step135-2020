@@ -257,7 +257,7 @@ public final class TripServletTest {
     PowerMockito.mockStatic(UserServiceFactory.class);
     when(UserServiceFactory.getUserService()).thenReturn(userServiceMock);
 
-    // Run storeTripEntity(...), with the User logged in (so trip is stored).
+    // Run storeTripEntity(...), with the User not logged in (so nothing is stored).
     Entity tripEntityReturn = tripServlet.storeTripEntity(responseMock,
       tripName, destinationName, tripDayOfTravel, photoSrc);
 

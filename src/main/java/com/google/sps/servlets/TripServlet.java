@@ -54,7 +54,7 @@ public class TripServlet extends HttpServlet {
 
   // Create the GeoApiContext object.
   private GeoApiContext context;
-  private int photoSrcSize = 400;
+  private static final int PHOTO_SRC_SIZE = 400;
 
   // Constants to get form inputs.
   private static final String INPUT_TRIP_NAME = "inputTripName";
@@ -218,7 +218,7 @@ public class TripServlet extends HttpServlet {
   /**
    * Get the PlaceDetails object from the place ID.
    */
-  public PlaceDetails getPlaceDetailsFromPlaceId(GeoApiContext context, String placeId)
+  private PlaceDetails getPlaceDetailsFromPlaceId(GeoApiContext context, String placeId)
     throws IOException {
 
     PlaceDetailsRequest placeDetailsRequest = PlacesApi.placeDetails(context, 
@@ -233,7 +233,7 @@ public class TripServlet extends HttpServlet {
   /**
    * Populate the destinationName and photoSrc fields using the Google Maps API.
    */
-  public void populateDestinationAndPhoto(GeoApiContext context, String tripDestination)
+  private void populateDestinationAndPhoto(GeoApiContext context, String tripDestination)
     throws IOException {
 
     // Get place ID from search of trip destination. Get photo and destination 
@@ -253,7 +253,7 @@ public class TripServlet extends HttpServlet {
         this.photoSrc = "../images/placeholder_image.png";
       } else {
         Photo photoObject = placeDetailsResult.photos[0];
-        this.photoSrc = getUrlFromPhotoReference(this.photoSrcSize, photoObject.photoReference);
+        this.photoSrc = getUrlFromPhotoReference(PHOTO_SRC_SIZE, photoObject.photoReference);
       }
     }
   }
@@ -265,7 +265,6 @@ public class TripServlet extends HttpServlet {
   public Entity storeTripEntity(HttpServletResponse response, String tripName, 
     String destinationName, String tripDayOfTravel, String photoSrc) throws IOException {
     // Get User Entity. If user not logged in, redirect to homepage.
-    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
     Entity userEntity = AuthServlet.getCurrentUserEntity();
     if (userEntity == null) {
       response.sendRedirect("/");
@@ -273,6 +272,7 @@ public class TripServlet extends HttpServlet {
     }
 
     // Put Trip Entity into datastore.
+    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
     Entity tripEntity = Trip.buildEntity(tripName, destinationName, photoSrc,
       tripDayOfTravel, tripDayOfTravel, userEntity.getKey());
     datastore.put(tripEntity);
@@ -288,7 +288,7 @@ public class TripServlet extends HttpServlet {
    * @param photoReference This is the photo reference String stored in the 
    * Google Maps Photo object; this is used to retrieve the actual photo URL.
    */
-  public String getUrlFromPhotoReference(int maxWidth, String photoReference) {
+  private String getUrlFromPhotoReference(int maxWidth, String photoReference) {
     final String baseUrl = "https://maps.googleapis.com/maps/api/place/photo?";
     return baseUrl + "maxwidth=" + maxWidth + "&photoreference=" + 
       photoReference + "&key=" + Config.API_KEY;
