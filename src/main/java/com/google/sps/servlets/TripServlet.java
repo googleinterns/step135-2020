@@ -42,10 +42,6 @@ import javax.servlet.http.HttpServletResponse;
 @WebServlet("/calculate-trip")
 public class TripServlet extends HttpServlet {
 
-  // temporary vars
-  private LocalDateTime startDateTime;
-  private static int count = 0;
-
   // time class constants
   private static final int HALF_HOUR = 30;
   private static final int NINETY_MINS = 90;
@@ -72,6 +68,7 @@ public class TripServlet extends HttpServlet {
    * put TripDay into Datastore
    * @return tripDay entity, needed for event creation
    */
+
   private Entity putTripDayInDatastore(HttpServletRequest request, HttpServletResponse response,
       DatastoreService datastore, String date) throws IOException {
     
@@ -92,9 +89,9 @@ public class TripServlet extends HttpServlet {
   private void putEventsInDatastore(HttpServletRequest request, HttpServletResponse response, 
       Enumeration<String> params, Entity tripDayEntity, String date, DatastoreService datastore)
       throws IOException { 
-
-    // set startDateTime, will be removed
-    setDateTime(date);
+ 
+    // set startDateTime
+    LocalDateTime startDateTime = LocalDateTime.of(LocalDate.parse(date), LocalTime.of(10, 0));
 
     // search through all the parameters looking for pois
     while (params.hasMoreElements()) {
@@ -120,10 +117,5 @@ public class TripServlet extends HttpServlet {
       // redirect to home page
       response.sendRedirect("/trips/");
     }
-  }
-
-  // function to set time, need to do only once
-  public void setDateTime(String date) {
-    startDateTime = LocalDateTime.of(LocalDate.parse(date), LocalTime.of(10, 0));
   }
 }

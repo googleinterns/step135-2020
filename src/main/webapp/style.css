@@ -132,5 +132,9 @@
 
 #map {
   height: 200px;
-  width: 100%;
+  width: 100%
+}
+
+#suggested-location-block-header {
+  margin-top: 15px;
 }

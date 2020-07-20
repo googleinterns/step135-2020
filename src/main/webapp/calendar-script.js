@@ -103,7 +103,6 @@ function createMap(modalBody, eventObj) {
       zoom: 4,
       center: coords
     });
-
     var marker = new google.maps.Marker({
       position: coords,
       map: map,

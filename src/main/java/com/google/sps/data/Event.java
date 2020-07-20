@@ -32,7 +32,10 @@ public class Event {
   private LocalDateTime startTime;
   private LocalDateTime endTime;
 
-  // format (yyyy-MM-dd'T'HH:mm:ss)
+  /**
+   * format (yyyy-MM-dd'T'HH:mm:ss)
+   * needed for loading events into frontend calendar
+   */
   private String strStartTime;
   private String strEndTime;
 
@@ -116,7 +119,9 @@ public class Event {
     return eventEntity;
   } 
 
-  // build event from entity
+  /**
+   * Build event from entity
+   */
   public static Event eventFromEntity(Entity eventEntity) {
     String name = (String) eventEntity.getProperty(NAME);
     String address = (String) eventEntity.getProperty(ADDRESS);
