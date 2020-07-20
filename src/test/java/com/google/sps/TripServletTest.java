@@ -21,6 +21,7 @@ import com.google.appengine.api.datastore.FetchOptions;
 import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
 import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
@@ -57,13 +58,6 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import static org.mockito.Mockito.*;
-// <<<<<<< HEAD
-
-// @RunWith(JUnit4.class)
-// public final class TripServletTest {
-
-  
-// =======
 
 
 @RunWith(PowerMockRunner.class)
@@ -79,6 +73,7 @@ public final class TripServletTest {
 
   // create TripServlet object
   private TripServlet tripServlet;
+  private DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 
   // initialize mock objects
   private HttpServletRequest request = mock(HttpServletRequest.class);
@@ -93,10 +88,6 @@ public final class TripServletTest {
   public static final String AUTH_DOMAIN = "gmail.com";
   public static final String LOGOUT_URL = "/_ah/logout?continue=%2F";
   public static final String LOGIN_URL = "/_ah/login?continue=%2F";
-
-  // Create TripServlet object.
-  //TripServlet tripServlet;
-// >>>>>>> 0bbacbfc4ad6a3824ea761e1b31ba5201d7501cf
 
   // Add helper to allow datastore testing in local JUnit tests.
   // See https://cloud.google.com/appengine/docs/standard/java/tools/localunittesting.
@@ -123,10 +114,12 @@ public final class TripServletTest {
     // set mock object behavior
     when(request.getParameter("inputDestination")).thenReturn(INPUT_DESTINATION);
 
-    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+    // create key
+    long test = 123;
+    Key testKey = KeyFactory.createKey("test", test);
 
     // put entity in datastore and query it
-    Entity tripDayEntity = tripServlet.putTripDayInDatastore(request, datastore, INPUT_DATE);
+    Entity tripDayEntity = tripServlet.putTripDayInDatastore(request, datastore, INPUT_DATE, testKey);
     Query query = new Query(TripDay.QUERY_STRING);
     PreparedQuery results = datastore.prepare(query);
     List<Entity> listResults = results.asList(FetchOptions.Builder.withDefaults());
@@ -262,7 +255,7 @@ public final class TripServletTest {
 
     // Run storeTripEntity(...), with the User logged in (so trip is stored).
     Entity tripEntityReturn = tripServlet.storeTripEntity(responseMock,
-      tripName, destinationName, tripDayOfTravel, photoSrc);
+      tripName, destinationName, tripDayOfTravel, photoSrc, datastore);
 
     // Retrieve the datastore results.
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
@@ -308,7 +301,7 @@ public final class TripServletTest {
 
     // Run storeTripEntity(...), with the User logged in (so trip is stored).
     tripServlet.storeTripEntity(responseMock, tripName, destinationName, 
-      tripDayOfTravel, photoSrc);
+      tripDayOfTravel, photoSrc, datastore);
 
     // Retrieve the datastore results.
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
@@ -345,7 +338,7 @@ public final class TripServletTest {
 
     // Run storeTripEntity(...), with the User not logged in (so nothing is stored).
     Entity tripEntityReturn = tripServlet.storeTripEntity(responseMock,
-      tripName, destinationName, tripDayOfTravel, photoSrc);
+      tripName, destinationName, tripDayOfTravel, photoSrc, datastore);
 
     // Retrieve the datastore results.
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
