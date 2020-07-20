@@ -56,7 +56,7 @@ public class CalendarServlet extends HttpServlet {
     
      /** 
      * Adam TODO: Get current user, specific trip associated with tripCard clicked,
-     * and get all evnets associated with the tripDay(s) in that trip
+     * and get all events associated with the tripDay(s) in that trip
      */
 
     Query tripDayQuery = new Query(TripDay.QUERY_STRING);
