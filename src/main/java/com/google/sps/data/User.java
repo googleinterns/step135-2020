@@ -28,6 +28,8 @@ public class User {
   /**
    * Constructor to create a User object; the userId is generated automatically,
    * and the trip IDs are added to the User after constructing the object.
+   *
+   * @param email The email of the user.
    */
   public User(String email) {
     this.email = email;

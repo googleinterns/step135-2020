@@ -41,13 +41,13 @@ public class Trip {
   private int numDays;
 
   // Constants to get and put the Entity objects in Datastore.
-  private static final String TRIP = "trip";
-  private static final String TRIP_NAME = "trip_name";
-  private static final String DESTINATION_NAME = "destination_name";
-  private static final String TRIP_KEY = "trip_key";
-  private static final String IMAGE_SRC = "image_src";
-  private static final String START_DATE = "start_date";
-  private static final String END_DATE = "end_date";
+  public static final String TRIP = "trip";
+  public static final String TRIP_NAME = "trip_name";
+  public static final String DESTINATION_NAME = "destination_name";
+  public static final String TRIP_KEY = "trip_key";
+  public static final String IMAGE_SRC = "image_src";
+  public static final String START_DATE = "start_date";
+  public static final String END_DATE = "end_date";
 
   /**
    * Creates a new Trip.
