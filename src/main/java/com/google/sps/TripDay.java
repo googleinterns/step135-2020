@@ -102,7 +102,9 @@ public class TripDay {
    * Add locations
    */
   public void setLocations(ArrayList<String> locations) {
-    this.locations = locations;
+    List<String> temp = new ArrayList<>();
+    temp.addAll(locations);
+    this.locations = temp;
   }
 
   /**
