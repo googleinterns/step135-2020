@@ -240,7 +240,7 @@ public class TripServlet extends HttpServlet {
       // put entity in datastore   
       datastore.put(eventEntity);
 
-      // sets start time for next event 2 hours after start of prev
+      // sets start time for next event one hour and travel time after start of prev
       startDateTime = startDateTime.plusMinutes(Long.valueOf(ONE_HOUR + travelTimes.get(travelTimeIndex)));
       travelTimeIndex++;
     }

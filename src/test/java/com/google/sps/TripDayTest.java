@@ -124,6 +124,7 @@ public final class TripDayTest {
 
     List<Entity> actualEntities = TripDay.locationsToEntities(locations, testKey);
 
+    // build manual list of expected entities based on hard coded locations list
     List<Entity> expectedEntities = new ArrayList<>();
     Entity TimesSquareEntity = new Entity(LOCATION_ENTITY_TYPE, testKey);
     TimesSquareEntity.setProperty(NAME, TIMES_SQUARE_ID);
