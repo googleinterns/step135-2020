@@ -54,7 +54,7 @@ public class Trip {
    * Creates a new Trip.
    *
    * @param tripName The human-readable name for the trip. Must be non-null.
-   * @param destinationName The name of the destination they are heading.
+   * @param destinationName The name of the destination the user is heading to.
    * @param tripKey The key of the trip as created by the Trip Entity.
    * @param imageSrc The image source / URL to represent the trip.
    * @param startDate The start date for the trip. Must be non-null. Must be in yyyy-MM-dd date format.
@@ -106,7 +106,7 @@ public class Trip {
    * This constructor will be used for the MVP.
    * 
    * @param tripName The human-readable name for the trip. Must be non-null.
-   * @param destinationName The name of the destination they are heading.
+   * @param destinationName The name of the destination the user is heading to.
    * @param tripKey The key of the trip as created by the Trip Entity.
    * @param imageSrc The image source / URL to represent the trip.
    * @param startDate The start date for the trip. Must be non-null.
@@ -156,7 +156,7 @@ public class Trip {
   }
 
   /**
-   * Returns the name of the destination they are heading.
+   * Returns the name of the destination the user is heading to.
    */
   public String getDestinationName() {
     return this.destinationName;
