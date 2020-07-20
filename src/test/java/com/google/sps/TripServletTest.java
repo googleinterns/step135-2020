@@ -140,4 +140,9 @@ public final class TripServletTest {
 
     Assert.assertEquals(expectedResult.routes[0].waypointOrder, actualResult.routes[0].waypointOrder);
   }
+
+  @Test
+  public void doPostTest() {
+    //TODO (eshika): add an integration test 
+  }
 }

@@ -127,21 +127,11 @@ public class TripServlet extends HttpServlet {
     String startDate = request.getParameter(INPUT_DAY_OF_TRAVEL);
     String[] poiStrings = request.getParameterValues(INPUT_POI_LIST);
 
-    // Print user input for now
-    response.getWriter().println("startDate: " + startDate);
-    response.getWriter().println("tripName: " + tripName);
-    response.getWriter().println("origin: " + origin);
-    response.getWriter().println(poiStrings.toString());
-
     //do post for maps
     DirectionsApiRequest dirRequest = generateDirectionsRequest(origin, origin, poiStrings, this.context);
     DirectionsResult dirResult = getDirectionsResult(dirRequest);
     List<Integer> travelTimes = getTravelTimes(dirResult);
     List<String> orderedLocationStrings = getOrderedWaypoints(dirResult, poiStrings);
-
-    // Print out results on page for now
-    response.getWriter().println("travel times: " + travelTimes.toString());
-    response.getWriter().println("ordered POIs: " + orderedLocationStrings.toString());
 
     // TODO: replace testKey with key of TripDay entity
     long test = 123;
