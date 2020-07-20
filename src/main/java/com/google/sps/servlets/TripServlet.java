@@ -243,6 +243,7 @@ public class TripServlet extends HttpServlet {
       // sets start time for next event 2 hours after start of prev
       startDateTime = startDateTime.plusMinutes(Long.valueOf(ONE_HOUR + travelTimes.get(travelTimeIndex)));
       travelTimeIndex++;
+    }
   }
 
   /**
@@ -314,7 +315,8 @@ public class TripServlet extends HttpServlet {
     // Put Trip Entity into datastore.
     Entity tripEntity = Trip.buildEntity(tripName, destinationName, photoSrc,
       tripDayOfTravel, tripDayOfTravel, userEntity.getKey());
-    this.datastore.put(tripEntity);
+    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+    datastore.put(tripEntity);
     return tripEntity;
   }
 

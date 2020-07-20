@@ -204,6 +204,7 @@ public final class TripServletTest {
   @Test
   public void doPostTest() {
     //TODO (eshika): add an integration test 
+  }
 
   @Test
   public void testGetPlaceIdFromTextSearchCandidatesPresent() throws Exception {
