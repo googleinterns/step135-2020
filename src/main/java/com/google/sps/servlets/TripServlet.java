@@ -24,14 +24,21 @@ import com.google.appengine.api.datastore.Query;
 import com.google.maps.DirectionsApi;
 import com.google.maps.DirectionsApiRequest;
 import com.google.maps.DirectionsApi.RouteRestriction;
+import com.google.maps.FindPlaceFromTextRequest;
 import com.google.maps.GeoApiContext;
+import com.google.maps.PlaceDetailsRequest;
+import com.google.maps.PlacesApi;
 import com.google.maps.errors.ApiException;
 import com.google.maps.errors.NotFoundException;
 import com.google.maps.model.AddressType;
 import com.google.maps.model.DirectionsLeg;
 import com.google.maps.model.DirectionsResult;
+import com.google.maps.model.FindPlaceFromText;
 import com.google.maps.model.GeocodedWaypointStatus;
 import com.google.maps.model.LatLng;
+import com.google.maps.model.Photo;
+import com.google.maps.model.PlaceDetails;
+import com.google.maps.model.PlaceType;
 import com.google.maps.model.TrafficModel;
 import com.google.maps.model.TransitMode;
 import com.google.maps.model.TransitRoutingPreference;
@@ -64,6 +71,15 @@ public class TripServlet extends HttpServlet {
 
   // Constant for picking route
   private static final int ROUTE_INDEX = 0;
+
+  private static final int PHOTO_SRC_SIZE = 400;
+
+  // Trip attributes needed to store the Trip Entity in datastore.
+  private String tripName;
+  private String tripDestination;
+  private String tripDayOfTravel;
+  private String destinationName;
+  private String photoSrc;
 
   // time class constants
   private static final int HALF_HOUR = 30;
@@ -121,14 +137,21 @@ public class TripServlet extends HttpServlet {
       throws IOException {
     response.setContentType("application/json;");
 
-    Enumeration<String> params = request.getParameterNames();
-    String tripName = request.getParameter(INPUT_TRIP_NAME);
-    String origin = request.getParameter(INPUT_DESTINATION);
-    String startDate = request.getParameter(INPUT_DAY_OF_TRAVEL);
+    // Retrieve form inputs to define the Trip object.
+    this.tripName = request.getParameter(INPUT_TRIP_NAME);
+    this.tripDestination = request.getParameter(INPUT_DESTINATION);
+    this.tripDayOfTravel = request.getParameter(INPUT_DAY_OF_TRAVEL);
     String[] poiStrings = request.getParameterValues(INPUT_POI_LIST);
 
+    // Populate the destinationName and photoSrc fields using Google Maps API.
+    populateDestinationAndPhoto(this.context, this.tripDestination);
+
+    // Store the Trip Entity in datastore with the User Entity as an ancestor.
+    storeTripEntity(response, this.tripName, this.destinationName, 
+      this.tripDayOfTravel, this.photoSrc);
+
     //do post for maps
-    DirectionsApiRequest dirRequest = generateDirectionsRequest(origin, origin, poiStrings, this.context);
+    DirectionsApiRequest dirRequest = generateDirectionsRequest(this.tripDestination, this.tripDestination, poiStrings, this.context);
     DirectionsResult dirResult = getDirectionsResult(dirRequest);
     List<Integer> travelTimes = getTravelTimes(dirResult);
     List<String> orderedLocationStrings = getOrderedWaypoints(dirResult, poiStrings);
@@ -141,20 +164,49 @@ public class TripServlet extends HttpServlet {
     TripDay.storeLocationsInDatastore(locationEntities, this.datastore);
 
     // do post for events
-    eventDoPost(startDate, orderedLocationStrings, travelTimes); 
+    eventDoPost(this.tripDayOfTravel, orderedLocationStrings, travelTimes); 
 
-    // redirect to trips page
+    // Redirect to the "/trips/" page to show the trip that was added.
     response.sendRedirect("/trips/");
+  }
+
+  /**
+   * Get the place ID of the text search. Return null if no place ID matches
+   * the search.
+   * 
+   * @param context The entry point for making requests against the Google Geo 
+   * APIs (googlemaps.github.io/google-maps-services-java/v0.1.2/javadoc/com/google/maps/GeoApiContext.html).
+   * @param textSearch The text query to be entered in the findPlaceFromText(...)
+   * API call. Must be non-null.
+   */ 
+  public String getPlaceIdFromTextSearch(GeoApiContext context, String textSearch) 
+    throws IOException {
+
+    FindPlaceFromTextRequest findPlaceRequest = PlacesApi.findPlaceFromText(context, 
+      textSearch, FindPlaceFromTextRequest.InputType.TEXT_QUERY);
+
+    try {
+      FindPlaceFromText findPlaceResult = findPlaceRequest.await();
+
+      // Return place ID of the first candidate result.
+      if (findPlaceResult.candidates != null) {
+        return findPlaceResult.candidates[0].placeId;
+      }
+      
+      // No candidate is given, so return null.
+      return null;
+    } catch(ApiException | InterruptedException e) {
+      throw new IOException(e);
+    }
   }
 
   /**
    * Iterate through the entities and create the events and write them to json.
    */
-  private void eventDoGet(HttpServletResponse response) throws IOException { 
-    
+  private void eventDoGet(HttpServletResponse response) throws IOException {
     Query query = new Query("events");
 
-    PreparedQuery results = datastore.prepare(query);
+    PreparedQuery results = this.datastore.prepare(query);
 
     List<Event> events = new ArrayList<>();
 
@@ -191,7 +243,94 @@ public class TripServlet extends HttpServlet {
       // sets start time for next event 2 hours after start of prev
       startDateTime = startDateTime.plusMinutes(Long.valueOf(ONE_HOUR + travelTimes.get(travelTimeIndex)));
       travelTimeIndex++;
+  }
+
+  /**
+   * Get the PlaceDetails object from the place ID.
+   */
+  private PlaceDetails getPlaceDetailsFromPlaceId(GeoApiContext context, String placeId)
+    throws IOException {
+
+    PlaceDetailsRequest placeDetailsRequest = PlacesApi.placeDetails(context, 
+      placeId);
+    try {
+      return placeDetailsRequest.await();
+    } catch(ApiException | InterruptedException e) {
+      throw new IOException(e);
     }
+  }
+
+  /**
+   * Populate the destinationName and photoSrc fields using the Google Maps API.
+   */
+  private void populateDestinationAndPhoto(GeoApiContext context, String tripDestination)
+    throws IOException {
+
+    // Get place ID from search of trip destination. Get photo and destination 
+    // if not null; otherwise, use a placeholder photo and destination.
+    String destinationPlaceId = getPlaceIdFromTextSearch(context, this.tripDestination);
+    if (destinationPlaceId == null) {
+      this.destinationName = tripDestination;
+      this.photoSrc = "../images/placeholder_image.png";
+    } else {
+      PlaceDetails placeDetailsResult = getPlaceDetailsFromPlaceId(context, destinationPlaceId);
+
+      // Get the name of the location from the place details result.
+      this.destinationName = placeDetailsResult.name;
+
+      // Get a photo of the location from the place details result.
+      if (placeDetailsResult.photos == null) {
+        this.photoSrc = "../images/placeholder_image.png";
+      } else {
+        Photo photoObject = placeDetailsResult.photos[0];
+        this.photoSrc = getUrlFromPhotoReference(PHOTO_SRC_SIZE, photoObject.photoReference);
+      }
+    }
+  }
+
+  /**
+   * Store the Trip Entity in datastore with the User Entity as an ancestor.
+   * Return the Trip Entity object.
+   * 
+   * @param response The HttpServletResponse used to redirect to homepage if
+   * no user is logged in. 
+   * @param tripName The human-readable name for the trip. Must be non-null.
+   * @param destinationName The name of the destination the user is heading to.
+   * This destination should be verified by the Google Maps API.
+   * @param tripDayOfTravel The date of the trip. Must be in yyyy-MM-dd date format.
+   * @param photoSrc The image source / URL to represent the trip. This is 
+   * typically retrieved using the Places API to get a photo from the destination
+   * name, but can also be the placeholder image source if no photo exists.
+   */
+  public Entity storeTripEntity(HttpServletResponse response, String tripName, 
+    String destinationName, String tripDayOfTravel, String photoSrc) throws IOException {
+    // Get User Entity. If user not logged in, redirect to homepage.
+    Entity userEntity = AuthServlet.getCurrentUserEntity();
+    if (userEntity == null) {
+      response.sendRedirect("/");
+      return null;
+    }
+
+    // Put Trip Entity into datastore.
+    Entity tripEntity = Trip.buildEntity(tripName, destinationName, photoSrc,
+      tripDayOfTravel, tripDayOfTravel, userEntity.getKey());
+    this.datastore.put(tripEntity);
+    return tripEntity;
+  }
+
+  /**
+   * Get a URL to show the photo from the photoreference.
+   * See https://developers.google.com/places/web-service/photos#place_photo_requests
+   * for more info.
+   * 
+   * @param maxWidth This is the maximum width of the image.
+   * @param photoReference This is the photo reference String stored in the 
+   * Google Maps Photo object; this is used to retrieve the actual photo URL.
+   */
+  private String getUrlFromPhotoReference(int maxWidth, String photoReference) {
+    final String baseUrl = "https://maps.googleapis.com/maps/api/place/photo?";
+    return baseUrl + "maxwidth=" + maxWidth + "&photoreference=" + 
+      photoReference + "&key=" + Config.API_KEY;
   }
 
   /**
