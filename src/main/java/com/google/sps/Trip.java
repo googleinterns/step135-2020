@@ -135,6 +135,9 @@ public class Trip {
 
   /**
    * Build and return a Trip object from the Entity.
+   *
+   * @param tripEntity An Entity of the type "trip" with the properties trip
+   * name, destination name, image source, start date, and end date.
    */
   public static Trip buildTripFromEntity(Entity tripEntity) {
     String tripName = (String) tripEntity.getProperty(TRIP_NAME);
