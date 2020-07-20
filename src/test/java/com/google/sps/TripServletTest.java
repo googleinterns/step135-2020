@@ -38,7 +38,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import static org.mockito.Mockito.*;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest(DirectionsApi.class)
+@PrepareForTest({DirectionsApi.class, DirectionsApiRequest.class})
 public final class TripServletTest {
 
   // Test directionsRequest generation with mocks.
@@ -123,8 +123,21 @@ public final class TripServletTest {
     Assert.assertEquals(actualTravelTimes, expectedTravelTimes);
   }
 
+  // Test getting DirectionsResult object from DirectionsRequest
   @Test
-  public void mapDoPostTest() {
-    // TODO: eshika to add an integration test post-MVP
+  public void getDirectionsResultTest() throws Exception {
+    DirectionsApiRequest mockRequest = PowerMockito.mock(DirectionsApiRequest.class);
+
+    // Construct directionsResult object
+    DirectionsResult expectedResult = new DirectionsResult();
+    expectedResult.routes = new DirectionsRoute[1];
+    expectedResult.routes[0] = new DirectionsRoute();
+    expectedResult.routes[0].waypointOrder = new int[]{ 1, 2, 0 };
+
+    PowerMockito.when(mockRequest.await()).thenReturn(expectedResult);
+
+    DirectionsResult actualResult = TripServlet.getDirectionsResult(mockRequest);
+
+    Assert.assertEquals(expectedResult.routes[0].waypointOrder, actualResult.routes[0].waypointOrder);
   }
 }

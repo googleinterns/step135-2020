@@ -67,6 +67,7 @@ public class TripServlet extends HttpServlet {
 
   // time class constants
   private static final int HALF_HOUR = 30;
+  private static final int ONE_HOUR = 60;
   private static final int NINETY_MINS = 90;
   private static final int SECONDS_IN_MIN = 60;
 
@@ -136,7 +137,7 @@ public class TripServlet extends HttpServlet {
     DirectionsApiRequest dirRequest = generateDirectionsRequest(origin, origin, poiStrings, this.context);
     DirectionsResult dirResult = getDirectionsResult(dirRequest);
     List<Integer> travelTimes = getTravelTimes(dirResult);
-    List<String> orderedLocationStrings = getOrderedWaypoints(dirResult, pois);
+    List<String> orderedLocationStrings = getOrderedWaypoints(dirResult, poiStrings);
 
     // Print out results on page for now
     response.getWriter().println("travel times: " + travelTimes.toString());
@@ -145,10 +146,12 @@ public class TripServlet extends HttpServlet {
     // TODO: replace testKey with key of TripDay entity
     long test = 123;
     Key testKey = KeyFactory.createKey("test", test);
-    TripDay.storeLocationsInDatastore(orderedLocationStrings, testKey, this.datastore);
+
+    List<Entity> locationEntities = TripDay.locationsToEntities(orderedLocationStrings, testKey);
+    TripDay.storeLocationsInDatastore(locationEntities, this.datastore);
 
     // do post for events
-    eventDoPost(request, response, startDate, orderedLocationStrings, travelTimes); 
+    eventDoPost(startDate, orderedLocationStrings, travelTimes); 
 
     // redirect to trips page
     response.sendRedirect("/trips/");
@@ -176,15 +179,16 @@ public class TripServlet extends HttpServlet {
   /**
    * Creates the events and puts them into datastore.
    * @param date Trip date
-   * @param pois String array of pois
+   * @param pois List<String> of pois
    * @param travelTimes List<Integer> of travel times in minutes
    */
-  private void eventDoPost(String date, String[] pois, List<Integer> travelTimes) 
+  private void eventDoPost(String date, List<String> pois, List<Integer> travelTimes) 
       throws IOException { 
     
     // set startDateTime
     LocalDateTime startDateTime = LocalDateTime.of(LocalDate.parse(date), LocalTime.of(10, 0));
 
+    int travelTimeIndex = 1;
     // for each poi create the necessary fields
     for (String address : pois) {
       String name = address.split(",")[0];
@@ -195,7 +199,8 @@ public class TripServlet extends HttpServlet {
       datastore.put(eventEntity);
 
       // sets start time for next event 2 hours after start of prev
-      startDateTime = startDateTime.plusMinutes(Long.valueOf(NINETY_MINS));
+      startDateTime = startDateTime.plusMinutes(Long.valueOf(ONE_HOUR + travelTimes.get(travelTimeIndex)));
+      travelTimeIndex++;
     }
   }
 
@@ -203,7 +208,7 @@ public class TripServlet extends HttpServlet {
    * Generate directionsResult from directionsRequest.
    * @param directionsRequest DirectionsApiRequest object generated from user input
    */
-  private DirectionsResult getDirectionsResult(DirectionsApiRequest directionsRequest) 
+  public static DirectionsResult getDirectionsResult(DirectionsApiRequest directionsRequest) 
       throws IOException {
     // Calculate route and save travelTimes and waypointOrder to two ArrayLists.
     try {
