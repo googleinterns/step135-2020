@@ -156,7 +156,6 @@ public class TripServlet extends HttpServlet {
    */
   public Entity putTripDayInDatastore(HttpServletRequest request, 
       DatastoreService datastore, LocalDate date, Key tripEntityKey) throws IOException {
-    
     String origin = request.getParameter("inputDestination");
     String destination = origin; // may change if user can differentiate b/t the two
 

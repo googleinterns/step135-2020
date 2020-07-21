@@ -14,6 +14,7 @@
 
 package com.google.sps;
 
+import static org.mockito.Mockito.*;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
@@ -38,7 +39,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import static org.mockito.Mockito.*;
 
 @RunWith(JUnit4.class)
 public final class CalendarServletTest {
@@ -56,7 +56,7 @@ public final class CalendarServletTest {
       LocalDateTime.of(LocalDate.parse(INPUT_DATE), LocalTime.of(10, 0));
   private static final String EMAIL = "test123@gmail.com";
 
-  // Cosntants to represent different Trip attributes.
+  // Constants to represent different Trip attributes.
   private static final String TRIP_NAME = "Trip to California";
   private static final String DESTINATION_NAME = "California";
   private static final String IMAGE_SRC =

@@ -115,8 +115,7 @@ public final class TripServletTest {
     when(request.getParameter("inputDestination")).thenReturn(INPUT_DESTINATION);
 
     // create key
-    long test = 123;
-    Key testKey = KeyFactory.createKey("test", test);
+    Key testKey = KeyFactory.createKey("test", ((long) 123));
 
     // put entity in datastore and query it
     Entity tripDayEntity = tripServlet.putTripDayInDatastore(request, datastore, INPUT_DATE, testKey);

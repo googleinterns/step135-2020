@@ -19,7 +19,6 @@ import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.datastore.Entity;
-import com.google.appengine.api.datastore.FetchOptions;
 import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.datastore.Query.Filter;
@@ -59,6 +58,11 @@ public class CalendarServlet extends HttpServlet {
     // get current user
     Entity userEntity = AuthServlet.getCurrentUserEntity();
 
+    // if no user Entity return home
+    if (userEntity == null) {
+      response.sendRedirect("/");
+    }
+
     // gets the events from datastore and writes them to .../get-calendar
     doGetEvents(response, datastore, userEntity, tripKey);
   }
@@ -75,14 +79,7 @@ public class CalendarServlet extends HttpServlet {
     tripQuery.setFilter(tripKeyFilter);
 
     PreparedQuery tripResults = datastore.prepare(tripQuery);
-    List<Entity> listResults = tripResults.asList(FetchOptions.Builder.withDefaults());
-
-     if (listResults.isEmpty()) {
-      throw new IllegalArgumentException("Trip does not exist");
-    }
-
-    // get the Entity object of the trip.
-    Entity tripEntity =  listResults.get(0);
+    Entity tripEntity = tripResults.asSingleEntity();
 
     Query tripDayQuery = new Query(TripDay.QUERY_STRING, tripEntity.getKey());
     PreparedQuery tripDayResults = datastore.prepare(tripDayQuery);
