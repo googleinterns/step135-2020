@@ -17,11 +17,17 @@ package com.google.sps.servlets;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.datastore.FetchOptions;
 import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
+import com.google.appengine.api.datastore.Query.Filter;
+import com.google.appengine.api.datastore.Query.FilterOperator;
+import com.google.appengine.api.datastore.Query.FilterPredicate;
 import com.google.gson.Gson;
 import com.google.sps.data.Event;
+import com.google.sps.Trip;
 import com.google.sps.TripDay;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -38,28 +44,47 @@ import javax.servlet.http.HttpServletResponse;
 @WebServlet("/get-calendar")
 public class CalendarServlet extends HttpServlet {
 
+  /**
+   * Adam TODO: put functionality into a Utility class!
+   */
+
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) 
       throws IOException {
     response.setContentType("application/json;");
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+    String stringTripKey = request.getParameter("tripKey");
+    Key tripKey = KeyFactory.stringToKey(stringTripKey);
+
+    // get current user
+    Entity userEntity = AuthServlet.getCurrentUserEntity();
 
     // gets the events from datastore and writes them to .../get-calendar
-    doGetEvents(response, datastore);
+    doGetEvents(response, datastore, userEntity, tripKey);
   }
 
   /**
    * Gets the events and prints them to writer, necessary break up for testing
    */
   public void doGetEvents(HttpServletResponse response, 
-      DatastoreService datastore) throws IOException {
-    
-     /** 
-     * Adam TODO: Get current user, specific trip associated with tripCard clicked,
-     * and get all events associated with the tripDay(s) in that trip
-     */
+      DatastoreService datastore, Entity userEntity, Key tripEntityKey) throws IOException {
+  
+    Filter tripKeyFilter =
+      new FilterPredicate("__key__", FilterOperator.EQUAL, tripEntityKey);
+    Query tripQuery = new Query(Trip.TRIP, userEntity.getKey());
+    tripQuery.setFilter(tripKeyFilter);
 
-    Query tripDayQuery = new Query(TripDay.QUERY_STRING);
+    PreparedQuery tripResults = datastore.prepare(tripQuery);
+    List<Entity> listResults = tripResults.asList(FetchOptions.Builder.withDefaults());
+
+     if (listResults.isEmpty()) {
+      throw new IllegalArgumentException("Trip does not exist");
+    }
+
+    // get the Entity object of the trip.
+    Entity tripEntity =  listResults.get(0);
+
+    Query tripDayQuery = new Query(TripDay.QUERY_STRING, tripEntity.getKey());
     PreparedQuery tripDayResults = datastore.prepare(tripDayQuery);
 
     List<Event> events = new ArrayList<>();

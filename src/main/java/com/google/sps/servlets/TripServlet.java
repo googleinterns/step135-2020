@@ -109,15 +109,6 @@ public class TripServlet extends HttpServlet {
     Entity tripEntity = storeTripEntity(response, this.tripName, this.destinationName, 
       this.tripDayOfTravel, this.photoSrc, datastore);
 
-    /**
-     * TODO: Remaining code for storing Event and TripDay objects should 
-     * go here, below the above code, as the Trip has to be set first in order
-     * to maintain Entity hierarchy / ancestor paths. 
-     * 
-     * Below methods can also use the field variables fetched from request in 
-     * the above code.
-     */
-
     // put TripDay entity into datastore
     Entity tripDayEntity = putTripDayInDatastore(request, datastore, LocalDate.parse(tripDayOfTravel), tripEntity.getKey());
 
@@ -212,7 +203,6 @@ public class TripServlet extends HttpServlet {
         startDateTime = startDateTime.plusMinutes(Long.valueOf(NINETY_MINS));
       }
     }
-
     return eventEntities;
   }
 

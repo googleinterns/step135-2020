@@ -17,9 +17,12 @@ package com.google.sps;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.datastore.Key;
 import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
 import com.google.sps.data.Event;
+import com.google.sps.data.User;
+import com.google.sps.Trip;
 import com.google.sps.servlets.CalendarServlet;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -51,6 +54,14 @@ public final class CalendarServletTest {
   private static final int HALF_HOUR = 30;
   private static final LocalDateTime DEF_START_TIME = 
       LocalDateTime.of(LocalDate.parse(INPUT_DATE), LocalTime.of(10, 0));
+  private static final String EMAIL = "test123@gmail.com";
+
+  // Cosntants to represent different Trip attributes.
+  private static final String TRIP_NAME = "Trip to California";
+  private static final String DESTINATION_NAME = "California";
+  private static final String IMAGE_SRC =
+    "https://lh3.googleusercontent.com/p/AF1QipM7tbCZOj_5SOft9cYgI7un3bmieieqvdYkCPT5=s1600-w400";
+  private static final String TRIP_DAY_OF_TRAVEL = "2020-02-29";
 
   private final LocalServiceTestHelper helper =
       new LocalServiceTestHelper(new LocalDatastoreServiceTestConfig());
@@ -83,8 +94,23 @@ public final class CalendarServletTest {
     // initialize datastore
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 
+    // create user entity
+    Entity userEntity = new Entity(User.USER);
+    userEntity.setProperty(User.USER_EMAIL, EMAIL);
+    datastore.put(userEntity);
+    Key userEntityKey = userEntity.getKey();
+
+    // Add a single Trip to Datastore with the User Entity Key.
+    Entity tripEntity = new Entity(Trip.TRIP, userEntityKey);
+    tripEntity.setProperty(Trip.TRIP_NAME, TRIP_NAME);
+    tripEntity.setProperty(Trip.DESTINATION_NAME, DESTINATION_NAME);
+    tripEntity.setProperty(Trip.IMAGE_SRC, IMAGE_SRC);
+    tripEntity.setProperty(Trip.START_DATE, TRIP_DAY_OF_TRAVEL);
+    tripEntity.setProperty(Trip.END_DATE, TRIP_DAY_OF_TRAVEL);
+    datastore.put(tripEntity);
+
     // create tripDay entity, needed for put events in datastore
-    Entity tripDayEntity = new Entity(TripDay.QUERY_STRING);
+    Entity tripDayEntity = new Entity(TripDay.QUERY_STRING, tripEntity.getKey());
     tripDayEntity.setProperty("origin", INPUT_DESTINATION);
     tripDayEntity.setProperty("destination", INPUT_DESTINATION);
     tripDayEntity.setProperty("date", INPUT_DATE);
@@ -96,7 +122,7 @@ public final class CalendarServletTest {
     datastore.put(event);
 
     // run do Get
-    calendarServlet.doGetEvents(response, datastore);
+    calendarServlet.doGetEvents(response, datastore, userEntity, tripEntity.getKey());
 
     // create expected JSON array
     String expectedJson = "[{\"name\":\"testName\",\"address\":\"20 W 34th St, New York, NY 10001\"," + 
