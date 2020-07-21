@@ -52,19 +52,22 @@ public class CalendarServlet extends HttpServlet {
       throws IOException {
     response.setContentType("application/json;");
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-    String stringTripKey = request.getParameter("tripKey");
-    Key tripKey = KeyFactory.stringToKey(stringTripKey);
 
     // get current user
     Entity userEntity = AuthServlet.getCurrentUserEntity();
 
     // if no user Entity return home
     if (userEntity == null) {
+      System.err.println("here");
+      response.getWriter().println("No current User");
       response.sendRedirect("/");
-    }
+    } else {
+      String stringTripKey = request.getParameter("tripKey");
+      Key tripKey = KeyFactory.stringToKey(stringTripKey);
 
-    // gets the events from datastore and writes them to .../get-calendar
-    doGetEvents(response, datastore, userEntity, tripKey);
+      // gets the events from datastore and writes them to .../get-calendar
+      doGetEvents(response, datastore, userEntity, tripKey);
+    }
   }
 
   /**

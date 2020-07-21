@@ -136,4 +136,22 @@ public final class CalendarServletTest {
     writer.flush();
     Assert.assertTrue(stringWriter.toString().contains(expectedJson));
   }
+
+  @Test
+  public void testNoCurrentUser() throws Exception {
+    HttpServletRequest request = mock(HttpServletRequest.class);       
+    HttpServletResponse response = mock(HttpServletResponse.class);  
+
+    when(request.getParameter("tripKey")).thenReturn("6632254138744832");
+
+    // Create writers to check against actual output.
+    StringWriter stringWriter = new StringWriter();
+    PrintWriter writer = new PrintWriter(stringWriter);
+    when(response.getWriter()).thenReturn(writer);
+
+    calendarServlet.doGet(request, response);
+
+    String expectedJson = "No current User";
+    Assert.assertTrue(stringWriter.toString().contains(expectedJson));
+  }
 }
