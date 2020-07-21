@@ -33,6 +33,8 @@ import java.time.LocalTime;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.HashMap;
+import java.util.Map;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -142,12 +144,34 @@ public final class CalendarServletTest {
     HttpServletRequest request = mock(HttpServletRequest.class);       
     HttpServletResponse response = mock(HttpServletResponse.class);  
 
-    when(request.getParameter("tripKey")).thenReturn("6632254138744832");
+    // Create writers to check against actual output.
+    StringWriter stringWriter = new StringWriter();
+    PrintWriter writer = new PrintWriter(stringWriter);
+    when(response.getWriter()).thenReturn(writer);
+
+    calendarServlet.doGet(request, response);
+
+    String expectedJson = "No current User";
+    Assert.assertTrue(stringWriter.toString().contains(expectedJson));
+  }
+
+  @Test
+  public void testNoTripKeyPassedIn() throws Exception {
+    HttpServletRequest request = mock(HttpServletRequest.class);       
+    HttpServletResponse response = mock(HttpServletResponse.class); 
+    when(request.getParameterMap()).thenReturn(new HashMap<>());
 
     // Create writers to check against actual output.
     StringWriter stringWriter = new StringWriter();
     PrintWriter writer = new PrintWriter(stringWriter);
     when(response.getWriter()).thenReturn(writer);
+
+    // initialize datastore
+    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+
+    Entity userEntity = new Entity(User.USER);
+    userEntity.setProperty(User.USER_EMAIL, EMAIL);
+    datastore.put(userEntity);
 
     calendarServlet.doGet(request, response);
 
