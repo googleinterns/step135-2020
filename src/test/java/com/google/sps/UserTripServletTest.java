@@ -53,7 +53,7 @@ public final class UserTripServletTest {
   private static final String LOGOUT_URL = "/_ah/logout?continue=%2F";
   private static final String LOGIN_URL = "/_ah/login?continue=%2F";
 
-  // Cosntants to represent different Trip attributes.
+  // Constants to represent different Trip attributes.
   private static final String TRIP_NAME = "Trip to California";
   private static final String DESTINATION_NAME = "California";
   private static final String IMAGE_SRC =
@@ -89,11 +89,8 @@ public final class UserTripServletTest {
     helper.tearDown();
   }
 
-  /**
-   * Add a User Entity and no Trip Entity objects to Datastore, and return the 
-   * User Entity Key. This is a helper method used to test writeTripsToFile(...).
-   */
-  public Key addCurrentUserAndNoTripDatastore() {
+  @Test
+  public void testWriteTripsToFileResponseNoTrip() throws Exception {
     // Add the logged-in User to Datastore, and get the User Entity Key.
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
     Entity userEntity = new Entity(User.USER);
@@ -101,15 +98,28 @@ public final class UserTripServletTest {
     datastore.put(userEntity);
     Key userEntityKey = userEntity.getKey();
 
-    // Return the User Entity Key, used to Query for the Trip Entity.
-    return userEntityKey;
+    // Mock request and response.  
+    HttpServletRequest requestMock = mock(HttpServletRequest.class);    
+    HttpServletResponse responseMock = mock(HttpServletResponse.class);
+
+    // Create writers to pass into the mock response object.
+    StringWriter stringWriter = new StringWriter();
+    PrintWriter writer = new PrintWriter(stringWriter);
+    when(responseMock.getWriter()).thenReturn(writer);
+
+    // Run the UserServlet writeTripsToFile(...) method with response mock.
+    userTripServlet.writeTripsToFile(responseMock, userEntityKey); 
+
+    // Create the expected JSON String outputted from the above function.
+    // The tripKey variable was copied from the output.
+    String expectedJson = "[]";
+
+    writer.flush(); // Flush the writer.
+    Assert.assertTrue(stringWriter.toString().contains(expectedJson));
   }
 
-  /**
-   * Add a User Entity and pne Trip Entity object to Datastore, and return the 
-   * User Entity Key. This is a helper method used to test writeTripsToFile(...).
-   */
-  public Key addCurrentUserAndSingleTripDatastore() {
+  @Test
+  public void testWriteTripsToFileResponseOneTrip() throws Exception {
     // Add the logged-in User to Datastore, and get the User Entity Key.
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
     Entity userEntity = new Entity(User.USER);
@@ -126,15 +136,33 @@ public final class UserTripServletTest {
     tripEntity.setProperty(Trip.END_DATE, TRIP_DAY_OF_TRAVEL);
     datastore.put(tripEntity);
 
-    // Return the User Entity Key, used to Query for the Trip Entity.
-    return userEntityKey;
+    // Mock request and response.  
+    HttpServletRequest requestMock = mock(HttpServletRequest.class);    
+    HttpServletResponse responseMock = mock(HttpServletResponse.class);
+
+    // Create writers to pass into the mock response object.
+    StringWriter stringWriter = new StringWriter();
+    PrintWriter writer = new PrintWriter(stringWriter);
+    when(responseMock.getWriter()).thenReturn(writer);
+
+    // Run the UserServlet writeTripsToFile(...) method with response mock.
+    userTripServlet.writeTripsToFile(responseMock, userEntityKey); 
+
+    // Create the expected JSON String outputted from the above function.
+    // The tripKey variable was copied from the output.
+    String expectedJson = "[{\"tripName\":\"Trip to California\",\"destinationName\"" +
+    ":\"California\",\"tripKey\":\"agR0ZXN0chQLEgR1c2VyGAEMCxIEdHJpcBgCDA\"" + 
+    ",\"imageSrc\":\"https://lh3.googleusercontent.com/p/AF1QipM7tbCZOj_5SOft9cYg" +
+    "I7un3bmieieqvdYkCPT5\\u003ds1600-w400\",\"startDate\":{\"year\":2020,\"month\"" +
+    ":2,\"day\":29},\"endDate\":{\"year\":2020,\"month\":2,\"day\":29},\"num" +
+    "Days\":1}]";
+
+    writer.flush(); // Flush the writer.
+    Assert.assertTrue(stringWriter.toString().contains(expectedJson));
   }
 
-  /**
-   * Add a User Entity and two Trip Entity objects to Datastore, and return the 
-   * User Entity Key. This is a helper method used to test writeTripsToFile(...).
-   */
-  public Key addCurrentUserAndTwoTripsDatastore() {
+    @Test
+  public void testDoGetResponseTwoTrips() throws Exception {
     // Add the logged-in User to Datastore, and get the User Entity Key.
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
     Entity userEntity = new Entity(User.USER);
@@ -160,12 +188,6 @@ public final class UserTripServletTest {
     tripEntity2.setProperty(Trip.END_DATE, TRIP_DAY_OF_TRAVEL_2);
     datastore.put(tripEntity2);
 
-    // Return the User Entity Key, used to Query for the Trip Entity.
-    return userEntityKey;
-  }
-
-  @Test
-  public void testWriteTripsToFileResponseNoTrip() throws Exception {
     // Mock request and response.  
     HttpServletRequest requestMock = mock(HttpServletRequest.class);    
     HttpServletResponse responseMock = mock(HttpServletResponse.class);
@@ -174,64 +196,6 @@ public final class UserTripServletTest {
     StringWriter stringWriter = new StringWriter();
     PrintWriter writer = new PrintWriter(stringWriter);
     when(responseMock.getWriter()).thenReturn(writer);
-
-    // Get the User Entity Key, and set up the database using the helper method.
-    Key userEntityKey = addCurrentUserAndNoTripDatastore();
-
-    // Run the UserServlet writeTripsToFile(...) method with response mock.
-    userTripServlet.writeTripsToFile(responseMock, userEntityKey); 
-
-    // Create the expected JSON String outputted from the above function.
-    // The tripKey variable was copied from the output.
-    String expectedJson = "[]";
-
-    writer.flush(); // Flush the writer.
-    Assert.assertTrue(stringWriter.toString().contains(expectedJson));
-  }
-
-  @Test
-  public void testWriteTripsToFileResponseOneTrip() throws Exception {
-    // Mock request and response.  
-    HttpServletRequest requestMock = mock(HttpServletRequest.class);    
-    HttpServletResponse responseMock = mock(HttpServletResponse.class);
-
-    // Create writers to pass into the mock response object.
-    StringWriter stringWriter = new StringWriter();
-    PrintWriter writer = new PrintWriter(stringWriter);
-    when(responseMock.getWriter()).thenReturn(writer);
-
-    // Get the User Entity Key, and set up the database using the helper method.
-    Key userEntityKey = addCurrentUserAndSingleTripDatastore();
-
-    // Run the UserServlet writeTripsToFile(...) method with response mock.
-    userTripServlet.writeTripsToFile(responseMock, userEntityKey); 
-
-    // Create the expected JSON String outputted from the above function.
-    // The tripKey variable was copied from the output.
-    String expectedJson = "[{\"tripName\":\"Trip to California\",\"destinationName\"" +
-    ":\"California\",\"tripKey\":\"agR0ZXN0chQLEgR1c2VyGAEMCxIEdHJpcBgCDA\"" + 
-    ",\"imageSrc\":\"https://lh3.googleusercontent.com/p/AF1QipM7tbCZOj_5SOft9cYg" +
-    "I7un3bmieieqvdYkCPT5\\u003ds1600-w400\",\"startDate\":{\"year\":2020,\"month\"" +
-    ":2,\"day\":29},\"endDate\":{\"year\":2020,\"month\":2,\"day\":29},\"num" +
-    "Days\":1}]";
-
-    writer.flush(); // Flush the writer.
-    Assert.assertTrue(stringWriter.toString().contains(expectedJson));
-  }
-
-    @Test
-  public void testDoGetResponseTwoTrips() throws Exception {
-    // Mock request and response.  
-    HttpServletRequest requestMock = mock(HttpServletRequest.class);    
-    HttpServletResponse responseMock = mock(HttpServletResponse.class);
-
-    // Create writers to pass into the mock response object.
-    StringWriter stringWriter = new StringWriter();
-    PrintWriter writer = new PrintWriter(stringWriter);
-    when(responseMock.getWriter()).thenReturn(writer);
-
-    // Get the User Entity Key, and set up the database using the helper method.
-    Key userEntityKey = addCurrentUserAndTwoTripsDatastore();
 
     // Run the UserServlet writeTripsToFile(...) method with response mock.
     userTripServlet.writeTripsToFile(responseMock, userEntityKey); 
