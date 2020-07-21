@@ -14,6 +14,11 @@
 
 package com.google.sps;
 
+import static org.mockito.Mockito.*;
+import com.google.appengine.api.datastore.DatastoreService;
+import com.google.appengine.api.datastore.DatastoreServiceFactory;
+import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
 import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
@@ -22,7 +27,7 @@ import com.google.sps.data.Config;
 import com.google.sps.data.User;
 import com.google.sps.servlets.AuthServlet;
 import com.google.sps.servlets.UserTripServlet;
-import com.google.sps.servlets.TripServlet;
+import com.google.sps.Trip;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import javax.servlet.http.HttpServlet;
@@ -34,7 +39,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import static org.mockito.Mockito.*;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
@@ -49,9 +53,21 @@ public final class UserTripServletTest {
   private static final String LOGOUT_URL = "/_ah/logout?continue=%2F";
   private static final String LOGIN_URL = "/_ah/login?continue=%2F";
 
-  // Create UserTripServlet and TripServlet objects.
+  // Cosntants to represent different Trip attributes.
+  private static final String TRIP_NAME = "Trip to California";
+  private static final String DESTINATION_NAME = "California";
+  private static final String IMAGE_SRC =
+    "https://lh3.googleusercontent.com/p/AF1QipM7tbCZOj_5SOft9cYgI7un3bmieieqvdYkCPT5=s1600-w400";
+  private static final String TRIP_DAY_OF_TRAVEL = "2020-02-29";
+
+  // Constants to represent different Trip attributes for a second Trip.
+  private static final String TRIP_NAME_2 = "Family Vacation";
+  private static final String DESTINATION_NAME_2 = "Island of Hawai'i";
+  private static final String IMAGE_SRC_2 = "../images/placeholder_image.png";
+  private static final String TRIP_DAY_OF_TRAVEL_2 = "2020-07-17";
+
+  // Create UserTripServlet object.
   private UserTripServlet userTripServlet;
-  private TripServlet tripServlet;
 
   // Add helper to allow datastore testing in local JUnit tests.
   // See https://cloud.google.com/appengine/docs/standard/java/tools/localunittesting.
@@ -61,7 +77,6 @@ public final class UserTripServletTest {
   @Before
   public void initServlets() {
     userTripServlet = new UserTripServlet();
-    tripServlet = new TripServlet();
   }
 
   @Before
@@ -74,94 +89,167 @@ public final class UserTripServletTest {
     helper.tearDown();
   }
 
+  /**
+   * Add a User Entity and no Trip Entity objects to Datastore, and return the 
+   * User Entity Key. This is a helper method used to test writeTripsToFile(...).
+   */
+  public Key addCurrentUserAndNoTripDatastore() {
+    // Add the logged-in User to Datastore, and get the User Entity Key.
+    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+    Entity userEntity = new Entity(User.USER);
+    userEntity.setProperty(User.USER_EMAIL, EMAIL);
+    datastore.put(userEntity);
+    Key userEntityKey = userEntity.getKey();
+
+    // Return the User Entity Key, used to Query for the Trip Entity.
+    return userEntityKey;
+  }
+
+  /**
+   * Add a User Entity and pne Trip Entity object to Datastore, and return the 
+   * User Entity Key. This is a helper method used to test writeTripsToFile(...).
+   */
+  public Key addCurrentUserAndSingleTripDatastore() {
+    // Add the logged-in User to Datastore, and get the User Entity Key.
+    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+    Entity userEntity = new Entity(User.USER);
+    userEntity.setProperty(User.USER_EMAIL, EMAIL);
+    datastore.put(userEntity);
+    Key userEntityKey = userEntity.getKey();
+
+    // Add a single Trip to Datastore with the User Entity Key.
+    Entity tripEntity = new Entity(Trip.TRIP, userEntityKey);
+    tripEntity.setProperty(Trip.TRIP_NAME, TRIP_NAME);
+    tripEntity.setProperty(Trip.DESTINATION_NAME, DESTINATION_NAME);
+    tripEntity.setProperty(Trip.IMAGE_SRC, IMAGE_SRC);
+    tripEntity.setProperty(Trip.START_DATE, TRIP_DAY_OF_TRAVEL);
+    tripEntity.setProperty(Trip.END_DATE, TRIP_DAY_OF_TRAVEL);
+    datastore.put(tripEntity);
+
+    // Return the User Entity Key, used to Query for the Trip Entity.
+    return userEntityKey;
+  }
+
+  /**
+   * Add a User Entity and two Trip Entity objects to Datastore, and return the 
+   * User Entity Key. This is a helper method used to test writeTripsToFile(...).
+   */
+  public Key addCurrentUserAndTwoTripsDatastore() {
+    // Add the logged-in User to Datastore, and get the User Entity Key.
+    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+    Entity userEntity = new Entity(User.USER);
+    userEntity.setProperty(User.USER_EMAIL, EMAIL);
+    datastore.put(userEntity);
+    Key userEntityKey = userEntity.getKey();
+
+    // Add a single Trip to Datastore with the User Entity Key.
+    Entity tripEntity = new Entity(Trip.TRIP, userEntityKey);
+    tripEntity.setProperty(Trip.TRIP_NAME, TRIP_NAME);
+    tripEntity.setProperty(Trip.DESTINATION_NAME, DESTINATION_NAME);
+    tripEntity.setProperty(Trip.IMAGE_SRC, IMAGE_SRC);
+    tripEntity.setProperty(Trip.START_DATE, TRIP_DAY_OF_TRAVEL);
+    tripEntity.setProperty(Trip.END_DATE, TRIP_DAY_OF_TRAVEL);
+    datastore.put(tripEntity);
+
+    // Add a second Trip to Datastore with the User Entity Key.
+    Entity tripEntity2 = new Entity(Trip.TRIP, userEntityKey);
+    tripEntity2.setProperty(Trip.TRIP_NAME, TRIP_NAME_2);
+    tripEntity2.setProperty(Trip.DESTINATION_NAME, DESTINATION_NAME_2);
+    tripEntity2.setProperty(Trip.IMAGE_SRC, IMAGE_SRC_2);
+    tripEntity2.setProperty(Trip.START_DATE, TRIP_DAY_OF_TRAVEL_2);
+    tripEntity2.setProperty(Trip.END_DATE, TRIP_DAY_OF_TRAVEL_2);
+    datastore.put(tripEntity2);
+
+    // Return the User Entity Key, used to Query for the Trip Entity.
+    return userEntityKey;
+  }
+
   @Test
-  public void testDoGetResponseLoggedIn() throws Exception {
+  public void testWriteTripsToFileResponseNoTrip() throws Exception {
     // Mock request and response.  
     HttpServletRequest requestMock = mock(HttpServletRequest.class);    
     HttpServletResponse responseMock = mock(HttpServletResponse.class);
-    
-    // Create Trip Entity properties.
-    final String tripName = "Family Vacation";
-    final String destinationName = "Island of Hawai'i";
-    final String tripDayOfTravel = "2020-07-17";
-    final String photoSrc = "../images/placeholder_image.png";
-
-    // Mock UserService methods as logged-in user.
-    UserService userServiceMock = mock(UserService.class);
-    when(userServiceMock.isUserLoggedIn()).thenReturn(true);
-
-    // This is the User object from Google Appengine (full path given to avoid
-    // confusion with local User.java file).
-    when(userServiceMock.getCurrentUser()).thenReturn(
-        new com.google.appengine.api.users.User(EMAIL, AUTH_DOMAIN));
-    when(userServiceMock.createLogoutURL(AuthServlet.redirectUrl)).thenReturn(LOGOUT_URL);
-
-    // PowerMock static getUserService() method, which is used to get the user.
-    PowerMockito.mockStatic(UserServiceFactory.class);
-    when(UserServiceFactory.getUserService()).thenReturn(userServiceMock);
-
-    // Run storeTripEntity(...), with the User logged in (so trip is stored).
-    tripServlet.storeTripEntity(responseMock,
-      tripName, destinationName, tripDayOfTravel, photoSrc);
 
     // Create writers to pass into the mock response object.
     StringWriter stringWriter = new StringWriter();
     PrintWriter writer = new PrintWriter(stringWriter);
     when(responseMock.getWriter()).thenReturn(writer);
 
-    // Run the UserServlet doGet(...) method with request and response mocks. 
-    userTripServlet.doGet(requestMock, responseMock); 
+    // Get the User Entity Key, and set up the database using the helper method.
+    Key userEntityKey = addCurrentUserAndNoTripDatastore();
 
-    // Create the expected JSON String outputted from the doGet(...) function.
+    // Run the UserServlet writeTripsToFile(...) method with response mock.
+    userTripServlet.writeTripsToFile(responseMock, userEntityKey); 
+
+    // Create the expected JSON String outputted from the above function.
     // The tripKey variable was copied from the output.
-    String expectedJson = "[{\"tripName\":\"Family Vacation\",\"destinationName\""
-      + ":\"Island of Hawai\\u0027i\",\"tripKey\":\"agR0ZXN0chQLEgR1c2VyGAEMCxIEdHJpcBgCDA"
-      + "\",\"imageSrc\":\"../images/placeholder_image.png"
-      + "\",\"startDate\":{\"year\":2020,\"month\":7,\"day\":17},\"endDate\""
-      + ":{\"year\":2020,\"month\":7,\"day\":17},\"numDays\":1}]";
+    String expectedJson = "[]";
 
     writer.flush(); // Flush the writer.
     Assert.assertTrue(stringWriter.toString().contains(expectedJson));
   }
 
   @Test
-  public void testDoGetResponseNotLoggedIn() throws Exception {
+  public void testWriteTripsToFileResponseOneTrip() throws Exception {
     // Mock request and response.  
     HttpServletRequest requestMock = mock(HttpServletRequest.class);    
     HttpServletResponse responseMock = mock(HttpServletResponse.class);
-    
-    // Create Trip Entity properties.
-    final String tripName = "Family Vacation";
-    final String destinationName = "Island of Hawai'i";
-    final String tripDayOfTravel = "2020-07-17";
-    final String photoSrc = "../images/placeholder_image.png";
-
-    // Mock UserService methods as logged-in user.
-    UserService userServiceMock = mock(UserService.class);
-    when(userServiceMock.isUserLoggedIn()).thenReturn(false);
-    when(userServiceMock.createLoginURL(AuthServlet.redirectUrl)).thenReturn(LOGIN_URL);
-
-    // PowerMock static getUserService() method, which is used to get the user.
-    PowerMockito.mockStatic(UserServiceFactory.class);
-    when(UserServiceFactory.getUserService()).thenReturn(userServiceMock);
-
-    // Run storeTripEntity(...), with the User logged in (so trip is stored).
-    tripServlet.storeTripEntity(responseMock,
-      tripName, destinationName, tripDayOfTravel, photoSrc);
 
     // Create writers to pass into the mock response object.
     StringWriter stringWriter = new StringWriter();
     PrintWriter writer = new PrintWriter(stringWriter);
     when(responseMock.getWriter()).thenReturn(writer);
 
-    // Run the UserServlet doGet(...) method with request and response mocks. 
-    userTripServlet.doGet(requestMock, responseMock); 
+    // Get the User Entity Key, and set up the database using the helper method.
+    Key userEntityKey = addCurrentUserAndSingleTripDatastore();
 
-    // Create the expected JSON String outputted from the doGet(...) function (null).
-    String expectedJson = "null\n";
+    // Run the UserServlet writeTripsToFile(...) method with response mock.
+    userTripServlet.writeTripsToFile(responseMock, userEntityKey); 
+
+    // Create the expected JSON String outputted from the above function.
+    // The tripKey variable was copied from the output.
+    String expectedJson = "[{\"tripName\":\"Trip to California\",\"destinationName\"" +
+    ":\"California\",\"tripKey\":\"agR0ZXN0chQLEgR1c2VyGAEMCxIEdHJpcBgCDA\"" + 
+    ",\"imageSrc\":\"https://lh3.googleusercontent.com/p/AF1QipM7tbCZOj_5SOft9cYg" +
+    "I7un3bmieieqvdYkCPT5\\u003ds1600-w400\",\"startDate\":{\"year\":2020,\"month\"" +
+    ":2,\"day\":29},\"endDate\":{\"year\":2020,\"month\":2,\"day\":29},\"num" +
+    "Days\":1}]";
 
     writer.flush(); // Flush the writer.
-    Assert.assertEquals(expectedJson, stringWriter.toString());
+    Assert.assertTrue(stringWriter.toString().contains(expectedJson));
   }
 
+    @Test
+  public void testDoGetResponseTwoTrips() throws Exception {
+    // Mock request and response.  
+    HttpServletRequest requestMock = mock(HttpServletRequest.class);    
+    HttpServletResponse responseMock = mock(HttpServletResponse.class);
+
+    // Create writers to pass into the mock response object.
+    StringWriter stringWriter = new StringWriter();
+    PrintWriter writer = new PrintWriter(stringWriter);
+    when(responseMock.getWriter()).thenReturn(writer);
+
+    // Get the User Entity Key, and set up the database using the helper method.
+    Key userEntityKey = addCurrentUserAndTwoTripsDatastore();
+
+    // Run the UserServlet writeTripsToFile(...) method with response mock.
+    userTripServlet.writeTripsToFile(responseMock, userEntityKey); 
+
+    // Create the expected JSON String outputted from the above function.
+    // The tripKey variables were copied from the output.
+    String expectedJson = "[{\"tripName\":\"Trip to California\",\"destinationName\"" +
+    ":\"California\",\"tripKey\":\"agR0ZXN0chQLEgR1c2VyGAEMCxIEdHJpcBgCDA\"" + 
+    ",\"imageSrc\":\"https://lh3.googleusercontent.com/p/AF1QipM7tbCZOj_5SOft9cYg" +
+    "I7un3bmieieqvdYkCPT5\\u003ds1600-w400\",\"startDate\":{\"year\":2020,\"month\"" +
+    ":2,\"day\":29},\"endDate\":{\"year\":2020,\"month\":2,\"day\":29},\"num" +
+    "Days\":1},{\"tripName\":\"Family Vacation\",\"destinationName\":\"Island " +
+    "of Hawai\\u0027i\",\"tripKey\":\"agR0ZXN0chQLEgR1c2VyGAEMCxIEdHJpcBgDDA\"," +
+    "\"imageSrc\":\"../images/placeholder_image.png\",\"startDate\":{\"year\":2020" +
+    ",\"month\":7,\"day\":17},\"endDate\":{\"year\":2020,\"month\":7,\"day\":17}" +
+    ",\"numDays\":1}]";
+
+    writer.flush(); // Flush the writer.
+    Assert.assertTrue(stringWriter.toString().contains(expectedJson));
+  }
 }

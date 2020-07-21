@@ -17,6 +17,7 @@ package com.google.sps.servlets;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.FetchOptions;
 import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
@@ -29,8 +30,8 @@ import com.google.gson.Gson;
 import com.google.sps.data.User;
 import com.google.sps.Trip;
 import java.io.IOException;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -53,9 +54,24 @@ public class UserTripServlet extends HttpServlet {
       return;
     }
 
+    // Write the list of Trips to file through the HttpServletResponse object.
+    writeTripsToFile(response, userEntity.getKey());
+  }
+
+  /**
+   * Retrieve the list of Trips from datastore using the User Entity Key, and 
+   * write the Trips to file using the HttpServletResponse object.
+   *
+   * @param response The HttpServletResponse object which is used to write the
+   * Trips to the file. Must be non-null.
+   * @param userEntityKey The Key of the User Entity which is currently signed 
+   * in; this User Entity should be the ancestor / parent of the Trip Entity
+   * objects. Must be non-null.
+   */
+  public void writeTripsToFile(HttpServletResponse response, Key userEntityKey) throws IOException {
     // Get the list of Trip Entity objects through a Query.
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-    Query query = new Query(Trip.TRIP, userEntity.getKey());
+    Query query = new Query(Trip.TRIP, userEntityKey);
     PreparedQuery results = datastore.prepare(query);
 
     // Iterate over the trip Entity objects, and convert them to Trip objects.
