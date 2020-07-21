@@ -57,12 +57,12 @@ public class CalendarServlet extends HttpServlet {
     Entity userEntity = AuthServlet.getCurrentUserEntity();
 
     // if no user Entity return home
-    if (userEntity == null) {
-      response.getWriter().println("No current User");
-      response.sendRedirect("/");
-    } else if (!request.getParameterMap().containsKey("tripKey")){
+    if (!request.getParameterMap().containsKey("tripKey")){
       response.getWriter().println("No trip Key");
       response.sendRedirect("/trips/");
+    } else if (userEntity == null) {
+      response.getWriter().println("No current User");
+      response.sendRedirect("/");
     } else { 
       String stringTripKey = request.getParameter("tripKey");
       Key tripKey = KeyFactory.stringToKey(stringTripKey);

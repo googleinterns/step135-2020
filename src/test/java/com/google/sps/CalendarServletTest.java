@@ -144,6 +144,11 @@ public final class CalendarServletTest {
     HttpServletRequest request = mock(HttpServletRequest.class);       
     HttpServletResponse response = mock(HttpServletResponse.class);  
 
+    Map<String, String[]> mockMap = new HashMap<>();
+    String[] emptyArr = new String[1];
+    mockMap.put("tripKey", emptyArr);
+    when(request.getParameterMap()).thenReturn(mockMap);
+
     // Create writers to check against actual output.
     StringWriter stringWriter = new StringWriter();
     PrintWriter writer = new PrintWriter(stringWriter);
@@ -175,7 +180,7 @@ public final class CalendarServletTest {
 
     calendarServlet.doGet(request, response);
 
-    String expectedJson = "No current User";
+    String expectedJson = "No trip Key";
     Assert.assertTrue(stringWriter.toString().contains(expectedJson));
   }
 }
