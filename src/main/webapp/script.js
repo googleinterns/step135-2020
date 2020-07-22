@@ -75,7 +75,7 @@ function displaySignInPage() {
 // User is signed in, show the start trip homepage.
 function displayStartTripDesign() {
   // Set the width of the content container.
-  setContentWidth('800px');
+  setContentWidth('1100px');
 
   // Remove background image id from body.
   document.body.removeAttribute('id');

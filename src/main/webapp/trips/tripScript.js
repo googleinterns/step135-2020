@@ -20,7 +20,7 @@
 // Triggered upon DOM load.
 $(document).ready(() => {
   // Set the content width of the site.
-  setContentWidth('800px');
+  setContentWidth('1100px');
 
   // Add the trip cards to the site.
   getAndAddTripCards();

@@ -13,6 +13,7 @@
 }
 
 #content {
+  width: 1100px;
   margin-left: auto;
   margin-right: auto;
   line-height: 1.1;
@@ -77,8 +78,17 @@
 }
 
 #mapsContent {
+  width: 1100px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 20px;
+  line-height: 1.1;
   overflow: hidden;
   text-align: center;
+}
+
+#mapsTitle {
+  margin-bottom: 10px;
 }
 
 #index-start-trip-block {
@@ -91,22 +101,11 @@
   background-color: #333;
 }
 
-#header-title {
-  line-height: 1.4;
-}
-
-.header-child {
-  color: white;
-  margin: 10px 0;
-  padding: 10px 20px;
-}
-
-.float-left {
-  float: left;
-}
-
-.float-right {
-  float: right;
+#header-text-container {
+  width: 1100px;
+  display: flex;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 #trips-container {
@@ -144,10 +143,45 @@
   font-family: 'leckerli-one';
 }
 
+.nav-item {
+  margin: 0 10px;
+}
+
 .card {
-  width: 15rem;
+  width: 18rem;
 }
 
 .trip-button {
   margin-right: 5px;
+}
+
+@media screen and (max-width: 1100px) {
+  #content, #header-text-container, #mapsContent {
+    width: auto !important;
+  }
+
+  #content {
+    margin: 0 20px;
+  }
+}
+
+#site-title {
+  margin: 10px 0;
+}
+
+#site-description {
+  margin: 10px 0;
+}
+
+#startTripForm {
+  display: inline-block;
+  margin: 10px 0px;
+  padding: 20px 20px;
+  border-radius: 5px;
+  box-shadow: 0 1px 5px 0 rgba(0, 0, 0, 0.15);
+  transition: all 1s;
+}
+
+#startTripForm:hover {
+  box-shadow: 0 1px 6px 0 rgba(0, 0, 0, 0.2);
 }

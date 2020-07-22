@@ -6,21 +6,36 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" 
       integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="style.css">
     <script src="config.js"></script>
     <script src="script.js"></script>
   </head>
   <body>
-    <div id="content">
-      <div id="header">
-        <a href="/"><h3 class="header-child float-left" id="header-title">TravIS</h3></a>
-        <div class="header-child float-right">
-          <a class="btn btn-primary" id="sign-out-link">Sign out</a>
-        </div>
-        <div class="header-child float-right">
-          <a class="btn btn-primary" href="/trips/">Trips</a>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark" id="header">
+      <div id="header-text-container">
+        <a class="navbar-brand" href="/" id="navbar-title">TravIS</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarText">
+          <ul class="nav navbar-nav navbar-right ml-auto">
+            <li class="nav-item active">
+              <a class="nav-link" href="/">Start Trip <span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/trips/">Trips</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" id="sign-out-link">Sign out</a>
+            </li>
+          </ul>
         </div>
       </div>
+    </nav>
+    <div id="content">
       <div id="index-registration-block">
         <h1 class="index-registration-block-child">TravIS: Travel Information System</h1>
         <p class="index-registration-block-child" id="index-registration-block-p">
@@ -30,6 +45,10 @@
         <a class="index-registration-block-child btn btn-primary" id="sign-in-link">Sign in</a>
       </div>
       <div id="index-start-trip-block">
+        <h2 id="site-title">Start a New Trip</h2>
+        <p id="site-description">
+          Create a specialized itinerary for your trip.
+        </p>
         <form action="/calculate-trip" method="POST" id="startTripForm">
           <div class="form-row">
             <div class="form-group col-md-3">
