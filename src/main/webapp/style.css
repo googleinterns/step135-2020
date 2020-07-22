@@ -143,3 +143,11 @@
   font-size: 2em;
   font-family: 'leckerli-one';
 }
+
+.card {
+  width: 15rem;
+}
+
+.trip-button {
+  margin-right: 5px;
+}
