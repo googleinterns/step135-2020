@@ -77,9 +77,7 @@ function getEvents(calendar) {
  * function that initializes map for popup, w specific address as marker
  */
 function createMap(modalBody, eventObj) {
-  console.log("1");
   var geocoder = new google.maps.Geocoder();
-  console.log("2");
   var coords;
 
   // text to dispaly in popover
@@ -94,11 +92,8 @@ function createMap(modalBody, eventObj) {
   mapDis.id = 'map'
   modalBody.appendChild(mapDis);
 
-  console.log("3");
-  geocoder.geocode({ address: eventObj.extendedProps.address}, function(results, status) {
-    console.log("4");
+  geocoder.geocode({ placeId: eventObj.extendedProps.address}, function(results, status) {
     if (status == google.maps.GeocoderStatus.OK) {
-      console.log("5");
       var latitude = results[0].geometry.location.lat();
       var longitude = results[0].geometry.location.lng();
       coords = {lat: latitude, lng: longitude};
