@@ -13,7 +13,7 @@
 // limitations under the License.
 
 let script = document.createElement('script');
-script.src = 'https://maps.googleapis.com/maps/api/js?key=' + config.API_KEY + '&callback=initMod&libraries=&v=weekly';
+script.src = 'https://maps.googleapis.com/maps/api/js?key=' + config.API_KEY + '&libraries=geometry,places&callback=initMod';
 // 'https://maps.googleapis.com/maps/api/js?key=' + config.API_KEY + 
   //'&libraries=&callback=initMod';
 script.defer = true;
@@ -95,7 +95,7 @@ function createMap(modalBody, eventObj) {
   modalBody.appendChild(mapDis);
 
   console.log("3");
-  geocoder.geocode({ 'address': eventObj.extendedProps.address}, function(results, status) {
+  geocoder.geocode({ address: eventObj.extendedProps.address}, function(results, status) {
     console.log("4");
     if (status == google.maps.GeocoderStatus.OK) {
       console.log("5");
