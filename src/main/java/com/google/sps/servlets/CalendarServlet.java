@@ -56,8 +56,10 @@ public class CalendarServlet extends HttpServlet {
     // get current user
     Entity userEntity = AuthServlet.getCurrentUserEntity();
 
+    System.err.println(request.getParameter("tripKey"));
+
     // if no user Entity return home
-    if (!request.getParameterMap().containsKey("tripKey")){
+    if (request.getParameter("tripKey") == null ){
       response.getWriter().println("No trip Key");
       response.sendRedirect("/trips/");
     } else if (userEntity == null) {
@@ -66,6 +68,7 @@ public class CalendarServlet extends HttpServlet {
     } else { 
       String stringTripKey = request.getParameter("tripKey");
       Key tripKey = KeyFactory.stringToKey(stringTripKey);
+      System.err.println(tripKey.toString());
 
       // gets the events from datastore and writes them to .../get-calendar
       doGetEvents(response, datastore, userEntity, tripKey);

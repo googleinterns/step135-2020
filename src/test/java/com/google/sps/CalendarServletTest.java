@@ -19,6 +19,12 @@ import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.KeyFactory;
+import com.google.appengine.api.datastore.PreparedQuery;
+import com.google.appengine.api.datastore.Query;
+import com.google.appengine.api.datastore.Query.Filter;
+import com.google.appengine.api.datastore.Query.FilterOperator;
+import com.google.appengine.api.datastore.Query.FilterPredicate;
 import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
 import com.google.sps.data.Event;
@@ -33,7 +39,9 @@ import java.time.LocalTime;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import org.junit.After;
 import org.junit.Assert;
@@ -144,10 +152,7 @@ public final class CalendarServletTest {
     HttpServletRequest request = mock(HttpServletRequest.class);       
     HttpServletResponse response = mock(HttpServletResponse.class);  
 
-    Map<String, String[]> mockMap = new HashMap<>();
-    String[] emptyArr = new String[1];
-    mockMap.put("tripKey", emptyArr);
-    when(request.getParameterMap()).thenReturn(mockMap);
+    when(request.getParameter("tripKey")).thenReturn("true");
 
     // Create writers to check against actual output.
     StringWriter stringWriter = new StringWriter();
@@ -164,7 +169,6 @@ public final class CalendarServletTest {
   public void testNoTripKeyPassedIn() throws Exception {
     HttpServletRequest request = mock(HttpServletRequest.class);       
     HttpServletResponse response = mock(HttpServletResponse.class); 
-    when(request.getParameterMap()).thenReturn(new HashMap<>());
 
     // Create writers to check against actual output.
     StringWriter stringWriter = new StringWriter();

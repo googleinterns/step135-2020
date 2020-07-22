@@ -33,7 +33,11 @@ $(document).ready(() => {
  * retrives the events from /calculate-trip url and dynamically adds the events
  */
 function getEvents(calendar) {
-  fetch('/get-calendar').then(response => response.json()).then((events) => {
+  const urlParams = new URLSearchParams(window.location.search);
+  const tripKey = urlParams.get('tripKey');
+  const tripKeyQuery = (tripKey != null && tripKey != '') ? '?tripKey=' + tripKey : '';
+
+  fetch('/get-calendar' + tripKeyQuery).then(response => response.json()).then((events) => {
     events.forEach((event) => {
       calendar.addEvent({     
         title: event.name,
