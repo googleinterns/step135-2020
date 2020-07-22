@@ -133,3 +133,13 @@
 #suggested-location-block-header {
   margin-top: 15px;
 }
+
+@font-face {
+  font-family: 'leckerli-one';
+  src: url('fonts/LeckerliOne-Regular.ttf') format('truetype')
+}
+
+#navbar-title {
+  font-size: 2em;
+  font-family: 'leckerli-one';
+}

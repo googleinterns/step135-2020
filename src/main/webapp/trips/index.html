@@ -14,47 +14,28 @@
     <script src="../authScript.js"></script>
   </head>
   <body>
+    
     <div id="content">
-      <nav class="navbar navbar-dark bg-dark">
-        <a class="navbar-brand" href="#">
-          <img src="../images/placeholder_image.png" width="30" height="30" class="d-inline-block align-top" alt="">
-        </a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <nav class="header navbar navbar-expand-lg navbar-dark bg-dark">
+        <a class="navbar-brand" href="#" id="navbar-title">TravIS</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-          <ul class="navbar-nav">
+        <div class="collapse navbar-collapse" id="navbarText">
+          <ul class="nav navbar-nav navbar-right ml-auto">
             <li class="nav-item active">
-              <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+              <a class="nav-link" href="#">Trips <span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item active">
+              <a class="nav-link" href="#">About</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="#">Features</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#">Pricing</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link disabled" href="#">Disabled</a>
+              <a class="nav-link" href="#">Sign out</a>
             </li>
           </ul>
-          <span class="navbar-text">
-            Navbar text with an inline element
-          </span>
-          <span class="navbar-text">
-            Navbar text two
-          </span>
         </div>
       </nav>
       <br>
-      <div id="header">
-        <a href="/"><h3 class="header-child float-left" id="header-title">TravIS</h3></a>
-        <div class="header-child float-right">
-          <a class="btn btn-primary" id="sign-out-link">Sign out</a>
-        </div>
-        <div class="header-child float-right">
-          <a class="btn btn-primary" href="/trips/">Trips</a>
-        </div>
-      </div>
       <div id="trips-container">
         <h2>My trips</h2>
         <div id="trips-cards-container">
