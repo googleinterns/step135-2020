@@ -68,7 +68,6 @@ public class CalendarServlet extends HttpServlet {
     } else { 
       String stringTripKey = request.getParameter("tripKey");
       Key tripKey = KeyFactory.stringToKey(stringTripKey);
-      System.err.println(tripKey.toString());
 
       // gets the events from datastore and writes them to .../get-calendar
       doGetEvents(response, datastore, userEntity, tripKey);
@@ -115,3 +114,5 @@ public class CalendarServlet extends HttpServlet {
     return json;
   }
 }
+
+

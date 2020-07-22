@@ -73,6 +73,18 @@ public final class CalendarServletTest {
     "https://lh3.googleusercontent.com/p/AF1QipM7tbCZOj_5SOft9cYgI7un3bmieieqvdYkCPT5=s1600-w400";
   private static final String TRIP_DAY_OF_TRAVEL = "2020-02-29";
 
+  // event constants
+  private static final String DOME = "Half Dome Visor";
+  private static final String DOME_ADDRESS = "Half Dome Visor";
+  private static final LocalDateTime DOME_START_TIME = 
+      LocalDateTime.of(LocalDate.parse("2020-07-22"), LocalTime.of(11, 30));
+  private static final String YOSEMITE = "Upper Yosemite Fall";
+  private static final String YOSEMITE_ADDRESS = "Upper Yosemite Fall";
+  private static final LocalDateTime YOS_START_TIME = 
+      LocalDateTime.of(LocalDate.parse("2020-07-22"), LocalTime.of(10, 00));
+
+
+
   private final LocalServiceTestHelper helper =
       new LocalServiceTestHelper(new LocalDatastoreServiceTestConfig());
 
@@ -127,22 +139,32 @@ public final class CalendarServletTest {
     datastore.put(tripDayEntity);
 
     // create event entity and put it into datastore
-    Event e = new Event(TEST_NAME, EMPIRE_ADDRESS, DEF_START_TIME, HALF_HOUR);
-    Entity event = e.eventToEntity(tripDayEntity.getKey());
-    datastore.put(event);
+    Event e1 = new Event(DOME, DOME_ADDRESS, DOME_START_TIME, HALF_HOUR);
+    Entity event1 = e1.eventToEntity(tripDayEntity.getKey());
+    datastore.put(event1);
+
+    Event e2 = new Event(YOSEMITE, YOSEMITE_ADDRESS, YOS_START_TIME, HALF_HOUR);
+    Entity event2 = e2.eventToEntity(tripDayEntity.getKey());
+    datastore.put(event2);
 
     // run do Get
     calendarServlet.doGetEvents(response, datastore, userEntity, tripEntity.getKey());
 
-    // create expected JSON array
-    String expectedJson = "[{\"name\":\"testName\",\"address\":\"20 W 34th St, New York, NY 10001\"," + 
-            "\"startTime\":{\"date\":{\"year\":2020,\"month\":7,\"day\":15}," + 
+    String expectedJson = "[{\"name\":\"Half Dome Visor\",\"address\":\"Half Dome Visor\"," + 
+            "\"startTime\":{\"date\":{\"year\":2020,\"month\":7,\"day\":22}," + 
+            "\"time\":{\"hour\":11,\"minute\":30,\"second\":0,\"nano\":0}}," + 
+            "\"endTime\":{\"date\":{\"year\":2020,\"month\":7,\"day\":22}," +
+            "\"time\":{\"hour\":12,\"minute\":30,\"second\":0,\"nano\":0}}," +
+            "\"strStartTime\":\"2020-07-22T11:30:00\",\"strEndTime\":\"2020-07-22T12:30:00\"," +
+            "\"travelTime\":30}," +
+            "{\"name\":\"Upper Yosemite Fall\",\"address\":\"Upper Yosemite Fall\"," +
+            "\"startTime\":{\"date\":{\"year\":2020,\"month\":7,\"day\":22}," + 
             "\"time\":{\"hour\":10,\"minute\":0,\"second\":0,\"nano\":0}}," + 
-            "\"endTime\":{\"date\":{\"year\":2020,\"month\":7,\"day\":15}," +
+            "\"endTime\":{\"date\":{\"year\":2020,\"month\":7,\"day\":22}," +
             "\"time\":{\"hour\":11,\"minute\":0,\"second\":0,\"nano\":0}}," +
-            "\"strStartTime\":\"2020-07-15T10:00:00\",\"strEndTime\":\"2020-07-15T11:00:00\"," +
+            "\"strStartTime\":\"2020-07-22T10:00:00\",\"strEndTime\":\"2020-07-22T11:00:00\"," +
             "\"travelTime\":30}]";
-
+    
     writer.flush();
     Assert.assertTrue(stringWriter.toString().contains(expectedJson));
   }
