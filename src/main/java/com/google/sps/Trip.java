@@ -16,6 +16,7 @@ package com.google.sps;
 
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.KeyFactory;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -130,6 +131,24 @@ public class Trip {
     tripEntity.setProperty(START_DATE, startDate);
     tripEntity.setProperty(END_DATE, endDate);
     return tripEntity;
+  }
+
+  /**
+   * Build and return a Trip object from the Entity.
+   *
+   * @param tripEntity An Entity of the type "trip" with the properties trip
+   * name, destination name, image source, start date, and end date.
+   */
+  public static Trip buildTripFromEntity(Entity tripEntity) {
+    String tripName = (String) tripEntity.getProperty(TRIP_NAME);
+    String destinationName = (String) tripEntity.getProperty(DESTINATION_NAME);
+    String tripKey = KeyFactory.keyToString(tripEntity.getKey());
+    String imageSrc = (String) tripEntity.getProperty(IMAGE_SRC);
+    String startDate = (String) tripEntity.getProperty(START_DATE);
+    String endDate = (String) tripEntity.getProperty(END_DATE);
+    Trip trip = new Trip(tripName, destinationName, tripKey, imageSrc, 
+      startDate, endDate);
+    return trip;
   }
 
   /**
