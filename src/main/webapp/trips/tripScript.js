@@ -92,11 +92,17 @@ function buildTripCard(tripTitle, destinationName, imageSrc, startDate, endDate,
   mapsButton.href = '../maps.html?tripKey=' + tripKey;
   mapsButton.innerText = 'Maps';
 
+  const editButton = document.createElement('a');
+  editButton.className = 'btn btn-primary trip-button';
+  editButton.href = '../edit.html?tripKey=' + tripKey;
+  editButton.innerText = 'Edit';
+
   // Add the body elements to the card body container.
   cardBodyContainer.appendChild(titleElement);
   cardBodyContainer.appendChild(datesDestinationElement);
   cardBodyContainer.appendChild(calendarButton);
   cardBodyContainer.appendChild(mapsButton);
+  cardBodyContainer.appendChild(editButton);
 
   // Add the trip image and card body to the card container.
   cardContainer.appendChild(tripImage);
