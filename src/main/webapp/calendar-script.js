@@ -27,6 +27,7 @@ $(document).ready(() => {
   });
   getEvents(calendar);
   calendar.render();
+  createGroupNavLinks();
 });
 
 /**
@@ -43,4 +44,24 @@ function getEvents(calendar) {
       });
     });
   });
+}
+
+/**
+ * Create the group nav links for the calendar, maps, and edit pages.
+ */
+function createGroupNavLinks() {
+  // Get the calendar, maps, and edit button links.
+  const calendarButton = document.getElementById('button-group-nav-calendar');
+  const mapsButton = document.getElementById('button-group-nav-maps');
+  const editButton = document.getElementById('button-group-nav-edit');
+
+  // Get the tripKey from the URL to add to the button links.
+  const urlParams = new URLSearchParams(window.location.search);
+  const tripKey = urlParams.get('tripKey');
+  const tripKeyQuery = (tripKey != null && tripKey != '') ? '?tripKey=' + tripKey : '';
+
+  // Add the href links to the buttons.
+  calendarButton.href = '/calendar.html' + tripKeyQuery;
+  mapsButton.href = '/maps.html' + tripKeyQuery;
+  editButton.href = '/edit.html' + tripKeyQuery;
 }
