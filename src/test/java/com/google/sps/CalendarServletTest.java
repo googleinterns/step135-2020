@@ -58,6 +58,7 @@ public final class CalendarServletTest {
   // class constants
   private static final String INPUT_DESTINATION = 
       "4265 24th Street San Francisco, CA, 94114";
+  private static final String INPUT_DESTINATION2 = "testDest";
   private static final String INPUT_DATE = "2020-07-15";
   private static final String TEST_NAME = "testName";
   private static final String EMPIRE_ADDRESS = "20 W 34th St, New York, NY 10001";
@@ -104,7 +105,7 @@ public final class CalendarServletTest {
   }
 
   @Test
-  public void testWriteEventsCorrectly() throws Exception {
+  public void testWriteEventsMulTripDays() throws Exception {
     HttpServletRequest request = mock(HttpServletRequest.class);       
     HttpServletResponse response = mock(HttpServletResponse.class);    
 
@@ -131,20 +132,26 @@ public final class CalendarServletTest {
     tripEntity.setProperty(Trip.END_DATE, TRIP_DAY_OF_TRAVEL);
     datastore.put(tripEntity);
 
-    // create tripDay entity, needed for put events in datastore
-    Entity tripDayEntity = new Entity(TripDay.QUERY_STRING, tripEntity.getKey());
-    tripDayEntity.setProperty("origin", INPUT_DESTINATION);
-    tripDayEntity.setProperty("destination", INPUT_DESTINATION);
-    tripDayEntity.setProperty("date", INPUT_DATE);
-    datastore.put(tripDayEntity);
+    // create tripDay entities, needed for put events in datastore
+    Entity tripDayEntity1 = new Entity(TripDay.QUERY_STRING, tripEntity.getKey());
+    tripDayEntity1.setProperty("origin", INPUT_DESTINATION);
+    tripDayEntity1.setProperty("destination", INPUT_DESTINATION);
+    tripDayEntity1.setProperty("date", INPUT_DATE);
+    datastore.put(tripDayEntity1);
 
-    // create event entity and put it into datastore
+    Entity tripDayEntity2 = new Entity(TripDay.QUERY_STRING, tripEntity.getKey());
+    tripDayEntity2.setProperty("origin", INPUT_DESTINATION2);
+    tripDayEntity2.setProperty("destination", INPUT_DESTINATION2);
+    tripDayEntity2.setProperty("date", INPUT_DATE);
+    datastore.put(tripDayEntity2);
+
+    // create event entities and put it into datastore
     Event e1 = new Event(DOME, DOME_ADDRESS, DOME_START_TIME, HALF_HOUR);
-    Entity event1 = e1.eventToEntity(tripDayEntity.getKey());
+    Entity event1 = e1.eventToEntity(tripDayEntity1.getKey());
     datastore.put(event1);
 
     Event e2 = new Event(YOSEMITE, YOSEMITE_ADDRESS, YOS_START_TIME, HALF_HOUR);
-    Entity event2 = e2.eventToEntity(tripDayEntity.getKey());
+    Entity event2 = e2.eventToEntity(tripDayEntity2.getKey());
     datastore.put(event2);
 
     // run do Get
