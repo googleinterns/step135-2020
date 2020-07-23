@@ -56,8 +56,6 @@ public class CalendarServlet extends HttpServlet {
     // get current user
     Entity userEntity = AuthServlet.getCurrentUserEntity();
 
-    System.err.println(request.getParameter("tripKey"));
-
     // if no user Entity return home
     if (request.getParameter("tripKey") == null ){
       response.getWriter().println("No trip Key");
