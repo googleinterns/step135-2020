@@ -26,7 +26,7 @@ var directionsRenderer;
 // Attach callback function to the `window` object
 window.initMap = function() {
   // Manhattan coords
-  const coords = {lat: 40.771, lng: -73.974};
+  const coords = {lat: 0, lng: 0};
 
   // Create map centered on Manhattan
   map = new google.maps.Map(
@@ -50,6 +50,11 @@ window.initMap = function() {
   let worldTradeID = 'ChIJy7cGfBlawokR5l2e93hsoEA';
   let empireStateID = 'ChIJtcaxrqlZwokRfwmmibzPsTU';
   let hotelID = 'ChIJ68J3tfpYwokR2HaRoBcB4xg';
+
+  // let locations = getLocations();
+
+  // let origin = locations[0];
+  // console.log(origin);
 
   let waypts = [{location : {'placeId': worldTradeID}},
                 {location : {'placeId': empireStateID}},
@@ -77,3 +82,7 @@ window.initMap = function() {
 
 // Append the 'script' element to 'head'
 document.head.appendChild(script);
+
+function getLocations() {
+  fetch('/get-map').then(response => response.json()).then(locations);
+}
