@@ -23,6 +23,7 @@ import com.google.appengine.api.datastore.Query;
 import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
 import com.google.sps.data.Event;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -71,17 +72,17 @@ public final class EventTest {
   }
 
   @Test(expected = IllegalArgumentException.class)
-  public void testTravelTimeBelowMinPossible() {
+  public void testTravelTimeBelowMinPossible()  throws IOException {
     Event e = new Event (GOLDEN_GATE_PARK, ADDRESS, DEF_LDT, -1, HOUR);
   }
 
   @Test(expected = IllegalArgumentException.class)
-  public void testCheckTravelTimeGreaterThanFullDay() {
+  public void testCheckTravelTimeGreaterThanFullDay() throws IOException {
     Event e = new Event (GOLDEN_GATE_PARK, ADDRESS, DEF_LDT, 1440, HOUR);
   }
 
   @Test
-  public void testConstructorManualTimeSpent() {
+  public void testConstructorManualTimeSpent() throws IOException {
     // clarifying inputs
     int timeAtLocation = 80;
     LocalDateTime manualEndTime = LocalDateTime.of(
@@ -103,7 +104,7 @@ public final class EventTest {
   }
 
    @Test
-  public void testConstructorDefaultTimeSpent() {
+  public void testConstructorDefaultTimeSpent() throws IOException  {
     // clarifying inputs
     LocalDateTime manualEndTime = LocalDateTime.of(
                           LocalDate.parse("2020-06-25"), LocalTime.of(11, 0));
@@ -123,7 +124,7 @@ public final class EventTest {
   }
 
    @Test
-  public void testEventToEntityCorrectParent() {
+  public void testEventToEntityCorrectParent() throws IOException {
     // initialize datastore
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 
@@ -148,7 +149,7 @@ public final class EventTest {
   }
 
    @Test
-  public void testEventFromEntity() {
+  public void testEventFromEntity() throws IOException {
     // create eventEntity
     Entity eventEntity = new Entity(Event.QUERY_STRING);
     eventEntity.setProperty("name", GOLDEN_GATE_PARK);

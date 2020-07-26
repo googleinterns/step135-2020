@@ -16,6 +16,15 @@ package com.google.sps.data;
 
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.Key;
+import com.google.maps.model.FindPlaceFromText;
+import com.google.maps.errors.ApiException;
+import com.google.maps.FindPlaceFromTextRequest;
+import com.google.maps.GeoApiContext;
+import com.google.maps.PlaceDetailsRequest;
+import com.google.maps.PlacesApi;
+import com.google.maps.model.FindPlaceFromText;
+import com.google.maps.model.PlaceDetails;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -26,11 +35,15 @@ import java.time.format.DateTimeFormatter;
  */
 public class Event {
  
+  // Create the GeoApiContext object.
+  private GeoApiContext context;
+
   // inputs
   private String name;
   private String address;
   private LocalDateTime startTime;
   private LocalDateTime endTime;
+  private String placeId;
 
   /**
    * format (yyyy-MM-dd'T'HH:mm:ss)
@@ -54,9 +67,16 @@ public class Event {
   private static final String DATE = "date";
   private static final String START_TIME = "start-time";
   private static final String TRAVEL_TIME = "travel-time";
+  private static final String PLACE_ID = "place-id";
 
   // query string
   public static final String QUERY_STRING = "event";
+
+  public void init() {
+    this.context = new GeoApiContext.Builder()
+      .apiKey(Config.API_KEY)
+      .build();
+  }
 
   /**
    * Constructor that takes in time spent at location
@@ -69,7 +89,8 @@ public class Event {
    * @param timeAtLocation time spent at POI (minutes)
    */
   public Event(String name, String address, LocalDateTime startTime, 
-              int travelTime, int timeAtLocation) {
+              int travelTime, int timeAtLocation) throws IOException {
+    init();
     this.name = name;
     this.address = address;
     this.startTime = startTime;
@@ -78,6 +99,8 @@ public class Event {
     checkTravelTime(this.travelTime);
     this.strStartTime = DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(startTime);
     this.strEndTime = DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(endTime);
+    this.placeId = getPlaceIdFromTextSearch(this.context, this.address);
+    System.out.println(this.placeId);
   }
 
   /**
@@ -90,7 +113,7 @@ public class Event {
    *        Null if last location of the day.
    */
   public Event(String name, String address, LocalDateTime startTime, 
-              int travelTime) {
+              int travelTime) throws IOException {
     this(name, address, startTime, travelTime, HOUR);
   }
 
@@ -122,13 +145,14 @@ public class Event {
     eventEntity.setProperty(START_TIME, 
                   DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(startTime));
     eventEntity.setProperty(TRAVEL_TIME, Long.toString(this.travelTime));
+    eventEntity.setProperty(PLACE_ID, this.placeId);
     return eventEntity;
   } 
 
   /**
    * Build event from entity
    */
-  public static Event eventFromEntity(Entity eventEntity) {
+  public static Event eventFromEntity(Entity eventEntity) throws IOException {
     String name = (String) eventEntity.getProperty(NAME);
     String address = (String) eventEntity.getProperty(ADDRESS);
     String startDateTimeStr = (String) eventEntity.getProperty(START_TIME);
@@ -157,5 +181,35 @@ public class Event {
 
   public long getTravelTime() {
     return this.travelTime;
+  }
+
+  /**
+   * Get the place ID of the text search. Return null if no place ID matches
+   * the search.
+   * 
+   * @param context The entry point for making requests against the Google Geo 
+   * APIs (googlemaps.github.io/google-maps-services-java/v0.1.2/javadoc/com/google/maps/GeoApiContext.html).
+   * @param textSearch The text query to be entered in the findPlaceFromText(...)
+   * API call. Must be non-null.
+   */ 
+  public String getPlaceIdFromTextSearch(GeoApiContext context, String textSearch) 
+    throws IOException {
+
+    FindPlaceFromTextRequest findPlaceRequest = PlacesApi.findPlaceFromText(context, 
+      textSearch, FindPlaceFromTextRequest.InputType.TEXT_QUERY);
+
+    try {
+      FindPlaceFromText findPlaceResult = findPlaceRequest.await();
+
+      // Return place ID of the first candidate result.
+      if (findPlaceResult.candidates != null) {
+        return findPlaceResult.candidates[0].placeId;
+      }
+      
+      // No candidate is given, so return null.
+      return null;
+    } catch(ApiException | InterruptedException e) {
+      throw new IOException(e);
+    }
   }
 }

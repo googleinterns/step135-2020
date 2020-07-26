@@ -147,7 +147,6 @@ public class TripServlet extends HttpServlet {
     } catch(ApiException | InterruptedException e) {
       throw new IOException(e);
     }
-
   }
 
   /**
