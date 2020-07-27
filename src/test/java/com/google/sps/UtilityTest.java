@@ -27,7 +27,15 @@ import com.google.sps.data.User;
 import com.google.sps.Trip;
 import com.google.sps.TripDay;
 import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
+@RunWith(PowerMockRunner.class)
+@PrepareForTest(UserServiceFactory.class)
 public class UtilityTest {
 
   // Datastore field variable, used to place and retrieve items to / from Datastore.
