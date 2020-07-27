@@ -14,6 +14,7 @@
 
 package com.google.sps;
 
+import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.Key;
 import java.time.LocalDate;
@@ -36,6 +37,11 @@ public class TripDay {
   
   // query string
   public static final String QUERY_STRING = "trip-day";
+
+  // constants for entity construction
+  public static final String LOCATION_ENTITY_TYPE = "location";
+  public static final String NAME = "name";
+  public static final String ORDER = "order";
 
   /**
    * Creates a new TripDay.
@@ -93,17 +99,41 @@ public class TripDay {
    * Returns a List<String> copy of locations for this TripDay.
    */
   public List<String> getLocations() {
-    List<String> locationsCopy = new ArrayList<>();
-    locationsCopy.addAll(this.locations);
-    return locationsCopy;
+    return new ArrayList<>(this.locations);
   }
 
   /**
-   * Add locations
+   * Build location entities to be put in datastore. 
+   * @param locations ArrayList of locations (in optimized order) as strings
+   * @param parentKeyId Key of TripDay entity that these locations are a part of  
+   */
+  public static List<Entity> locationsToEntities(List<String> locations, Key parentKeyId) {
+    List<Entity> locationEntities = new ArrayList<>();
+    for (int i = 0; i < locations.size(); i++) {
+      Entity locationEntity = new Entity(LOCATION_ENTITY_TYPE, parentKeyId);
+      locationEntity.setProperty(NAME, locations.get(i));
+      locationEntity.setProperty(ORDER, i);
+      locationEntities.add(locationEntity);
+    }
+    return locationEntities;
+  } 
+
+  /**
+   * Store list location entities to be put in datastore.
+   * @param locationEntities ArrayList of Entities to be put in Datastore
+   * @param datastore Datastore for storing 
+   */
+  public static void storeLocationsInDatastore(List<Entity> locationEntities, DatastoreService datastore) {
+    for (Entity locationEntity : locationEntities) {
+      datastore.put(locationEntity);
+    }
+  }
+
+  /**
+   * Add/set locations
    */
   public void setLocations(ArrayList<String> locations) {
-    List<String> temp = new ArrayList<>();
-    temp.addAll(locations);
+    List<String> temp = new ArrayList<>(locations);
     this.locations = temp;
   }
 
