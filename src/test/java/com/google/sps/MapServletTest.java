@@ -43,15 +43,13 @@ public final class MapServletTest {
 
   private MapServlet mapServlet;
 
-  // class constants
-  private static final String INPUT_DESTINATION = 
-      "4265 24th Street San Francisco, CA, 94114";
-  private static final String INPUT_DATE = "2020-07-15";
+  // User constants
   private static final String EMAIL = "test123@gmail.com";
 
   // Constants to represent different Trip attributes.
   private static final String TRIP_NAME = "Trip to California";
-  private static final String DESTINATION_NAME = "California";
+  private static final String INPUT_DESTINATION = 
+      "4265 24th Street San Francisco, CA, 94114";
   private static final String IMAGE_SRC =
     "https://lh3.googleusercontent.com/p/AF1QipM7tbCZOj_5SOft9cYgI7un3bmieieqvdYkCPT5=s1600-w400";
   private static final String TRIP_DAY_OF_TRAVEL = "2020-02-29";
@@ -103,7 +101,7 @@ public final class MapServletTest {
     // Add a single Trip to Datastore with the User Entity Key.
     Entity tripEntity = new Entity(Trip.TRIP, userEntityKey);
     tripEntity.setProperty(Trip.TRIP_NAME, TRIP_NAME);
-    tripEntity.setProperty(Trip.DESTINATION_NAME, DESTINATION_NAME);
+    tripEntity.setProperty(Trip.DESTINATION_NAME, INPUT_DESTINATION);
     tripEntity.setProperty(Trip.IMAGE_SRC, IMAGE_SRC);
     tripEntity.setProperty(Trip.START_DATE, TRIP_DAY_OF_TRAVEL);
     tripEntity.setProperty(Trip.END_DATE, TRIP_DAY_OF_TRAVEL);
@@ -113,7 +111,7 @@ public final class MapServletTest {
     Entity tripDayEntity = new Entity(TripDay.QUERY_STRING, tripEntity.getKey());
     tripDayEntity.setProperty("origin", INPUT_DESTINATION);
     tripDayEntity.setProperty("destination", INPUT_DESTINATION);
-    tripDayEntity.setProperty("date", INPUT_DATE);
+    tripDayEntity.setProperty("date", TRIP_DAY_OF_TRAVEL);
     datastore.put(tripDayEntity);
 
     // create location entities and put it into datastore
@@ -130,6 +128,8 @@ public final class MapServletTest {
     // run do Get
     mapServlet.doGetMap(response, datastore, userEntity, tripEntity.getKey());
 
+    // even though DomeEntity is added first, its order property is 1 so it should appear 
+    // after YosemiteEntity in the JSON.
     String expectedJson = "[\"" + INPUT_DESTINATION + "\",\""+YOSEMITE_ADDRESS+"\",\""+DOME_ADDRESS+"\"]";
     
     writer.flush();
