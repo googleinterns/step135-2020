@@ -25,10 +25,10 @@ var directionsRenderer;
 
 // Attach callback function to the `window` object
 window.initMap = function() {
-  // Manhattan coords
+  // initialize coords
   const coords = {lat: 0, lng: 0};
 
-  // Create map centered on Manhattan
+  // Create map centered on the (0, 0) coordinates
   map = new google.maps.Map(
       document.getElementById('routeMap'),
       {center: coords, 
@@ -44,29 +44,26 @@ window.initMap = function() {
   directionsRenderer.setMap(map);
   directionsRenderer.setPanel(document.getElementById('rightPanel'));
 
-  // Hard coded place IDs - will replace with user input
-  let timesSquareID = 'ChIJmQJIxlVYwokRLgeuocVOGVU';
-  let centralParkID = 'ChIJ4zGFAZpYwokRGUGph3Mf37k';
-  let worldTradeID = 'ChIJy7cGfBlawokR5l2e93hsoEA';
-  let empireStateID = 'ChIJtcaxrqlZwokRfwmmibzPsTU';
-  let hotelID = 'ChIJ68J3tfpYwokR2HaRoBcB4xg';
+  getLocations();
+}
 
-  // let locations = getLocations();
+function getLocations() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const tripKey = urlParams.get('tripKey');
+  const tripKeyQuery = (tripKey != null && tripKey != '') ? '?tripKey=' + tripKey : '';
+  
+  fetch('/get-map' + tripKeyQuery).then(response => response.json()).then((locations) => {
+    showDirections(locations);
+  });
+}
 
-  // let origin = locations[0];
-  // console.log(origin);
+function showDirections(locations) {
+  let origin = locations[0];
+  let waypts = [];
 
-  // let waypts = [{location : {'placeId': worldTradeID}},
-  //               {location : {'placeId': empireStateID}},
-  //               {location : {'placeId': timesSquareID}},
-  //               {location : {'placeId': centralParkID}},
-  //             ];
-
-  let waypts = [{ location : "MoPOP, 5th Avenue North, Seattle, WA, USA"},
-                                    {location : "Space Needle, Broad Street, Seattle, WA, USA"},
-                                    {location : "Alki Beach, Seattle, WA, USA"}];
-
-  let origin = "The Westin Bellevue, Bellevue Way Northeast, Bellevue, WA, USA";
+  for (let i = 1; i < locations.length; i++) {
+    waypts.push({ location : locations[i]});
+  }
 
   // Create a DirectionsRequest with hotel as start/end and 
   // POIs as waypoints (stops on the route)
@@ -88,7 +85,3 @@ window.initMap = function() {
 
 // Append the 'script' element to 'head'
 document.head.appendChild(script);
-
-// function getLocations() {
-//   fetch('/get-map').then(response => response.json()).then(locations);
-// }

@@ -80,11 +80,14 @@ public class MapServlet extends HttpServlet {
     Entity tripEntity = tripResults.asSingleEntity();
 
     Query tripDayQuery = new Query(TripDay.QUERY_STRING, tripEntity.getKey());
+
+    System.err.println(tripEntity.getKey());
     PreparedQuery tripDayResults = datastore.prepare(tripDayQuery);
 
     int tripDayIndex = 0;
 
-    Entity tripDayEntity = tripDayResults.asList(FetchOptions.Builder.withLimit(10)).get(tripDayIndex);
+    // Post-MVP: change to select the desired tripDay 
+    Entity tripDayEntity = tripDayResults.asSingleEntity();
 
     List<String> locations = new ArrayList<>();
     locations.add((String) tripDayEntity.getProperty("origin"));
