@@ -27,7 +27,6 @@ import com.google.appengine.api.datastore.Query.Filter;
 import com.google.appengine.api.datastore.Query.FilterOperator;
 import com.google.appengine.api.datastore.Query.FilterPredicate;
 import com.google.gson.Gson;
-import com.google.sps.data.Event;
 import com.google.sps.Trip;
 import com.google.sps.TripDay;
 import java.io.IOException;
@@ -40,19 +39,28 @@ import javax.servlet.http.HttpServletResponse;
 
 @WebServlet("/get-map")
 public class MapServlet extends HttpServlet {
+
+  /**
+   * Checks for invalid cases (no user or tripKey).
+   * Gets the locations from datastore and prints them to writer.
+   */  
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) 
       throws IOException {
     response.setContentType("application/json;");
+
+    // Initialize Datastore
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 
-    // get current user
+    // Get current user
     Entity userEntity = AuthServlet.getCurrentUserEntity();
 
-    // if no user Entity return home
+    // if no tripKey return to trips page
     if (request.getParameter("tripKey") == null ){
       response.getWriter().println("No trip Key");
       response.sendRedirect("/trips/");
+  
+    // if no user Entity return home
     } else if (userEntity == null) {
       response.getWriter().println("No current User");
       response.sendRedirect("/");
@@ -60,37 +68,36 @@ public class MapServlet extends HttpServlet {
       String stringTripKey = request.getParameter("tripKey");
       Key tripKey = KeyFactory.stringToKey(stringTripKey);
 
-      // gets the locations from datastore and writes them to .../get-map
+      // Gets the locations from datastore and writes them to .../get-map
       doGetMap(response, datastore, userEntity, tripKey);
     }
   }
 
   /**
-   * Gets the events and prints them to writer, necessary break up for testing
+   * Gets the locations and prints them to writer
    */
   public void doGetMap(HttpServletResponse response, 
       DatastoreService datastore, Entity userEntity, Key tripEntityKey) throws IOException {
   
+    // get trip Entity based on trip key
     Filter tripKeyFilter =
       new FilterPredicate("__key__", FilterOperator.EQUAL, tripEntityKey);
     Query tripQuery = new Query(Trip.TRIP, userEntity.getKey());
     tripQuery.setFilter(tripKeyFilter);
-
     PreparedQuery tripResults = datastore.prepare(tripQuery);
     Entity tripEntity = tripResults.asSingleEntity();
 
-    Query tripDayQuery = new Query(TripDay.QUERY_STRING, tripEntity.getKey());
-
-    PreparedQuery tripDayResults = datastore.prepare(tripDayQuery);
-
-    int tripDayIndex = 0;
-
+    // Get TripDay associated with the Trip
     // Post-MVP: change to select the desired tripDay 
+    Query tripDayQuery = new Query(TripDay.QUERY_STRING, tripEntity.getKey());
+    PreparedQuery tripDayResults = datastore.prepare(tripDayQuery);
     Entity tripDayEntity = tripDayResults.asSingleEntity();
 
+    // Add origin as the first location
     List<String> locations = new ArrayList<>();
     locations.add((String) tripDayEntity.getProperty("origin"));
 
+    // Add rest of POIs to locations list and write to writer
     Query locationsQuery = new Query(TripDay.LOCATION_ENTITY_TYPE, tripDayEntity.getKey());
     locationsQuery.addSort(TripDay.ORDER);
     PreparedQuery locationResults = datastore.prepare(locationsQuery); 
