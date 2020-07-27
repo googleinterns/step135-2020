@@ -87,15 +87,32 @@ public class UtilityTest {
   /**
    * Create the mock of the UserService object of the logged-in user.
    */
-  public static UserService createUserServiceMockLoggedIn() {
+  public static UserService createUserServiceMockLoggedIn(String email, 
+    String logoutUrl, String authDomain) {
+
     // Mock UserService methods as logged-in user.
     UserService userServiceMock = mock(UserService.class);
     when(userServiceMock.isUserLoggedIn()).thenReturn(true);
     // This is the User object from Google Appengine (full path given to avoid
     // confusion with local User.java file).
     when(userServiceMock.getCurrentUser()).thenReturn(
-        new com.google.appengine.api.users.User(EMAIL, AUTH_DOMAIN));
-    when(userServiceMock.createLogoutURL(AuthServlet.redirectUrl)).thenReturn(LOGOUT_URL);
+        new com.google.appengine.api.users.User(email, auth_domain));
+    when(userServiceMock.createLogoutURL(AuthServlet.redirectUrl)).thenReturn(logoutUrl);
+
+    // PowerMock static getUserService() method, which is used to get the user.
+    PowerMockito.mockStatic(UserServiceFactory.class);
+    when(UserServiceFactory.getUserService()).thenReturn(userServiceMock);
+    return userServiceMock;
+  }
+
+    /**
+   * Create the mock of the UserService object of the logged-out user.
+   */
+  public static UserService createUserServiceMockLoggedOut(String loginUrl) {
+    // Mock UserService methods as logged-in user.
+    UserService userServiceMock = mock(UserService.class);
+    when(userServiceMock.isUserLoggedIn()).thenReturn(false);
+    when(userServiceMock.createLogoutURL(AuthServlet.redirectUrl)).thenReturn(loginUrl);
 
     // PowerMock static getUserService() method, which is used to get the user.
     PowerMockito.mockStatic(UserServiceFactory.class);
