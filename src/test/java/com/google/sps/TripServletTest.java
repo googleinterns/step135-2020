@@ -1,3 +1,4 @@
+
 // Copyright 2019 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,24 +23,36 @@ import com.google.appengine.api.datastore.FetchOptions;
 import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
 import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
+import com.google.maps.DirectionsApi;
+import com.google.maps.DirectionsApiRequest;
 import com.google.maps.FindPlaceFromTextRequest;
 import com.google.maps.GeoApiContext;
 import com.google.maps.PlaceDetailsRequest;
 import com.google.maps.PlacesApi;
+import com.google.maps.model.DirectionsResult;
+import com.google.maps.model.DirectionsRoute;
+import com.google.maps.model.DirectionsLeg;
+import com.google.maps.model.Duration;
 import com.google.maps.model.FindPlaceFromText;
 import com.google.maps.model.PlaceDetails;
 import com.google.maps.model.PlacesSearchResult;
+import com.google.maps.model.TravelMode;
 import com.google.sps.Trip;
+import com.google.sps.data.Event;
 import com.google.sps.data.User;
 import com.google.sps.servlets.AuthServlet;
 import com.google.sps.servlets.TripServlet;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Enumeration;
 import java.util.List;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -50,13 +63,32 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+import org.mockito.ArgumentMatchers;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
+import static org.mockito.Mockito.*;
+
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({PlacesApi.class,FindPlaceFromTextRequest.class,UserServiceFactory.class})
+@PrepareForTest({DirectionsApi.class, DirectionsApiRequest.class,
+                 PlacesApi.class,FindPlaceFromTextRequest.class,UserServiceFactory.class})
 public final class TripServletTest {
+
+  // class constants
+  private static final String INPUT_DESTINATION = 
+    "4265 24th Street San Francisco, CA, 94114";
+  private static final LocalDate INPUT_DATE = LocalDate.parse("2020-07-15");
+  private static final String POI_ONE = "one";
+  private static final String POI_TWO = "two";
+
+  // create TripServlet object
+  private TripServlet tripServlet;
+  private DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+
+  // initialize mock objects
+  private HttpServletRequest request = mock(HttpServletRequest.class);
+  private HttpServletResponse response = mock(HttpServletResponse.class);
 
   // Constants to pass into PlacesApi methods.
   private static final String TEXT_LOCATION_SEARCH = "Big Island, Hawaii, USA";
@@ -68,13 +100,10 @@ public final class TripServletTest {
   public static final String LOGOUT_URL = "/_ah/logout?continue=%2F";
   public static final String LOGIN_URL = "/_ah/login?continue=%2F";
 
-  // Create TripServlet object.
-  TripServlet tripServlet;
-
   // Add helper to allow datastore testing in local JUnit tests.
   // See https://cloud.google.com/appengine/docs/standard/java/tools/localunittesting.
   private final LocalServiceTestHelper helper =
-    new LocalServiceTestHelper(new LocalDatastoreServiceTestConfig());
+      new LocalServiceTestHelper(new LocalDatastoreServiceTestConfig());
 
   @Before
   public void initTripServlet() {
@@ -91,7 +120,170 @@ public final class TripServletTest {
     helper.tearDown();
   }
 
+  // Test directionsRequest generation with mocks.
   @Test
+  public void generateDirectionsRequestTest() {
+    PowerMockito.mockStatic(DirectionsApi.class);
+    DirectionsApiRequest mockRequest = mock(DirectionsApiRequest.class);
+    when(DirectionsApi.newRequest(any())).thenReturn(mockRequest);
+    when(mockRequest.origin(anyString())).thenReturn(mockRequest);
+    when(mockRequest.destination(anyString())).thenReturn(mockRequest);
+    when(mockRequest.waypoints(ArgumentMatchers.<String>any())).thenReturn(mockRequest);
+    when(mockRequest.optimizeWaypoints(anyBoolean())).thenReturn(mockRequest);
+    when(mockRequest.mode(any())).thenReturn(mockRequest);
+
+    GeoApiContext mockGeoApiContext = mock(GeoApiContext.class);
+
+    String[] waypoints = new String[]{ "MoPOP, 5th Avenue North, Seattle, WA, USA",
+                                    "Space Needle, Broad Street, Seattle, WA, USA",
+                                    "Alki Beach, Seattle, WA, USA"};
+    
+    String origin = "The Westin Bellevue, Bellevue Way Northeast, Bellevue, WA, USA";
+
+    DirectionsApiRequest request = TripServlet.generateDirectionsRequest(origin, origin, waypoints, mockGeoApiContext);
+
+    // Verify that proper methods and parameters are called to generate directionsRequest.
+    verify(mockRequest).origin(origin);
+    verify(mockRequest).destination(origin);
+    verify(mockRequest).waypoints(waypoints);
+    verify(mockRequest).optimizeWaypoints(true);
+    verify(mockRequest).mode(TravelMode.DRIVING);
+  }
+
+  // Test waypoint order parsing from a DirectionsResult object.
+  @Test
+  public void getOrderedWaypointsTest() {
+    // Manually create directions result object.
+    DirectionsResult dirResult = new DirectionsResult();
+    dirResult.routes = new DirectionsRoute[1];
+    dirResult.routes[0] = new DirectionsRoute();
+    dirResult.routes[0].waypointOrder = new int[]{ 1, 2, 0 };
+    
+    // Manually create user input.
+    String[] pois = new String[]{"Alki Beach, Seattle, WA, USA",
+                                  "MoPOP, 5th Avenue North, Seattle, WA, USA",
+                                  "Space Needle, Broad Street, Seattle, WA, USA"};
+
+    List<String> orderedWaypoints = TripServlet.getOrderedWaypoints(dirResult, pois);
+
+    List<String> expectedWaypointOrder = new ArrayList<>();
+    expectedWaypointOrder.add("MoPOP, 5th Avenue North, Seattle, WA, USA");
+    expectedWaypointOrder.add("Space Needle, Broad Street, Seattle, WA, USA");
+    expectedWaypointOrder.add("Alki Beach, Seattle, WA, USA");
+
+    Assert.assertEquals(orderedWaypoints, expectedWaypointOrder);
+  }
+
+  // Test travel time parsing from a DirectionsResult object.
+  @Test
+  public void getTravelTimesTest() {
+    // Manually create directions result object
+    DirectionsResult dirResult = new DirectionsResult();
+    dirResult.routes = new DirectionsRoute[1];
+    dirResult.routes[0] = new DirectionsRoute();
+    dirResult.routes[0].legs = new DirectionsLeg[4];
+    for (int i = 0; i < dirResult.routes[0].legs.length; i++) {
+      dirResult.routes[0].legs[i] = new DirectionsLeg();
+      dirResult.routes[0].legs[i].duration = new Duration();
+    }
+    dirResult.routes[0].legs[0].duration.inSeconds = 1080;
+    dirResult.routes[0].legs[1].duration.inSeconds = 60;
+    dirResult.routes[0].legs[2].duration.inSeconds = 1500;
+    dirResult.routes[0].legs[3].duration.inSeconds = 2100;
+    
+    List<Integer> actualTravelTimes  = TripServlet.getTravelTimes(dirResult);
+
+    List<Integer> expectedTravelTimes = new ArrayList<>();
+    expectedTravelTimes.add(18);
+    expectedTravelTimes.add(1);
+    expectedTravelTimes.add(25);
+    expectedTravelTimes.add(35);
+
+    Assert.assertEquals(actualTravelTimes, expectedTravelTimes);
+  }
+
+  // Test getting DirectionsResult object from DirectionsRequest
+  @Test
+  public void getDirectionsResultTest() throws Exception {
+    DirectionsApiRequest mockRequest = PowerMockito.mock(DirectionsApiRequest.class);
+
+    // Construct directionsResult object
+    DirectionsResult expectedResult = new DirectionsResult();
+    expectedResult.routes = new DirectionsRoute[1];
+    expectedResult.routes[0] = new DirectionsRoute();
+    expectedResult.routes[0].waypointOrder = new int[]{ 1, 2, 0 };
+
+    PowerMockito.when(mockRequest.await()).thenReturn(expectedResult);
+
+    DirectionsResult actualResult = TripServlet.getDirectionsResult(mockRequest);
+
+    Assert.assertEquals(expectedResult.routes[0].waypointOrder, actualResult.routes[0].waypointOrder);
+  }
+
+  @Test
+  public void doPostTest() {
+    //TODO (eshika): add an integration test 
+  }
+
+  @Test
+  public void testPutTripDayInDatastore() throws Exception {
+    // create key
+    Key testKey = KeyFactory.createKey("test", ((long) 123));
+
+    // put entity in datastore and query it
+    Entity tripDayEntity = tripServlet.putTripDayInDatastore(INPUT_DESTINATION, datastore, INPUT_DATE, testKey);
+    Query query = new Query(TripDay.QUERY_STRING);
+    PreparedQuery results = datastore.prepare(query);
+    List<Entity> listResults = results.asList(FetchOptions.Builder.withDefaults());
+
+    // check size, tripDayEntity is correctly added
+    Assert.assertEquals(1, listResults.size());
+    Assert.assertEquals(listResults.get(0), tripDayEntity);
+  }
+
+  @Test
+  public void testPutEventsInDatastore() throws Exception {
+    // Manually create list of ordered locations
+    List<String> orderedLocations = new ArrayList<>();
+    orderedLocations.add("MoPOP, 5th Avenue North, Seattle, WA, USA");
+    orderedLocations.add("Space Needle, Broad Street, Seattle, WA, USA");
+    orderedLocations.add("Alki Beach, Seattle, WA, USA");
+
+    // Manually create list of travelTimes
+    List<Integer> travelTimes = new ArrayList<>();
+    travelTimes.add(18);
+    travelTimes.add(1);
+    travelTimes.add(25);
+    travelTimes.add(35);
+
+    // initialize datastore
+    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+
+    // create tripDay entity, needed for put events in datastore
+    Entity tripDayEntity = new Entity(TripDay.QUERY_STRING);
+    tripDayEntity.setProperty("origin", INPUT_DESTINATION);
+    tripDayEntity.setProperty("destination", INPUT_DESTINATION);
+    tripDayEntity.setProperty("date", INPUT_DATE.toString());
+    datastore.put(tripDayEntity);
+
+    // put entities in datastore and query them
+    List<Entity> eventEntities = tripServlet.putEventsInDatastore(tripDayEntity, INPUT_DATE, datastore, orderedLocations, travelTimes);
+    Query query = new Query(Event.QUERY_STRING);
+    PreparedQuery results = datastore.prepare(query);
+    List<Entity> listResults = results.asList(FetchOptions.Builder.withDefaults());
+
+    // check that size is correct, added in correct order, entities match
+    Assert.assertEquals(3, listResults.size());
+    Assert.assertEquals(listResults.get(0), eventEntities.get(0));
+    Assert.assertEquals(listResults.get(1), eventEntities.get(1));
+    Assert.assertEquals(listResults.get(2), eventEntities.get(2));
+  }
+
+   @Test
+  public void testFullDoPost() {
+    // TODO: Adam to add full integration test
+  }
+
   public void testGetPlaceIdFromTextSearchCandidatesPresent() throws Exception {
     // Mock the GeoApiContext object to be passed into PlacesApi methods,
     // and the FindPlaceFromTextRequest.
@@ -176,7 +368,7 @@ public final class TripServletTest {
 
     // Run storeTripEntity(...), with the User logged in (so trip is stored).
     Entity tripEntityReturn = tripServlet.storeTripEntity(responseMock,
-      tripName, destinationName, tripDayOfTravel, photoSrc);
+      tripName, destinationName, tripDayOfTravel, photoSrc, datastore);
 
     // Retrieve the datastore results.
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
@@ -222,7 +414,7 @@ public final class TripServletTest {
 
     // Run storeTripEntity(...), with the User logged in (so trip is stored).
     tripServlet.storeTripEntity(responseMock, tripName, destinationName, 
-      tripDayOfTravel, photoSrc);
+      tripDayOfTravel, photoSrc, datastore);
 
     // Retrieve the datastore results.
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
@@ -259,7 +451,7 @@ public final class TripServletTest {
 
     // Run storeTripEntity(...), with the User not logged in (so nothing is stored).
     Entity tripEntityReturn = tripServlet.storeTripEntity(responseMock,
-      tripName, destinationName, tripDayOfTravel, photoSrc);
+      tripName, destinationName, tripDayOfTravel, photoSrc, datastore);
 
     // Retrieve the datastore results.
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
