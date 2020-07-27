@@ -99,9 +99,7 @@ public class TripDay {
    * Returns a List<String> copy of locations for this TripDay.
    */
   public List<String> getLocations() {
-    List<String> locationsCopy = new ArrayList<>();
-    locationsCopy.addAll(this.locations);
-    return locationsCopy;
+    return new ArrayList<>(this.locations);
   }
 
   /**
@@ -135,8 +133,7 @@ public class TripDay {
    * Add/set locations
    */
   public void setLocations(ArrayList<String> locations) {
-    List<String> temp = new ArrayList<>();
-    temp.addAll(locations);
+    List<String> temp = new ArrayList<>(locations);
     this.locations = temp;
   }
 
