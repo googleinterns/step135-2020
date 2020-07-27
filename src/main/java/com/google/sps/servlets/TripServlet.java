@@ -215,12 +215,17 @@ public class TripServlet extends HttpServlet {
     // entities to return, needed for testing
     List<Entity> eventEntities = new ArrayList<>();    
 
-    // set startDateTime
+    // set startDateTime to 10 am plus the travel time from hotel to POI 1
+    // assumes the user leaves hotel at 10 am
     LocalDateTime startDateTime = LocalDateTime.of(date, LocalTime.of(10, 0));
+    startDateTime = startDateTime.plusMinutes(Long.valueOf(travelTimes.get(0)));
 
+    // First travel time is from hotel to POI 1,
+    // so add travelTimeIndex at index 1 (time from POI 1 to POI 2) to get start time for POI 2.
     int travelTimeIndex = 1;
     // for each poi create the necessary fields
     for (String address : pois) {
+      // create event entity
       String name = address.split(",")[0];
       Event event = new Event(name, address, startDateTime, travelTimes.get(travelTimeIndex));
       Entity eventEntity = event.eventToEntity(tripDayEntity.getKey());
@@ -232,6 +237,8 @@ public class TripServlet extends HttpServlet {
       // sets start time for next event one hour and travel time after start of prev
       startDateTime = startDateTime.plusMinutes(Long.valueOf(ONE_HOUR + travelTimes.get(travelTimeIndex)));
       travelTimeIndex++;
+
+
     }
     return eventEntities;
   }
