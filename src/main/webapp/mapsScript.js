@@ -56,17 +56,23 @@ window.initMap = function() {
   // let origin = locations[0];
   // console.log(origin);
 
-  let waypts = [{location : {'placeId': worldTradeID}},
-                {location : {'placeId': empireStateID}},
-                {location : {'placeId': timesSquareID}},
-                {location : {'placeId': centralParkID}},
-              ];
+  // let waypts = [{location : {'placeId': worldTradeID}},
+  //               {location : {'placeId': empireStateID}},
+  //               {location : {'placeId': timesSquareID}},
+  //               {location : {'placeId': centralParkID}},
+  //             ];
+
+  let waypts = [{ location : "MoPOP, 5th Avenue North, Seattle, WA, USA"},
+                                    {location : "Space Needle, Broad Street, Seattle, WA, USA"},
+                                    {location : "Alki Beach, Seattle, WA, USA"}];
+
+  let origin = "The Westin Bellevue, Bellevue Way Northeast, Bellevue, WA, USA";
 
   // Create a DirectionsRequest with hotel as start/end and 
   // POIs as waypoints (stops on the route)
   directionsService.route({
-    origin: {'placeId': hotelID},
-    destination: {'placeId': hotelID},
+    origin: origin,
+    destination: origin,
     waypoints: waypts,
     optimizeWaypoints: true,
     travelMode: 'DRIVING'
@@ -83,6 +89,6 @@ window.initMap = function() {
 // Append the 'script' element to 'head'
 document.head.appendChild(script);
 
-function getLocations() {
-  fetch('/get-map').then(response => response.json()).then(locations);
-}
+// function getLocations() {
+//   fetch('/get-map').then(response => response.json()).then(locations);
+// }

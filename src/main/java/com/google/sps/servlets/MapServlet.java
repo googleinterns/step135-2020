@@ -45,47 +45,56 @@ public class MapServlet extends HttpServlet {
       throws IOException {
     response.setContentType("application/json;");
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-    String stringTripKey = request.getParameter("tripKey");
-    Key tripKey = KeyFactory.stringToKey(stringTripKey);
 
     // get current user
     Entity userEntity = AuthServlet.getCurrentUserEntity();
 
-
-    if (userEntity == null) {
+    // if no user Entity return home
+    if (request.getParameter("tripKey") == null ){
+      response.getWriter().println("No trip Key");
+      response.sendRedirect("/trips/");
+    } else if (userEntity == null) {
+      response.getWriter().println("No current User");
       response.sendRedirect("/");
-    }
+    } else { 
+      String stringTripKey = request.getParameter("tripKey");
+      Key tripKey = KeyFactory.stringToKey(stringTripKey);
 
+      // gets the locations from datastore and writes them to .../get-map
+      doGetMap(response, datastore, userEntity, tripKey);
+    }
+  }
+
+  /**
+   * Gets the events and prints them to writer, necessary break up for testing
+   */
+  public void doGetMap(HttpServletResponse response, 
+      DatastoreService datastore, Entity userEntity, Key tripEntityKey) throws IOException {
+  
     Filter tripKeyFilter =
-      new FilterPredicate("__key__", FilterOperator.EQUAL, tripKey);
-    Query tripQuery = new Query("trip", userEntity.getKey());
+      new FilterPredicate("__key__", FilterOperator.EQUAL, tripEntityKey);
+    Query tripQuery = new Query(Trip.TRIP, userEntity.getKey());
     tripQuery.setFilter(tripKeyFilter);
 
     PreparedQuery tripResults = datastore.prepare(tripQuery);
     Entity tripEntity = tripResults.asSingleEntity();
 
-    if (tripEntity == null) {
-      throw new IllegalArgumentException("Trip does not exist");
-    }
-
-    Query tripDayQuery = new Query("trip-day", tripEntity.getKey());
+    Query tripDayQuery = new Query(TripDay.QUERY_STRING, tripEntity.getKey());
     PreparedQuery tripDayResults = datastore.prepare(tripDayQuery);
 
-    List<Entity> tripDayEntities = tripDayResults.asList(FetchOptions.Builder.withDefaults());
-    // For MVP: only one tripDay per trip, so get first tripDay.
-    Entity tripDayEntity = tripDayEntities.get(0);
+    int tripDayIndex = 0;
 
-    String origin = (String) tripDayEntity.getProperty("origin");
-    Query locationsQuery = new Query("location", tripDayEntity.getKey());
-    PreparedQuery locationsResults = datastore.prepare(locationsQuery);
-    List<Entity> locationsEntities = locationsResults.asList(FetchOptions.Builder.withDefaults());
-    
+    Entity tripDayEntity = tripDayResults.asList(FetchOptions.Builder.withLimit(10)).get(tripDayIndex);
+
     List<String> locations = new ArrayList<>();
-    locations.add(origin);
-    for (Entity locationEntity : locationsEntities) {
-      locations.add((String) locationEntity.getProperty("name"));
-    }
+    locations.add((String) tripDayEntity.getProperty("origin"));
 
+    Query locationsQuery = new Query(TripDay.LOCATION_ENTITY_TYPE, tripDayEntity.getKey());
+    locationsQuery.addSort(TripDay.ORDER);
+    PreparedQuery locationResults = datastore.prepare(locationsQuery); 
+    for (Entity locationEntity : locationResults.asIterable()) {
+      locations.add((String) locationEntity.getProperty(TripDay.NAME));
+    }
     response.getWriter().println(convertToJson(locations));
   }
 
