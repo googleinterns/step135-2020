@@ -71,7 +71,6 @@ function showDirections(locations) {
     origin: origin,
     destination: origin,
     waypoints: waypts,
-    optimizeWaypoints: true,
     travelMode: 'DRIVING'
   }, function(response, status) {
     // Show directions when found

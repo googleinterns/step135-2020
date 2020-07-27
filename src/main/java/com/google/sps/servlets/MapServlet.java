@@ -81,7 +81,6 @@ public class MapServlet extends HttpServlet {
 
     Query tripDayQuery = new Query(TripDay.QUERY_STRING, tripEntity.getKey());
 
-    System.err.println(tripEntity.getKey());
     PreparedQuery tripDayResults = datastore.prepare(tripDayQuery);
 
     int tripDayIndex = 0;
