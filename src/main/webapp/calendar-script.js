@@ -13,9 +13,8 @@
 // limitations under the License.
 
 let script = document.createElement('script');
-script.src = 'https://maps.googleapis.com/maps/api/js?key=' + config.API_KEY + '&libraries=geometry,places&callback=initMod';
-// 'https://maps.googleapis.com/maps/api/js?key=' + config.API_KEY + 
-  //'&libraries=&callback=initMod';
+script.src = 'https://maps.googleapis.com/maps/api/js?key=' + config.API_KEY + 
+  '&libraries=places&callback=initMod';
 script.defer = true;
 script.async = true;
 
@@ -35,6 +34,7 @@ window.initMod = function() {
     dayMaxEvents: true, //alow "more" link when too many events on one day
     eventClick: function(info) {
       var eventObj = info.event;
+      console.log(eventObj);
 
       // title of pop-up
       const modalLabel = document.getElementById('exampleModalLabel');
@@ -69,6 +69,7 @@ function getEvents(calendar) {
         allDay: false,
         extendedProps: {
           address: event.address,
+          placeId: event.placeId, 
           openTime: '9AM',
           closeTime: '5PM',
         }
