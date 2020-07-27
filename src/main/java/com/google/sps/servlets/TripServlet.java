@@ -221,7 +221,7 @@ public class TripServlet extends HttpServlet {
     // for each poi create the necessary fields
     for (String address : pois) {
       String name = address.split(",")[0];
-      Event event = new Event(name, address, startDateTime, HALF_HOUR);
+      Event event = new Event(name, address, startDateTime, travelTimes.get(travelTimeIndex));
       Entity eventEntity = event.eventToEntity(tripDayEntity.getKey());
       eventEntities.add(eventEntity);
 
