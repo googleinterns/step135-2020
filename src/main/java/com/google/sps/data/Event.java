@@ -15,6 +15,7 @@
 package com.google.sps.data;
 
 import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.datastore.Key;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -49,10 +50,13 @@ public class Event {
 
   // event fields for entity
   private static final String NAME = "name";
-  private static final String ADDRESS = "end-time";
+  private static final String ADDRESS = "address";
   private static final String DATE = "date";
   private static final String START_TIME = "start-time";
   private static final String TRAVEL_TIME = "travel-time";
+
+  // query string
+  public static final String QUERY_STRING = "event";
 
   /**
    * Constructor that takes in time spent at location
@@ -108,10 +112,11 @@ public class Event {
   }
 
   /**
-   * Build entity from event to be put in datastore off event attributes
+   * Build entity from event to be put in datastore off event attributes.
+   * parentKeyID is from tripDay Entity
    */
-  public Entity eventToEntity() {
-    Entity eventEntity = new Entity("events");
+  public Entity eventToEntity(Key parentKeyID) {
+    Entity eventEntity = new Entity("event", parentKeyID);
     eventEntity.setProperty(NAME, this.name);
     eventEntity.setProperty(ADDRESS, this.address);
     eventEntity.setProperty(START_TIME, 

@@ -17,6 +17,7 @@ package com.google.sps;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.Key;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,11 +28,20 @@ public class TripDay {
   private String origin;
   private String destination;
   private List<String> locations;
+  private LocalDate date;
+
+  // Entity params
+  private static final String ORIGIN = "origin";
+  private static final String DESTINATION = "destination";
+  private static final String DATE = "date";
+  
+  // query string
+  public static final String QUERY_STRING = "trip-day";
 
   // constants for entity construction
-  private static final String LOCATION_ENTITY_TYPE = "location";
-  private static final String NAME = "name";
-  private static final String ORDER = "order";
+  public static final String LOCATION_ENTITY_TYPE = "location";
+  public static final String NAME = "name";
+  public static final String ORDER = "order";
 
   /**
    * Creates a new TripDay.
@@ -40,8 +50,9 @@ public class TripDay {
    * @param destination The final destination (Google Maps Place ID string) for this day. Must be non-null.
    * @param locations The list of POIs (list of Google Maps Place ID strings) 
                       that are stopovers for this day. Must be non-null.
+   * @param date The date of when this TripDay occurs.
    */
-  public TripDay(String origin, String destination, List<String> locations) {
+  public TripDay(String origin, String destination, List<String> locations, LocalDate date) {
     if (origin == null) {
       throw new IllegalArgumentException("origin cannot be null");
     }
@@ -56,6 +67,7 @@ public class TripDay {
 
     this.origin = origin;
     this.destination = destination;
+    this.date = date;
 
     // Duplicate locations to not modify original parameter
     this.locations = new ArrayList<>();
@@ -74,6 +86,13 @@ public class TripDay {
    */
   public String getDestination() {
     return this.destination;
+  }
+
+  /**
+   * Returns the date for this TripDay.
+   */
+  public LocalDate getDate() {
+    return this.date;
   }
 
   /**
@@ -110,5 +129,52 @@ public class TripDay {
     for (Entity locationEntity : locationEntities) {
       datastore.put(locationEntity);
     }
+  }
+
+  /**
+   * Add/set locations
+   */
+  public void setLocations(ArrayList<String> locations) {
+    List<String> temp = new ArrayList<>();
+    temp.addAll(locations);
+    this.locations = temp;
+  }
+
+  /**
+   * Builds entity corresponds to current TripDay
+   */
+  public Entity buildEntity() {
+    Entity tripDayEntity = new Entity(QUERY_STRING);
+    tripDayEntity.setProperty(ORIGIN, this.origin);
+    tripDayEntity.setProperty(DESTINATION, this.destination);
+    tripDayEntity.setProperty(DATE, this.date.toString());
+    return tripDayEntity;
+  }
+
+  /**
+   * Builds entity corresponds to current TripDay with parent ID (from
+   * Trip Entity)
+   */
+  public Entity buildEntity(Key parentKeyID) {
+    Entity tripDayEntity = new Entity(QUERY_STRING, parentKeyID);
+    tripDayEntity.setProperty(ORIGIN, this.origin);
+    tripDayEntity.setProperty(DESTINATION, this.destination);
+    tripDayEntity.setProperty(DATE, this.date.toString());
+    return tripDayEntity;
+  }
+
+  /**
+   * Build tripDay from tripDay entity. Set origin, destination, and date
+   * NOTE: Since Lists cannot be stored in datastore, must call setLocations()
+   * after!
+   */
+  public static TripDay tripDayFromEntity(Entity tripDayEntity) {
+    String origin = (String) tripDayEntity.getProperty(ORIGIN);
+    String destination = (String) tripDayEntity.getProperty(DESTINATION);
+    List<String> locations = new ArrayList<>();
+    String date = (String) tripDayEntity.getProperty(DATE);
+
+    TripDay tripDay = new TripDay(origin, destination, locations, LocalDate.parse(date));
+    return tripDay;
   }
 }
