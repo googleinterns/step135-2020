@@ -22,6 +22,7 @@ import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
 import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
+import com.google.sps.data.Event;
 import com.google.sps.data.User;
 import com.google.sps.Trip;
 import org.junit.Before;
@@ -105,7 +106,7 @@ public class UtilityTest {
     return userServiceMock;
   }
 
-    /**
+  /**
    * Create the mock of the UserService object of the logged-out user.
    */
   public static UserService createUserServiceMockLoggedOut(String loginUrl) {
@@ -118,6 +119,36 @@ public class UtilityTest {
     PowerMockito.mockStatic(UserServiceFactory.class);
     when(UserServiceFactory.getUserService()).thenReturn(userServiceMock);
     return userServiceMock;
+  }
+
+  /**
+   * Create the TripDay Entity and put it in Datastore.
+   */
+  public static TripDay putTripDayInDatastore(String inputDestination, 
+    String inputDate) {
+    // Create the TripDay Entity and put it in Datastore.
+    Entity tripDayEntity = new Entity(TripDay.QUERY_STRING);
+    tripDayEntity.setProperty("origin", inputDestination);
+    tripDayEntity.setProperty("destination", inputDestination);
+    tripDayEntity.setProperty("date", inputDate);
+    datastore.put(tripDayEntity);
+    return tripDayEntity;
+  }
+
+  /**
+   * Create the Event Entity and put it in Datastore.
+   */
+  public static Event putEventInDatastore(String name, String address, 
+    String startTime, String travelTime) {
+    // Create the Event Entity and put it in Datastore.
+    Entity eventEntity = new Entity(Event.QUERY_STRING);
+    eventEntity.setProperty("name", name);
+    eventEntity.setProperty("address", address);
+    eventEntity.setProperty("start-time", 
+        DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(startTime));
+    eventEntity.setProperty("travel-time", travelTime);
+    datastore.put(eventEntity);
+    return eventEntity;
   }
 
 }
