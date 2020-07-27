@@ -69,8 +69,11 @@ public final class TripServletTest {
   private static final String INPUT_DESTINATION = 
     "4265 24th Street San Francisco, CA, 94114";
   private static final LocalDate INPUT_DATE = LocalDate.parse("2020-07-15");
-  private static final String POI_ONE = "one";
-  private static final String POI_TWO = "two";
+  private static final String POI_ONE = "Sutro Tower, 1 La Avanzada St, San Francisco," +
+    "CA 94131";
+  private static final String PLACE_ID_1 = "ChIJuWrChft9j4ARBQYAnJ2k4jA"; 
+  private static final String POI_TWO = "Dolores St &, 19th St, San Francisco, CA 94114";
+  private static final String PLACE_ID_2 = "ChIJp3CqeRd-j4ARYI0i8e_kGKY"; 
 
   // create TripServlet object
   private TripServlet tripServlet;
@@ -131,6 +134,33 @@ public final class TripServletTest {
 
   @Test
   public void testPutEventsInDatastore() throws Exception {
+    // Mock the GeoApiContext object to be passed into PlacesApi methods,
+    // and the FindPlaceFromTextRequest.
+    GeoApiContext mockGeoApiContext = mock(GeoApiContext.class);
+    FindPlaceFromTextRequest findPlaceRequest = 
+      PowerMockito.mock(FindPlaceFromTextRequest.class);
+
+    // Create the FindPlaceFromText object with a valid place ID.
+    FindPlaceFromText findPlaceResult = new FindPlaceFromText();
+    findPlaceResult.candidates = new PlacesSearchResult[2];
+    findPlaceResult.candidates[0] = new PlacesSearchResult();
+    findPlaceResult.candidates[0].placeId = PLACE_ID_1;
+    findPlaceResult.candidates[1] = new PlacesSearchResult();
+    findPlaceResult.candidates[1].placeId = PLACE_ID_2;
+
+    // Have the findPlaceRequest.await() method return the FindPlaceFromText
+    // object using PowerMockito, as await() is a final method.
+    PowerMockito.when(findPlaceRequest.await()).thenReturn(findPlaceResult);
+
+    // Mock the PlacesApi object.
+    PowerMockito.mockStatic(PlacesApi.class);
+    when(PlacesApi.findPlaceFromText(any(), anyString(), any()))
+      .thenReturn(findPlaceRequest);
+
+    // Run the getPlaceIdFromTextSearch(...) method to test the result.
+    String placeIdResult = tripServlet.getPlaceIdFromTextSearch(mockGeoApiContext, 
+      TEXT_LOCATION_SEARCH);
+      
     // set mock object behavior
     when(request.getParameter("poi-1")).thenReturn(POI_ONE);
     when(request.getParameter("poi-2")).thenReturn(POI_TWO);
@@ -155,6 +185,7 @@ public final class TripServletTest {
     datastore.put(tripDayEntity);
 
     // put entities in datastore and query them
+    tripServlet.setGeoContext(mockGeoApiContext);
     List<Entity> eventEntities = tripServlet.putEventsInDatastore(request, response, params, tripDayEntity, INPUT_DATE, datastore);
     Query query = new Query(Event.QUERY_STRING);
     PreparedQuery results = datastore.prepare(query);

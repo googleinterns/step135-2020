@@ -130,7 +130,7 @@ public class TripServlet extends HttpServlet {
    */ 
   public String getPlaceIdFromTextSearch(GeoApiContext context, String textSearch) 
     throws IOException {
-
+    
     FindPlaceFromTextRequest findPlaceRequest = PlacesApi.findPlaceFromText(context, 
       textSearch, FindPlaceFromTextRequest.InputType.TEXT_QUERY);
 
@@ -190,7 +190,9 @@ public class TripServlet extends HttpServlet {
       if (p.contains("poi")) {
         String address = request.getParameter(p);
         String name = address.split(",")[0];
-        Event event = new Event(name, address, startDateTime, HALF_HOUR);
+        String placeId = getPlaceIdFromTextSearch(this.context, address);
+        System.err.println("PLACEID: " + placeId);
+        Event event = new Event(name, address, placeId, startDateTime, HALF_HOUR);
         Entity eventEntity = event.eventToEntity(tripDayEntity.getKey());
         eventEntities.add(eventEntity);
 
@@ -290,5 +292,14 @@ public class TripServlet extends HttpServlet {
     final String baseUrl = "https://maps.googleapis.com/maps/api/place/photo?";
     return baseUrl + "maxwidth=" + maxWidth + "&photoreference=" + 
       photoReference + "&key=" + Config.API_KEY;
+  }
+
+  /**
+   * Set GeoApiContext
+   * 
+   * @param context context to input, used for testing
+   */
+  public void setGeoContext(GeoApiContext context) {
+    this.context = context;
   }
 }

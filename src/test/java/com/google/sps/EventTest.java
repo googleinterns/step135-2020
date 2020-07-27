@@ -55,6 +55,7 @@ public final class EventTest {
   // constants for event
   private static final String GOLDEN_GATE_PARK = "GGPark";
   private static final String ADDRESS =  "4265 24th Street San Francisco, CA, 94114";
+  private static final String PLACE_ID = "1234";
 
   private static final LocalDateTime DEF_LDT = LocalDateTime.of(LocalDate.parse("2020-06-25"), LocalTime.of(10, 0));
 
@@ -73,12 +74,12 @@ public final class EventTest {
 
   @Test(expected = IllegalArgumentException.class)
   public void testTravelTimeBelowMinPossible()  throws IOException {
-    Event e = new Event (GOLDEN_GATE_PARK, ADDRESS, DEF_LDT, -1, HOUR);
+    Event e = new Event (GOLDEN_GATE_PARK, ADDRESS, PLACE_ID, DEF_LDT, -1, HOUR);
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void testCheckTravelTimeGreaterThanFullDay() throws IOException {
-    Event e = new Event (GOLDEN_GATE_PARK, ADDRESS, DEF_LDT, 1440, HOUR);
+    Event e = new Event (GOLDEN_GATE_PARK, ADDRESS, PLACE_ID, DEF_LDT, 1440, HOUR);
   }
 
   @Test
@@ -88,7 +89,7 @@ public final class EventTest {
     LocalDateTime manualEndTime = LocalDateTime.of(
                           LocalDate.parse("2020-06-25"), LocalTime.of(11, 20));
 
-    Event e = new Event (GOLDEN_GATE_PARK, ADDRESS, DEF_LDT, HALF_HOUR, 
+    Event e = new Event (GOLDEN_GATE_PARK, ADDRESS, PLACE_ID, DEF_LDT, HALF_HOUR, 
                         timeAtLocation);
 
     Assert.assertEquals(GOLDEN_GATE_PARK , e.getName());
@@ -109,7 +110,7 @@ public final class EventTest {
     LocalDateTime manualEndTime = LocalDateTime.of(
                           LocalDate.parse("2020-06-25"), LocalTime.of(11, 0));
 
-    Event e = new Event (GOLDEN_GATE_PARK, ADDRESS, DEF_LDT, HALF_HOUR);
+    Event e = new Event (GOLDEN_GATE_PARK, ADDRESS, PLACE_ID, DEF_LDT, HALF_HOUR);
 
     Assert.assertEquals(GOLDEN_GATE_PARK , e.getName());
     Assert.assertEquals(ADDRESS, e.getAddress());
@@ -136,7 +137,7 @@ public final class EventTest {
     datastore.put(tripDayEntity);
 
     // build eventEntity using fcn
-    Event e = new Event (GOLDEN_GATE_PARK, ADDRESS, DEF_LDT, HALF_HOUR);
+    Event e = new Event (GOLDEN_GATE_PARK, ADDRESS, PLACE_ID, DEF_LDT, HALF_HOUR);
     Entity eventEntity = e.eventToEntity(tripDayEntity.getKey());
     datastore.put(eventEntity);
 
@@ -154,12 +155,13 @@ public final class EventTest {
     Entity eventEntity = new Entity(Event.QUERY_STRING);
     eventEntity.setProperty("name", GOLDEN_GATE_PARK);
     eventEntity.setProperty("address", ADDRESS);
+    eventEntity.setProperty("place-id", PLACE_ID);
     eventEntity.setProperty("start-time", 
         DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(DEF_LDT));
     eventEntity.setProperty("travel-time", Integer.toString(HALF_HOUR));
 
     // create event w same fields for comparison
-    Event expected = new Event (GOLDEN_GATE_PARK, ADDRESS, DEF_LDT, HALF_HOUR);
+    Event expected = new Event (GOLDEN_GATE_PARK, ADDRESS, PLACE_ID, DEF_LDT, HALF_HOUR);
     Event actual = Event.eventFromEntity(eventEntity);
  
     Assert.assertEquals(expected.getName(), actual.getName());
