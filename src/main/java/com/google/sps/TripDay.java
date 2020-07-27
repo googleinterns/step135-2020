@@ -129,6 +129,7 @@ public class TripDay {
     for (Entity locationEntity : locationEntities) {
       datastore.put(locationEntity);
     }
+  }
 
   /**
    * Add/set locations

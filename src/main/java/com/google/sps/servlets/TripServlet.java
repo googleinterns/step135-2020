@@ -117,7 +117,6 @@ public class TripServlet extends HttpServlet {
       .apiKey(Config.API_KEY)
       .build();
   }
- 
 
   /**
    * Get user input.
@@ -128,11 +127,6 @@ public class TripServlet extends HttpServlet {
   public void doPost(HttpServletRequest request, HttpServletResponse response) 
       throws IOException {
     response.setContentType("application/json;");
-
-    // global info needed
-    DatastoreService datastore = 
-                                DatastoreServiceFactory.getDatastoreService();
-    Enumeration<String> params = request.getParameterNames(); 
 
     // Retrieve form inputs to define the Trip object.
     this.tripName = request.getParameter(INPUT_TRIP_NAME);
@@ -153,21 +147,14 @@ public class TripServlet extends HttpServlet {
     List<Integer> travelTimes = getTravelTimes(dirResult);
     List<String> orderedLocationStrings = getOrderedWaypoints(dirResult, poiStrings);
 
-    // TODO: replace testKey with key of TripDay entity
-    long test = 123;
-    Key testKey = KeyFactory.createKey("test", test);
-
-    List<Entity> locationEntities = TripDay.locationsToEntities(orderedLocationStrings, testKey);
-    TripDay.storeLocationsInDatastore(locationEntities, this.datastore);
-
-    // do post for events
-    eventDoPost(this.tripDayOfTravel, orderedLocationStrings, travelTimes); 
-
     // put TripDay entity into datastore
-    Entity tripDayEntity = putTripDayInDatastore(request, datastore, LocalDate.parse(tripDayOfTravel), tripEntity.getKey());
+    Entity tripDayEntity = putTripDayInDatastore(this.tripDestination, datastore, LocalDate.parse(tripDayOfTravel), tripEntity.getKey());
 
+    List<Entity> locationEntities = TripDay.locationsToEntities(orderedLocationStrings, tripDayEntity.getKey());
+    TripDay.storeLocationsInDatastore(locationEntities, this.datastore);
+    
     // put Event entities in datastore
-    putEventsInDatastore(request, response, params, tripDayEntity, LocalDate.parse(tripDayOfTravel), datastore, orderedLocationStrings, travelTimes);
+    putEventsInDatastore(tripDayEntity, LocalDate.parse(tripDayOfTravel), datastore, orderedLocationStrings, travelTimes);
 
     // Redirect to the "/trips/" page to show the trip that was added.
     response.sendRedirect("/trips/");
@@ -201,19 +188,15 @@ public class TripServlet extends HttpServlet {
     } catch(ApiException | InterruptedException e) {
       throw new IOException(e);
     }
-
   }
 
   /**
    * put TripDay into Datastore
    * @return tripDay entity, needed for event creation
    */
-  public Entity putTripDayInDatastore(HttpServletRequest request, 
-      DatastoreService datastore, LocalDate date, Key tripEntityKey) throws IOException {
-    String origin = request.getParameter("inputDestination");
-    String destination = origin; // may change if user can differentiate b/t the two
-
-    TripDay tripDay = new TripDay(origin, destination, new ArrayList<>(), date);
+  public Entity putTripDayInDatastore(String origin, DatastoreService datastore, LocalDate date, Key tripEntityKey) 
+      throws IOException {
+    TripDay tripDay = new TripDay(origin, origin, new ArrayList<>(), date);
     Entity tripDayEntity = tripDay.buildEntity(tripEntityKey);
     datastore.put(tripDayEntity);
     return tripDayEntity;  
@@ -224,8 +207,7 @@ public class TripServlet extends HttpServlet {
    * Searches through the parameters and creates the events and puts them into
    * datastore with associated tripDayEntity as a parent
    */
-  public List<Entity> putEventsInDatastore(HttpServletRequest request, HttpServletResponse response, 
-      Enumeration<String> params, Entity tripDayEntity, LocalDate date, DatastoreService datastore,
+  public List<Entity> putEventsInDatastore(Entity tripDayEntity, LocalDate date, DatastoreService datastore,
       List<String> pois, List<Integer> travelTimes)
       throws IOException { 
 
@@ -240,7 +222,8 @@ public class TripServlet extends HttpServlet {
     for (String address : pois) {
       String name = address.split(",")[0];
       Event event = new Event(name, address, startDateTime, HALF_HOUR);
-      Entity eventEntity = event.eventToEntity();
+      Entity eventEntity = event.eventToEntity(tripDayEntity.getKey());
+      eventEntities.add(eventEntity);
 
       // put entity in datastore   
       datastore.put(eventEntity);
@@ -321,7 +304,6 @@ public class TripServlet extends HttpServlet {
     // Put Trip Entity into datastore.
     Entity tripEntity = Trip.buildEntity(tripName, destinationName, photoSrc,
       tripDayOfTravel, tripDayOfTravel, userEntity.getKey());
-    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
     datastore.put(tripEntity);
     return tripEntity;
   }

@@ -227,14 +227,11 @@ public final class TripServletTest {
 
   @Test
   public void testPutTripDayInDatastore() throws Exception {
-    // set mock object behavior
-    when(request.getParameter("inputDestination")).thenReturn(INPUT_DESTINATION);
-
     // create key
     Key testKey = KeyFactory.createKey("test", ((long) 123));
 
     // put entity in datastore and query it
-    Entity tripDayEntity = tripServlet.putTripDayInDatastore(request, datastore, INPUT_DATE, testKey);
+    Entity tripDayEntity = tripServlet.putTripDayInDatastore(INPUT_DESTINATION, datastore, INPUT_DATE, testKey);
     Query query = new Query(TripDay.QUERY_STRING);
     PreparedQuery results = datastore.prepare(query);
     List<Entity> listResults = results.asList(FetchOptions.Builder.withDefaults());
@@ -246,18 +243,18 @@ public final class TripServletTest {
 
   @Test
   public void testPutEventsInDatastore() throws Exception {
-    // set mock object behavior
-    when(request.getParameter("poi-1")).thenReturn(POI_ONE);
-    when(request.getParameter("poi-2")).thenReturn(POI_TWO);
+    // Manually create list of ordered locations
+    List<String> orderedLocations = new ArrayList<>();
+    orderedLocations.add("MoPOP, 5th Avenue North, Seattle, WA, USA");
+    orderedLocations.add("Space Needle, Broad Street, Seattle, WA, USA");
+    orderedLocations.add("Alki Beach, Seattle, WA, USA");
 
-    // manually create params list
-    List<String> paramsList = new ArrayList<>();
-    paramsList.add("inputDestination");
-    paramsList.add("inputDayOfTravel");
-    paramsList.add("inputTripName");
-    paramsList.add("poi-1");
-    paramsList.add("poi-2");
-    Enumeration<String> params = Collections.enumeration(paramsList);
+    // Manually create list of travelTimes
+    List<Integer> travelTimes = new ArrayList<>();
+    travelTimes.add(18);
+    travelTimes.add(1);
+    travelTimes.add(25);
+    travelTimes.add(35);
 
     // initialize datastore
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
@@ -270,15 +267,16 @@ public final class TripServletTest {
     datastore.put(tripDayEntity);
 
     // put entities in datastore and query them
-    List<Entity> eventEntities = tripServlet.putEventsInDatastore(request, response, params, tripDayEntity, INPUT_DATE, datastore);
+    List<Entity> eventEntities = tripServlet.putEventsInDatastore(tripDayEntity, INPUT_DATE, datastore, orderedLocations, travelTimes);
     Query query = new Query(Event.QUERY_STRING);
     PreparedQuery results = datastore.prepare(query);
     List<Entity> listResults = results.asList(FetchOptions.Builder.withDefaults());
 
     // check that size is correct, added in correct order, entities match
-    Assert.assertEquals(2, listResults.size());
+    Assert.assertEquals(3, listResults.size());
     Assert.assertEquals(listResults.get(0), eventEntities.get(0));
     Assert.assertEquals(listResults.get(1), eventEntities.get(1));
+    Assert.assertEquals(listResults.get(2), eventEntities.get(2));
   }
 
    @Test
