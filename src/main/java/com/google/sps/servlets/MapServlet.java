@@ -49,18 +49,18 @@ public class MapServlet extends HttpServlet {
       throws IOException {
     response.setContentType("application/json;");
 
-    // Initialize Datastore
+    // Initialize Datastore.
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 
-    // Get current user
+    // Get current user.
     Entity userEntity = AuthServlet.getCurrentUserEntity();
 
-    // if no tripKey return to trips page
+    // if no tripKey return to trips page.
     if (request.getParameter("tripKey") == null ){
       response.getWriter().println("No trip Key");
       response.sendRedirect("/trips/");
   
-    // if no user Entity return home
+    // if no user Entity return home.
     } else if (userEntity == null) {
       response.getWriter().println("No current User");
       response.sendRedirect("/");
@@ -74,12 +74,12 @@ public class MapServlet extends HttpServlet {
   }
 
   /**
-   * Gets the locations and prints them to writer
+   * Gets the locations and prints them to writer.
    */
   public void doGetMap(HttpServletResponse response, 
       DatastoreService datastore, Entity userEntity, Key tripEntityKey) throws IOException {
   
-    // get trip Entity based on trip key
+    // Get trip Entity based on trip key.
     Filter tripKeyFilter =
       new FilterPredicate("__key__", FilterOperator.EQUAL, tripEntityKey);
     Query tripQuery = new Query(Trip.TRIP, userEntity.getKey());
@@ -87,17 +87,17 @@ public class MapServlet extends HttpServlet {
     PreparedQuery tripResults = datastore.prepare(tripQuery);
     Entity tripEntity = tripResults.asSingleEntity();
 
-    // Get TripDay associated with the Trip
-    // Post-MVP: change to select the desired tripDay 
+    // Get TripDay associated with the Trip.
+    // Post-MVP: change to select the desired tripDay.
     Query tripDayQuery = new Query(TripDay.QUERY_STRING, tripEntity.getKey());
     PreparedQuery tripDayResults = datastore.prepare(tripDayQuery);
     Entity tripDayEntity = tripDayResults.asSingleEntity();
 
-    // Add origin as the first location
+    // Add origin as the first location.
     List<String> locations = new ArrayList<>();
     locations.add((String) tripDayEntity.getProperty("origin"));
 
-    // Add rest of POIs to locations list and write to writer
+    // Add rest of POIs to locations list and write to writer.
     Query locationsQuery = new Query(TripDay.LOCATION_ENTITY_TYPE, tripDayEntity.getKey());
     locationsQuery.addSort(TripDay.ORDER);
     PreparedQuery locationResults = datastore.prepare(locationsQuery); 

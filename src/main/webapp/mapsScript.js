@@ -44,10 +44,15 @@ window.initMap = function() {
   directionsRenderer.setMap(map);
   directionsRenderer.setPanel(document.getElementById('rightPanel'));
 
-  getLocations();
+  // Get locations from MapServlet and display directions on map.
+  displayRouteOnMap();
 }
 
-function getLocations() {
+/*
+ * Gets locations from MapServlet with the tripKey parameter.
+ * Calls showDirections to show the directions with those locations.
+ */
+function displayRouteOnMap() {
   const urlParams = new URLSearchParams(window.location.search);
   const tripKey = urlParams.get('tripKey');
   const tripKeyQuery = (tripKey != null && tripKey != '') ? '?tripKey=' + tripKey : '';
@@ -57,6 +62,11 @@ function getLocations() {
   });
 }
 
+/* 
+ * Parses locations, generations DirectionsRequest with those locations,
+ * and displays on map with DirectionsRenderer.
+ * locations is a list of String addresses where the first element is the origin/destination
+ */
 function showDirections(locations) {
   let origin = locations[0];
   let waypts = [];
