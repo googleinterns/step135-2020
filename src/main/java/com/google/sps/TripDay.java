@@ -39,9 +39,9 @@ public class TripDay {
   public static final String QUERY_STRING = "trip-day";
 
   // constants for entity construction
-  private static final String LOCATION_ENTITY_TYPE = "location";
-  private static final String NAME = "name";
-  private static final String ORDER = "order";
+  public static final String LOCATION_ENTITY_TYPE = "location";
+  public static final String NAME = "name";
+  public static final String ORDER = "order";
 
   /**
    * Creates a new TripDay.

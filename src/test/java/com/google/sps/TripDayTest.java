@@ -47,11 +47,6 @@ public final class TripDayTest {
   private static final String EMPIRE_STATE_ID = "ChIJtcaxrqlZwokRfwmmibzPsTU";
   private static final String HOTEL_ID = "ChIJ68J3tfpYwokR2HaRoBcB4xg";
 
-  // constants for entity construction
-  private static final String LOCATION_ENTITY_TYPE = "location";
-  private static final String NAME = "name";
-  private static final String ORDER = "order";
-
   // constants for tripDay entity
   private static final String INPUT_DATE = "2020-07-15";
 
@@ -153,21 +148,21 @@ public final class TripDayTest {
 
     // build manual list of expected entities based on hard coded locations list
     List<Entity> expectedEntities = new ArrayList<>();
-    Entity TimesSquareEntity = new Entity(LOCATION_ENTITY_TYPE, testKey);
-    TimesSquareEntity.setProperty(NAME, TIMES_SQUARE_ID);
-    TimesSquareEntity.setProperty(ORDER, 0);
+    Entity TimesSquareEntity = new Entity(TripDay.LOCATION_ENTITY_TYPE, testKey);
+    TimesSquareEntity.setProperty(TripDay.NAME, TIMES_SQUARE_ID);
+    TimesSquareEntity.setProperty(TripDay.ORDER, 0);
     expectedEntities.add(TimesSquareEntity);
-    Entity CentralParkEntity = new Entity(LOCATION_ENTITY_TYPE, testKey);
-    CentralParkEntity.setProperty(NAME, CENTRAL_PARK_ID);
-    CentralParkEntity.setProperty(ORDER, 1);
+    Entity CentralParkEntity = new Entity(TripDay.LOCATION_ENTITY_TYPE, testKey);
+    CentralParkEntity.setProperty(TripDay.NAME, CENTRAL_PARK_ID);
+    CentralParkEntity.setProperty(TripDay.ORDER, 1);
     expectedEntities.add(CentralParkEntity);
 
     // Check that the entities are generated in the correct order with the correct properties
     Assert.assertEquals(expectedEntities.size(), actualEntities.size());
-    Assert.assertEquals(expectedEntities.get(0).getProperty(NAME), actualEntities.get(0).getProperty(NAME));
-    Assert.assertEquals(expectedEntities.get(0).getProperty(ORDER), actualEntities.get(0).getProperty(ORDER));
-    Assert.assertEquals(expectedEntities.get(1).getProperty(NAME), actualEntities.get(1).getProperty(NAME));
-    Assert.assertEquals(expectedEntities.get(1).getProperty(ORDER), actualEntities.get(1).getProperty(ORDER));
+    Assert.assertEquals(expectedEntities.get(0).getProperty(TripDay.NAME), actualEntities.get(0).getProperty(TripDay.NAME));
+    Assert.assertEquals(expectedEntities.get(0).getProperty(TripDay.ORDER), actualEntities.get(0).getProperty(TripDay.ORDER));
+    Assert.assertEquals(expectedEntities.get(1).getProperty(TripDay.NAME), actualEntities.get(1).getProperty(TripDay.NAME));
+    Assert.assertEquals(expectedEntities.get(1).getProperty(TripDay.ORDER), actualEntities.get(1).getProperty(TripDay.ORDER));
   }
 
   // Test the storing of location entities in datastore.
@@ -187,19 +182,19 @@ public final class TripDayTest {
 
     // build list of location entities
     List<Entity> expectedEntities = new ArrayList<>();
-    Entity TimesSquareEntity = new Entity(LOCATION_ENTITY_TYPE, testKey);
-    TimesSquareEntity.setProperty(NAME, TIMES_SQUARE_ID);
-    TimesSquareEntity.setProperty(ORDER, 0);
+    Entity TimesSquareEntity = new Entity(TripDay.LOCATION_ENTITY_TYPE, testKey);
+    TimesSquareEntity.setProperty(TripDay.NAME, TIMES_SQUARE_ID);
+    TimesSquareEntity.setProperty(TripDay.ORDER, 0);
     expectedEntities.add(TimesSquareEntity);
-    Entity CentralParkEntity = new Entity(LOCATION_ENTITY_TYPE, testKey);
-    CentralParkEntity.setProperty(NAME, CENTRAL_PARK_ID);
-    CentralParkEntity.setProperty(ORDER, 1);
+    Entity CentralParkEntity = new Entity(TripDay.LOCATION_ENTITY_TYPE, testKey);
+    CentralParkEntity.setProperty(TripDay.NAME, CENTRAL_PARK_ID);
+    CentralParkEntity.setProperty(TripDay.ORDER, 1);
     expectedEntities.add(CentralParkEntity);
 
     TripDay.storeLocationsInDatastore(expectedEntities, datastore);
 
     // query datastore to ensure that correct entities were stored
-    Query query = new Query(LOCATION_ENTITY_TYPE, testKey);
+    Query query = new Query(TripDay.LOCATION_ENTITY_TYPE, testKey);
     PreparedQuery results = datastore.prepare(query);
     List<Entity> actualEntities = results.asList(FetchOptions.Builder.withDefaults());
 
