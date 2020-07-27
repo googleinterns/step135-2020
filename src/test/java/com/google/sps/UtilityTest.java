@@ -25,6 +25,7 @@ import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
 import com.google.sps.data.Event;
 import com.google.sps.data.User;
 import com.google.sps.Trip;
+import com.google.sps.TripDay;
 import org.junit.Before;
 
 public class UtilityTest {
