@@ -192,6 +192,7 @@ public class TripServlet extends HttpServlet {
 
   /**
    * put TripDay into Datastore
+   * assumes that origin and destination are same 
    * @return tripDay entity, needed for event creation
    */
   public Entity putTripDayInDatastore(String origin, DatastoreService datastore, LocalDate date, Key tripEntityKey) 
@@ -343,7 +344,8 @@ public class TripServlet extends HttpServlet {
    * Generates directionsRequest from user input.
    * @param origin route starting point
    * @param destination route ending point
-   * @param poiStrings String array of poi stops along the route
+   * @param poiStrings String array of poi stops along the route. 
+                       Pois are stored as String addresses, not place IDs.
    * @param context API context
    */
   public static DirectionsApiRequest generateDirectionsRequest(String origin, String destination, 
