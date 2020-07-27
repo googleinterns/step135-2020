@@ -18,21 +18,37 @@ import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
-import com.google.gson.Gson;
-import com.google.maps.errors.ApiException;
+import com.google.maps.DirectionsApi;
+import com.google.maps.DirectionsApiRequest;
+import com.google.maps.DirectionsApi.RouteRestriction;
 import com.google.maps.FindPlaceFromTextRequest;
 import com.google.maps.GeoApiContext;
 import com.google.maps.PlaceDetailsRequest;
 import com.google.maps.PlacesApi;
+import com.google.maps.errors.ApiException;
+import com.google.maps.errors.NotFoundException;
+import com.google.maps.model.AddressType;
+import com.google.maps.model.DirectionsLeg;
+import com.google.maps.model.DirectionsResult;
 import com.google.maps.model.FindPlaceFromText;
+import com.google.maps.model.GeocodedWaypointStatus;
 import com.google.maps.model.LatLng;
 import com.google.maps.model.Photo;
 import com.google.maps.model.PlaceDetails;
 import com.google.maps.model.PlaceType;
-import com.google.sps.data.Config;
+import com.google.maps.model.TrafficModel;
+import com.google.maps.model.TransitMode;
+import com.google.maps.model.TransitRoutingPreference;
+import com.google.maps.model.TravelMode;
+import com.google.maps.model.Unit;
+import com.google.gson.Gson;
 import com.google.sps.Trip;
+import com.google.sps.TripDay;
+import com.google.sps.data.Config;
 import com.google.sps.data.Event;
 import com.google.sps.TripDay;
 import java.io.IOException;
@@ -40,6 +56,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.List;
 import javax.servlet.annotation.WebServlet;
@@ -48,19 +65,17 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /** 
- * Servlet that puts info into datastore to be pulled by maps and calendar
+ * Servlet that currently allows for retrieving info from url and put in 
+ * calendar, calculates optimal route using Maps Java Client,
+ * and puts info into datastore to be pulled by maps and calendar
  */
 @WebServlet("/calculate-trip")
 public class TripServlet extends HttpServlet {
 
-  // Create the GeoApiContext object.
-  private GeoApiContext context;
-  private static final int PHOTO_SRC_SIZE = 400;
+  // Constant for picking route
+  private static final int ROUTE_INDEX = 0;
 
-  // Constants to get form inputs.
-  private static final String INPUT_TRIP_NAME = "inputTripName";
-  private static final String INPUT_DESTINATION = "inputDestination";
-  private static final String INPUT_DAY_OF_TRAVEL = "inputDayOfTravel";
+  private static final int PHOTO_SRC_SIZE = 400;
 
   // Trip attributes needed to store the Trip Entity in datastore.
   private String tripName;
@@ -71,7 +86,9 @@ public class TripServlet extends HttpServlet {
 
   // time class constants
   private static final int HALF_HOUR = 30;
+  private static final int ONE_HOUR = 60;
   private static final int NINETY_MINS = 90;
+  private static final int SECONDS_IN_MIN = 60;
 
   // event fields for entity
   private static final String NAME = "name";
@@ -80,40 +97,64 @@ public class TripServlet extends HttpServlet {
   private static final String START_TIME = "start-time";
   private static final String TRAVEL_TIME = "travel-time";
 
+  // Constants to get form inputs.
+  private static final String INPUT_TRIP_NAME = "inputTripName";
+  private static final String INPUT_DESTINATION = "inputDestination";
+  private static final String INPUT_DAY_OF_TRAVEL = "inputDayOfTravel";
+  private static final String INPUT_POI_LIST = "poiList";
+
+  // Datastore and API context
+  private DatastoreService datastore;
+  private GeoApiContext context;
+
+  /**
+   * Initializes datastore and API.
+   */
   @Override
   public void init() {
+    this.datastore = DatastoreServiceFactory.getDatastoreService();  
     this.context = new GeoApiContext.Builder()
       .apiKey(Config.API_KEY)
       .build();
   }
 
+  /**
+   * Get user input.
+   * Generate directionsRequest from user input and parse optimized route.
+   * Create and store events in Datastore.
+   */
   @Override
   public void doPost(HttpServletRequest request, HttpServletResponse response) 
       throws IOException {
     response.setContentType("application/json;");
 
-    // global info needed
-    DatastoreService datastore = 
-                                DatastoreServiceFactory.getDatastoreService();
-    Enumeration<String> params = request.getParameterNames(); 
-
     // Retrieve form inputs to define the Trip object.
     this.tripName = request.getParameter(INPUT_TRIP_NAME);
     this.tripDestination = request.getParameter(INPUT_DESTINATION);
     this.tripDayOfTravel = request.getParameter(INPUT_DAY_OF_TRAVEL);
+    String[] poiStrings = request.getParameterValues(INPUT_POI_LIST);
 
     // Populate the destinationName and photoSrc fields using Google Maps API.
-    populateDestinationAndPhoto(context, tripDestination);
+    populateDestinationAndPhoto(this.context, this.tripDestination);
 
     // Store the Trip Entity in datastore with the User Entity as an ancestor.
     Entity tripEntity = storeTripEntity(response, this.tripName, this.destinationName, 
       this.tripDayOfTravel, this.photoSrc, datastore);
 
-    // put TripDay entity into datastore
-    Entity tripDayEntity = putTripDayInDatastore(request, datastore, LocalDate.parse(tripDayOfTravel), tripEntity.getKey());
+    //do post for maps
+    DirectionsApiRequest dirRequest = generateDirectionsRequest(this.tripDestination, this.tripDestination, poiStrings, this.context);
+    DirectionsResult dirResult = getDirectionsResult(dirRequest);
+    List<Integer> travelTimes = getTravelTimes(dirResult);
+    List<String> orderedLocationStrings = getOrderedWaypoints(dirResult, poiStrings);
 
+    // put TripDay entity into datastore
+    Entity tripDayEntity = putTripDayInDatastore(this.tripDestination, datastore, LocalDate.parse(tripDayOfTravel), tripEntity.getKey());
+
+    List<Entity> locationEntities = TripDay.locationsToEntities(orderedLocationStrings, tripDayEntity.getKey());
+    TripDay.storeLocationsInDatastore(locationEntities, this.datastore);
+    
     // put Event entities in datastore
-    putEventsInDatastore(request, response, params, tripDayEntity, LocalDate.parse(tripDayOfTravel), datastore);
+    putEventsInDatastore(tripDayEntity, LocalDate.parse(tripDayOfTravel), datastore, orderedLocationStrings, travelTimes);
 
     // Redirect to the "/trips/" page to show the trip that was added.
     response.sendRedirect("/trips/");
@@ -147,19 +188,16 @@ public class TripServlet extends HttpServlet {
     } catch(ApiException | InterruptedException e) {
       throw new IOException(e);
     }
-
   }
 
   /**
    * put TripDay into Datastore
+   * assumes that origin and destination are same 
    * @return tripDay entity, needed for event creation
    */
-  public Entity putTripDayInDatastore(HttpServletRequest request, 
-      DatastoreService datastore, LocalDate date, Key tripEntityKey) throws IOException {
-    String origin = request.getParameter("inputDestination");
-    String destination = origin; // may change if user can differentiate b/t the two
-
-    TripDay tripDay = new TripDay(origin, destination, new ArrayList<>(), date);
+  public Entity putTripDayInDatastore(String origin, DatastoreService datastore, LocalDate date, Key tripEntityKey) 
+      throws IOException {
+    TripDay tripDay = new TripDay(origin, origin, new ArrayList<>(), date);
     Entity tripDayEntity = tripDay.buildEntity(tripEntityKey);
     datastore.put(tripDayEntity);
     return tripDayEntity;  
@@ -170,37 +208,37 @@ public class TripServlet extends HttpServlet {
    * Searches through the parameters and creates the events and puts them into
    * datastore with associated tripDayEntity as a parent
    */
-  public List<Entity> putEventsInDatastore(HttpServletRequest request, HttpServletResponse response, 
-      Enumeration<String> params, Entity tripDayEntity, LocalDate date, DatastoreService datastore)
+  public List<Entity> putEventsInDatastore(Entity tripDayEntity, LocalDate date, DatastoreService datastore,
+      List<String> pois, List<Integer> travelTimes)
       throws IOException { 
 
     // entities to return, needed for testing
     List<Entity> eventEntities = new ArrayList<>();    
 
-    // set startDateTime
+    // set startDateTime to 10 am plus the travel time from hotel to POI 1
+    // assumes the user leaves hotel at 10 am
     LocalDateTime startDateTime = LocalDateTime.of(date, LocalTime.of(10, 0));
+    startDateTime = startDateTime.plusMinutes(Long.valueOf(travelTimes.get(0)));
 
-    // search through all the parameters looking for pois
-    while (params.hasMoreElements()) {
-      String p = params.nextElement();
+    // First travel time is from hotel to POI 1,
+    // so add travelTimeIndex at index 1 (time from POI 1 to POI 2) to get start time for POI 2.
+    int travelTimeIndex = 1;
+    // for each poi create the necessary fields
+    for (String address : pois) {
+      // create event entity
+      String name = address.split(",")[0];
+      Event event = new Event(name, address, startDateTime, travelTimes.get(travelTimeIndex));
+      Entity eventEntity = event.eventToEntity(tripDayEntity.getKey());
+      eventEntities.add(eventEntity);
 
-      /** 
-       * for each poi create the necessary fields, this will change
-       * as we are able to pull from the maps backend api
-       */
-      if (p.contains("poi")) {
-        String address = request.getParameter(p);
-        String name = address.split(",")[0];
-        Event event = new Event(name, address, startDateTime, HALF_HOUR);
-        Entity eventEntity = event.eventToEntity(tripDayEntity.getKey());
-        eventEntities.add(eventEntity);
+      // put entity in datastore   
+      datastore.put(eventEntity);
 
-        // put entity in datastore     
-        datastore.put(eventEntity);
+      // sets start time for next event one hour and travel time after start of prev
+      startDateTime = startDateTime.plusMinutes(Long.valueOf(ONE_HOUR + travelTimes.get(travelTimeIndex)));
+      travelTimeIndex++;
 
-        // sets start time for next event 1.5 hours after start of prev
-        startDateTime = startDateTime.plusMinutes(Long.valueOf(NINETY_MINS));
-      }
+
     }
     return eventEntities;
   }
@@ -291,5 +329,86 @@ public class TripServlet extends HttpServlet {
     final String baseUrl = "https://maps.googleapis.com/maps/api/place/photo?";
     return baseUrl + "maxwidth=" + maxWidth + "&photoreference=" + 
       photoReference + "&key=" + Config.API_KEY;
+  }
+
+  /**
+   * Generate directionsResult from directionsRequest.
+   * @param directionsRequest DirectionsApiRequest object generated from user input
+   */
+  public static DirectionsResult getDirectionsResult(DirectionsApiRequest directionsRequest) 
+      throws IOException {
+    // Calculate route and save travelTimes and waypointOrder to two ArrayLists.
+    try {
+      DirectionsResult dirResult = directionsRequest.await();
+      return dirResult;
+    } catch (ApiException | InterruptedException e) {
+      // If no directions are found or API throws an error.
+      throw new IOException(e);
+    } 
+  }
+
+  /**
+   * Generates directionsRequest from user input.
+   * @param origin route starting point
+   * @param destination route ending point
+   * @param poiStrings String array of poi stops along the route. 
+                       Pois are stored as String addresses, not place IDs.
+   * @param context API context
+   */
+  public static DirectionsApiRequest generateDirectionsRequest(String origin, String destination, 
+      String[] poiStrings, GeoApiContext context) {
+
+    // Generate directions request
+    DirectionsApiRequest directionsRequest = DirectionsApi.newRequest(context)
+        .origin(origin)
+        .destination(destination)
+        .waypoints(poiStrings)
+        .optimizeWaypoints(true)
+        .mode(TravelMode.DRIVING);
+
+    return directionsRequest;
+  }
+
+  /**
+   * Gets list of travel times for each route leg from a DirectionsResult object.
+   * @param dirResult DirectionsResult object containing optimal route
+   */
+  public static List<Integer> getTravelTimes(DirectionsResult dirResult) {
+    List<Integer> travelTimes = new ArrayList<>();
+    // Take the first route, usually the optimal.
+    for (DirectionsLeg leg : dirResult.routes[ROUTE_INDEX].legs) {
+      int travelTime = (int) leg.duration.inSeconds / SECONDS_IN_MIN;
+      travelTimes.add(travelTime);
+    }
+
+    return travelTimes;
+  }
+
+  /**
+   * Gets list of poi addresses in optimized route order from a DirectionsResult object.
+   * @param dirResult DirectionsResult object containing optimal route
+   * @param pois String array of poi names (in any order)
+   */
+  public static List<String> getOrderedWaypoints(DirectionsResult dirResult, String[] pois) {
+    // Take the first route, usually the optimal.
+    int[] waypointOrder = dirResult.routes[ROUTE_INDEX].waypointOrder;
+
+    // Generate an ordered list of location Strings from waypointOrder.
+    List<String> orderedLocationStrings = new ArrayList<>();
+    for (int i = 0; i < waypointOrder.length; i++) {
+      orderedLocationStrings.add(pois[waypointOrder[i]]);
+    }
+
+    return orderedLocationStrings;
+  }
+
+  /**
+   * Converts list of Event objects into a JSON string using the Gson library.
+   * @param events List of event objects
+   */
+  private String convertToJson(List<Event> events) {
+    Gson gson = new Gson();
+    String json = gson.toJson(events);
+    return json;
   }
 }

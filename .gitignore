@@ -1,3 +1,4 @@
 target/
+src/main/java/com/google/sps/data/Config.java
 src/main/webapp/config.js
 src/main/java/com/google/sps/data/Config.java
