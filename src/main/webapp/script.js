@@ -180,7 +180,6 @@ function addHiddenPoiFormTrigger() {
       // Add hidden input to the "start trip" form.
       $('<input>').attr('type', 'hidden')
         .attr('name', 'poiList')
-        .attr('id', 'poiList')
         .attr('value', poiInput.name)
         .appendTo('#startTripForm');
     });
