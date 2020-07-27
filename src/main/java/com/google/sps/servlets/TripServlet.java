@@ -16,6 +16,7 @@ package com.google.sps.servlets;
 
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
+import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
@@ -49,6 +50,7 @@ import com.google.sps.Trip;
 import com.google.sps.TripDay;
 import com.google.sps.data.Config;
 import com.google.sps.data.Event;
+import com.google.sps.TripDay;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -64,7 +66,8 @@ import javax.servlet.http.HttpServletResponse;
 
 /** 
  * Servlet that currently allows for retrieving info from url and put in 
- *  calendar and calculates optimal route using Maps Java Client
+ * calendar, calculates optimal route using Maps Java Client,
+ * and puts info into datastore to be pulled by maps and calendar
  */
 @WebServlet("/calculate-trip")
 public class TripServlet extends HttpServlet {
@@ -115,17 +118,6 @@ public class TripServlet extends HttpServlet {
       .build();
   }
  
-  /**
-   * Iterate through the entities and create the events and write them to json.
-   */
-  @Override
-  public void doGet(HttpServletRequest request, HttpServletResponse response) 
-      throws IOException {
-    response.setContentType("application/json;");
-    
-    // do get for events
-    eventDoGet(response);
-  }
 
   /**
    * Get user input.
@@ -137,6 +129,11 @@ public class TripServlet extends HttpServlet {
       throws IOException {
     response.setContentType("application/json;");
 
+    // global info needed
+    DatastoreService datastore = 
+                                DatastoreServiceFactory.getDatastoreService();
+    Enumeration<String> params = request.getParameterNames(); 
+
     // Retrieve form inputs to define the Trip object.
     this.tripName = request.getParameter(INPUT_TRIP_NAME);
     this.tripDestination = request.getParameter(INPUT_DESTINATION);
@@ -147,8 +144,8 @@ public class TripServlet extends HttpServlet {
     populateDestinationAndPhoto(this.context, this.tripDestination);
 
     // Store the Trip Entity in datastore with the User Entity as an ancestor.
-    storeTripEntity(response, this.tripName, this.destinationName, 
-      this.tripDayOfTravel, this.photoSrc);
+    Entity tripEntity = storeTripEntity(response, this.tripName, this.destinationName, 
+      this.tripDayOfTravel, this.photoSrc, datastore);
 
     //do post for maps
     DirectionsApiRequest dirRequest = generateDirectionsRequest(this.tripDestination, this.tripDestination, poiStrings, this.context);
@@ -165,6 +162,12 @@ public class TripServlet extends HttpServlet {
 
     // do post for events
     eventDoPost(this.tripDayOfTravel, orderedLocationStrings, travelTimes); 
+
+    // put TripDay entity into datastore
+    Entity tripDayEntity = putTripDayInDatastore(request, datastore, LocalDate.parse(tripDayOfTravel), tripEntity.getKey());
+
+    // put Event entities in datastore
+    putEventsInDatastore(request, response, params, tripDayEntity, LocalDate.parse(tripDayOfTravel), datastore, orderedLocationStrings, travelTimes);
 
     // Redirect to the "/trips/" page to show the trip that was added.
     response.sendRedirect("/trips/");
@@ -198,37 +201,39 @@ public class TripServlet extends HttpServlet {
     } catch(ApiException | InterruptedException e) {
       throw new IOException(e);
     }
+
   }
 
   /**
-   * Iterate through the entities and create the events and write them to json.
+   * put TripDay into Datastore
+   * @return tripDay entity, needed for event creation
    */
-  private void eventDoGet(HttpServletResponse response) throws IOException {
-    Query query = new Query("events");
+  public Entity putTripDayInDatastore(HttpServletRequest request, 
+      DatastoreService datastore, LocalDate date, Key tripEntityKey) throws IOException {
+    String origin = request.getParameter("inputDestination");
+    String destination = origin; // may change if user can differentiate b/t the two
 
-    PreparedQuery results = this.datastore.prepare(query);
-
-    List<Event> events = new ArrayList<>();
-
-    // create the events
-    for (Entity entity : results.asIterable()) {
-      events.add(Event.eventFromEntity(entity));
-    }   
-
-    response.getWriter().println(convertToJson(events));
+    TripDay tripDay = new TripDay(origin, destination, new ArrayList<>(), date);
+    Entity tripDayEntity = tripDay.buildEntity(tripEntityKey);
+    datastore.put(tripDayEntity);
+    return tripDayEntity;  
   }
 
   /**
-   * Creates the events and puts them into datastore.
-   * @param date Trip date
-   * @param pois List<String> of pois
-   * @param travelTimes List<Integer> of travel times in minutes
+   * Make the servlet cleaner.
+   * Searches through the parameters and creates the events and puts them into
+   * datastore with associated tripDayEntity as a parent
    */
-  private void eventDoPost(String date, List<String> pois, List<Integer> travelTimes) 
+  public List<Entity> putEventsInDatastore(HttpServletRequest request, HttpServletResponse response, 
+      Enumeration<String> params, Entity tripDayEntity, LocalDate date, DatastoreService datastore,
+      List<String> pois, List<Integer> travelTimes)
       throws IOException { 
-    
+
+    // entities to return, needed for testing
+    List<Entity> eventEntities = new ArrayList<>();    
+
     // set startDateTime
-    LocalDateTime startDateTime = LocalDateTime.of(LocalDate.parse(date), LocalTime.of(10, 0));
+    LocalDateTime startDateTime = LocalDateTime.of(date, LocalTime.of(10, 0));
 
     int travelTimeIndex = 1;
     // for each poi create the necessary fields
@@ -244,6 +249,7 @@ public class TripServlet extends HttpServlet {
       startDateTime = startDateTime.plusMinutes(Long.valueOf(ONE_HOUR + travelTimes.get(travelTimeIndex)));
       travelTimeIndex++;
     }
+    return eventEntities;
   }
 
   /**
@@ -304,7 +310,7 @@ public class TripServlet extends HttpServlet {
    * name, but can also be the placeholder image source if no photo exists.
    */
   public Entity storeTripEntity(HttpServletResponse response, String tripName, 
-    String destinationName, String tripDayOfTravel, String photoSrc) throws IOException {
+    String destinationName, String tripDayOfTravel, String photoSrc, DatastoreService datastore) throws IOException {
     // Get User Entity. If user not logged in, redirect to homepage.
     Entity userEntity = AuthServlet.getCurrentUserEntity();
     if (userEntity == null) {

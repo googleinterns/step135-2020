@@ -436,7 +436,6 @@ function buildSuggestedLocationWidget(name, vicinity, photoSrc) {
   // The container that holds the full card.
   const cardContainer = document.createElement('div');
   cardContainer.className = 'card';
-  cardContainer.style = 'width: 15rem';
 
   // Add the photo of this location.
   const photoElement = document.createElement('img');

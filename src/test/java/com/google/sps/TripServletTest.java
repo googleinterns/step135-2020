@@ -15,6 +15,7 @@
 
 package com.google.sps;
 
+import static org.mockito.Mockito.*;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
@@ -22,6 +23,7 @@ import com.google.appengine.api.datastore.FetchOptions;
 import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
 import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
@@ -41,12 +43,16 @@ import com.google.maps.model.PlaceDetails;
 import com.google.maps.model.PlacesSearchResult;
 import com.google.maps.model.TravelMode;
 import com.google.sps.Trip;
+import com.google.sps.data.Event;
 import com.google.sps.data.User;
 import com.google.sps.servlets.AuthServlet;
 import com.google.sps.servlets.TripServlet;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Enumeration;
 import java.util.List;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -58,17 +64,33 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 import org.mockito.ArgumentMatchers;
-import static org.mockito.Mockito.*;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
+import static org.mockito.Mockito.*;
+
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({DirectionsApi.class, DirectionsApiRequest.class,
                  PlacesApi.class,FindPlaceFromTextRequest.class,UserServiceFactory.class})
 public final class TripServletTest {
-  
-   // Constants to pass into PlacesApi methods.
+
+  // class constants
+  private static final String INPUT_DESTINATION = 
+    "4265 24th Street San Francisco, CA, 94114";
+  private static final LocalDate INPUT_DATE = LocalDate.parse("2020-07-15");
+  private static final String POI_ONE = "one";
+  private static final String POI_TWO = "two";
+
+  // create TripServlet object
+  private TripServlet tripServlet;
+  private DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+
+  // initialize mock objects
+  private HttpServletRequest request = mock(HttpServletRequest.class);
+  private HttpServletResponse response = mock(HttpServletResponse.class);
+
+  // Constants to pass into PlacesApi methods.
   private static final String TEXT_LOCATION_SEARCH = "Big Island, Hawaii, USA";
   private static final String PLACE_ID = "ChIJWTr3xcHnU3kRNIHX-ZKkVRQ";
 
@@ -78,13 +100,10 @@ public final class TripServletTest {
   public static final String LOGOUT_URL = "/_ah/logout?continue=%2F";
   public static final String LOGIN_URL = "/_ah/login?continue=%2F";
 
-  // Create TripServlet object.
-  TripServlet tripServlet;
-
   // Add helper to allow datastore testing in local JUnit tests.
   // See https://cloud.google.com/appengine/docs/standard/java/tools/localunittesting.
   private final LocalServiceTestHelper helper =
-    new LocalServiceTestHelper(new LocalDatastoreServiceTestConfig());
+      new LocalServiceTestHelper(new LocalDatastoreServiceTestConfig());
 
   @Before
   public void initTripServlet() {
@@ -207,6 +226,66 @@ public final class TripServletTest {
   }
 
   @Test
+  public void testPutTripDayInDatastore() throws Exception {
+    // set mock object behavior
+    when(request.getParameter("inputDestination")).thenReturn(INPUT_DESTINATION);
+
+    // create key
+    Key testKey = KeyFactory.createKey("test", ((long) 123));
+
+    // put entity in datastore and query it
+    Entity tripDayEntity = tripServlet.putTripDayInDatastore(request, datastore, INPUT_DATE, testKey);
+    Query query = new Query(TripDay.QUERY_STRING);
+    PreparedQuery results = datastore.prepare(query);
+    List<Entity> listResults = results.asList(FetchOptions.Builder.withDefaults());
+
+    // check size, tripDayEntity is correctly added
+    Assert.assertEquals(1, listResults.size());
+    Assert.assertEquals(listResults.get(0), tripDayEntity);
+  }
+
+  @Test
+  public void testPutEventsInDatastore() throws Exception {
+    // set mock object behavior
+    when(request.getParameter("poi-1")).thenReturn(POI_ONE);
+    when(request.getParameter("poi-2")).thenReturn(POI_TWO);
+
+    // manually create params list
+    List<String> paramsList = new ArrayList<>();
+    paramsList.add("inputDestination");
+    paramsList.add("inputDayOfTravel");
+    paramsList.add("inputTripName");
+    paramsList.add("poi-1");
+    paramsList.add("poi-2");
+    Enumeration<String> params = Collections.enumeration(paramsList);
+
+    // initialize datastore
+    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+
+    // create tripDay entity, needed for put events in datastore
+    Entity tripDayEntity = new Entity(TripDay.QUERY_STRING);
+    tripDayEntity.setProperty("origin", INPUT_DESTINATION);
+    tripDayEntity.setProperty("destination", INPUT_DESTINATION);
+    tripDayEntity.setProperty("date", INPUT_DATE.toString());
+    datastore.put(tripDayEntity);
+
+    // put entities in datastore and query them
+    List<Entity> eventEntities = tripServlet.putEventsInDatastore(request, response, params, tripDayEntity, INPUT_DATE, datastore);
+    Query query = new Query(Event.QUERY_STRING);
+    PreparedQuery results = datastore.prepare(query);
+    List<Entity> listResults = results.asList(FetchOptions.Builder.withDefaults());
+
+    // check that size is correct, added in correct order, entities match
+    Assert.assertEquals(2, listResults.size());
+    Assert.assertEquals(listResults.get(0), eventEntities.get(0));
+    Assert.assertEquals(listResults.get(1), eventEntities.get(1));
+  }
+
+   @Test
+  public void testFullDoPost() {
+    // TODO: Adam to add full integration test
+  }
+
   public void testGetPlaceIdFromTextSearchCandidatesPresent() throws Exception {
     // Mock the GeoApiContext object to be passed into PlacesApi methods,
     // and the FindPlaceFromTextRequest.
@@ -291,7 +370,7 @@ public final class TripServletTest {
 
     // Run storeTripEntity(...), with the User logged in (so trip is stored).
     Entity tripEntityReturn = tripServlet.storeTripEntity(responseMock,
-      tripName, destinationName, tripDayOfTravel, photoSrc);
+      tripName, destinationName, tripDayOfTravel, photoSrc, datastore);
 
     // Retrieve the datastore results.
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
@@ -337,7 +416,7 @@ public final class TripServletTest {
 
     // Run storeTripEntity(...), with the User logged in (so trip is stored).
     tripServlet.storeTripEntity(responseMock, tripName, destinationName, 
-      tripDayOfTravel, photoSrc);
+      tripDayOfTravel, photoSrc, datastore);
 
     // Retrieve the datastore results.
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
@@ -374,7 +453,7 @@ public final class TripServletTest {
 
     // Run storeTripEntity(...), with the User not logged in (so nothing is stored).
     Entity tripEntityReturn = tripServlet.storeTripEntity(responseMock,
-      tripName, destinationName, tripDayOfTravel, photoSrc);
+      tripName, destinationName, tripDayOfTravel, photoSrc, datastore);
 
     // Retrieve the datastore results.
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
