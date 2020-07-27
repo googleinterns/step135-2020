@@ -38,12 +38,6 @@ import java.util.List;
  */
 public class Utility {
 
-  // Add constants necessary to testing retrieval of the current User.
-  private static final String EMAIL = "testemail@gmail.com";
-  private static final String AUTH_DOMAIN = "gmail.com";
-  private static final String LOGOUT_URL = "/_ah/logout?continue=%2F";
-  private static final String LOGIN_URL = "/_ah/login?continue=%2F";
-
   /**
    * Get the place ID of the text search. Return null if no place ID matches
    * the search.
@@ -53,7 +47,7 @@ public class Utility {
    * @param textSearch The text query to be entered in the findPlaceFromText(...)
    * API call. Must be non-null.
    */ 
-  public String getPlaceIdFromTextSearch(GeoApiContext context, String textSearch) 
+  public static String getPlaceIdFromTextSearch(GeoApiContext context, String textSearch) 
     throws IOException {
 
     FindPlaceFromTextRequest findPlaceRequest = PlacesApi.findPlaceFromText(context, 
@@ -81,7 +75,7 @@ public class Utility {
    * APIs (googlemaps.github.io/google-maps-services-java/v0.1.2/javadoc/com/google/maps/GeoApiContext.html).
    * @param placeId The place ID of the location. Must be non-null.
    */
-  public PlaceDetails getPlaceDetailsFromPlaceId(GeoApiContext context, String placeId)
+  public static PlaceDetails getPlaceDetailsFromPlaceId(GeoApiContext context, String placeId)
     throws IOException {
 
     PlaceDetailsRequest placeDetailsRequest = PlacesApi.placeDetails(context, 
@@ -102,27 +96,18 @@ public class Utility {
    * @param photoReference This is the photo reference String stored in the 
    * Google Maps Photo object; this is used to retrieve the actual photo URL.
    */
-  public String getUrlFromPhotoReference(int maxWidth, String photoReference) {
+  public static String getUrlFromPhotoReference(int maxWidth, String photoReference) {
     final String baseUrl = "https://maps.googleapis.com/maps/api/place/photo?";
     return baseUrl + "maxwidth=" + maxWidth + "&photoreference=" + 
       photoReference + "&key=" + Config.API_KEY;
   }
 
   /**
-   * Converts a UserAuth object into a JSON string using the Gson library.
+   * Converts an Object into a JSON string using the Gson library.
    *
-   * @param object Object...
+   * @param object Object to be converted into a JSON string.
    */
   public static String convertToJson(Object object) {
-    Gson gson = new Gson();
-    String json = gson.toJson(object);
-    return json;
-  }
-
-  /**
-  * Converts a List of Trips into a JSON string using the Gson library.
-  */
-  private String convertObjectToJson(Object object) {
     Gson gson = new Gson();
     String json = gson.toJson(object);
     return json;

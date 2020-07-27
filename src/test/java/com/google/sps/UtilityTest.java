@@ -36,12 +36,6 @@ public class UtilityTest {
   private final LocalServiceTestHelper helper =
     new LocalServiceTestHelper(new LocalDatastoreServiceTestConfig());
 
-  // Add constants necessary to testing retrieval of the current User.
-  private static final String EMAIL = "testemail@gmail.com";
-  private static final String AUTH_DOMAIN = "gmail.com";
-  private static final String LOGOUT_URL = "/_ah/logout?continue=%2F";
-  private static final String LOGIN_URL = "/_ah/login?continue=%2F";
-
   @Before
   public void initDatastore() {
     datastore = DatastoreServiceFactory.getDatastoreService();
@@ -51,12 +45,13 @@ public class UtilityTest {
    * Add the logged-in user to Datastore. Get property names from the User class
    * and test property values from field variables.
    *
+   * @param email The email of the logged-in user.
    * @return The Key of the User Entity in Datastore.
    */ 
-  public static Key addLoggedInUserToDatastore() {
+  public static Key addLoggedInUserToDatastore(String email) {
     // Add the logged-in User to Datastore, and get the User Entity Key.
     Entity userEntity = new Entity(User.USER);
-    userEntity.setProperty(User.USER_EMAIL, EMAIL);
+    userEntity.setProperty(User.USER_EMAIL, email);
     datastore.put(userEntity);
     Key userEntityKey = userEntity.getKey();
     return userEntityKey;
@@ -87,6 +82,25 @@ public class UtilityTest {
     tripEntity.setProperty(Trip.END_DATE, endDate);
     datastore.put(tripEntity);
     return tripEntity;
+  }
+
+  /**
+   * Create the mock of the UserService object of the logged-in user.
+   */
+  public static UserService createUserServiceMockLoggedIn() {
+    // Mock UserService methods as logged-in user.
+    UserService userServiceMock = mock(UserService.class);
+    when(userServiceMock.isUserLoggedIn()).thenReturn(true);
+    // This is the User object from Google Appengine (full path given to avoid
+    // confusion with local User.java file).
+    when(userServiceMock.getCurrentUser()).thenReturn(
+        new com.google.appengine.api.users.User(EMAIL, AUTH_DOMAIN));
+    when(userServiceMock.createLogoutURL(AuthServlet.redirectUrl)).thenReturn(LOGOUT_URL);
+
+    // PowerMock static getUserService() method, which is used to get the user.
+    PowerMockito.mockStatic(UserServiceFactory.class);
+    when(UserServiceFactory.getUserService()).thenReturn(userServiceMock);
+    return userServiceMock;
   }
 
 }
