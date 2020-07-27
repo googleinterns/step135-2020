@@ -218,6 +218,8 @@ public class TripServlet extends HttpServlet {
     // set startDateTime
     LocalDateTime startDateTime = LocalDateTime.of(date, LocalTime.of(10, 0));
 
+    // First travel time is from hotel to POI 1, which is not reflected in the calendar,
+    // so start travelTimeIndex at index 1.
     int travelTimeIndex = 1;
     // for each poi create the necessary fields
     for (String address : pois) {
