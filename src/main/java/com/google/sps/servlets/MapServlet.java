@@ -98,7 +98,7 @@ public class MapServlet extends HttpServlet {
       response.sendRedirect("/");
     } else {
       // Get TripDay associated with the Trip.
-      // Post-MVP: change to select the desired tripDay.
+      // TODO(eshika): change to select the desired tripDay for multiday trips.
       Query tripDayQuery = new Query(TripDay.QUERY_STRING, tripEntity.getKey());
       PreparedQuery tripDayResults = datastore.prepare(tripDayQuery);
       Entity tripDayEntity = tripDayResults.asSingleEntity();
