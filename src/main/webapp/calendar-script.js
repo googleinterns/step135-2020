@@ -20,6 +20,10 @@ script.async = true;
 
 var map;
 var service;
+var emptyString = '';
+
+const daysOfWeek = 
+  ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
 // Triggered upon DOM load.
 window.initMod = function() {
@@ -35,7 +39,6 @@ window.initMod = function() {
     dayMaxEvents: true, //alow "more" link when too many events on one day
     eventClick: function(info) {
       var eventObj = info.event;
-      console.log(eventObj);
 
       // title of pop-up
       const modalLabel = document.getElementById('exampleModalLabel');
@@ -46,8 +49,7 @@ window.initMod = function() {
       const modalBody = document.getElementById('exampleModalBody');
       
       createMap(modalBody, eventObj);
-
-      console.log("8");
+      $('#exampleModal').modal('show');
     }
   });
   getEvents(calendar);
@@ -70,6 +72,7 @@ function getEvents(calendar) {
         end: event.strEndTime,
         allDay: false,
         extendedProps: {
+          stringDate: event.strStartTime,
           address: event.address,
           placeId: event.placeId, 
           openTime: '9AM',
@@ -81,10 +84,12 @@ function getEvents(calendar) {
 }
 
 function createMap(modalBody, eventObj) {
-  let infoDisplay = document.createElement('p');
-  infoDisplay.innerHTML = '<b>Address: </b>' + eventObj.extendedProps.address + '<br>' +
-  '<b>Opening hours: </b>' + eventObj.extendedProps.openTime + '<br>' +
-  '<b>Closing hours: </b>' + eventObj.extendedProps.closeTime + '<br>';
+  const infoDisplay = document.createElement('div');
+  let address = document.createElement('p');
+  infoDisplay.innerHTML = '<b>Address: </b>' + eventObj.extendedProps.address + '<br>';// +
+  // '<b>Opening hours: </b>' + eventObj.extendedProps.openTime + '<br>' +
+  // '<b>Closing hours: </b>' + eventObj.extendedProps.closeTime + '<br>';
+  infoDisplay.appendChild(address);
   modalBody.appendChild(infoDisplay)
 
   // create new div to hold map
@@ -92,42 +97,68 @@ function createMap(modalBody, eventObj) {
   mapDis.id = 'map';
   modalBody.appendChild(mapDis);
 
-  console.log("pre-map");
   // instantiate map
   map = new google.maps.Map(document.getElementById('map'), {
       zoom: 14,
       center: new google.maps.LatLng(0, 0)
     });
-  console.log("post-map");
 
-  console.log("1");
   service = new google.maps.places.PlacesService(map);
-  console.log("2");
-  console.log(eventObj.extendedProps.placeId);
   service.getDetails({
+    //fields: ['opening_hours', 'geometry', 'formatted_phone_number'],
     placeId: eventObj.extendedProps.placeId
   }, function(result, status) {
-    console.log("3");
     if (status != google.maps.places.PlacesServiceStatus.OK) {
-      console.log("4");
       alert(status);
       return;
     }
-    console.log("5");
-    console.log(result.geometry.location);
+    // set center of map
     map.setCenter(result.geometry.location);
+  
+    // add open hours to mod info Display
+    let openHours = document.createElement('p');
 
-    console.log("6");
+    // if there are open hours display them, otherwise open all day
+    try {
+      var stringFullDate = eventObj.extendedProps.stringDate;
+      var dateStr = stringFullDate.split('T')[0]; 
+      var intOfWeek = getintOfWeek(dateStr);
+
+      var dateObj = new Date(stringFullDate);
+      var openTime = formatAMPM(result.opening_hours.periods[intOfWeek].open.time);
+      var closeTime = formatAMPM(result.opening_hours.periods[intOfWeek].close.time);
+      openHours.innerHTML = '<b>Open: </b>' +  openTime + '</br>' +
+          '<b>Close: </b>' + closeTime;
+    } catch(e) {
+      openHours.innerHTML = '<b> Open All Day </b>';
+    }
+
+    infoDisplay.appendChild(openHours);
+
     var marker = new google.maps.Marker({
       map: map,
       position: result.geometry.location
     });
-    console.log("7");
-    console.log(map);
-    console.log(marker);
-    $('#exampleModal').modal('show');
   });
-  console.log("end");
+}
+
+// Accepts a Date object or date string that is recognized by the Date.parse() method
+function getintOfWeek(date) {
+  const intOfWeek = new Date(date).getDay();    
+  return isNaN(intOfWeek) ? null : 
+    intOfWeek;
+}
+
+// converts from 24hr (hh:mm) to 12hr format (hh:mm AM/PM)
+function formatAMPM(time) {
+  var hours = time.substring(0, 2);
+  var minutes = time.substring(2, 4);
+  var ampm = hours >= 12 ? 'pm' : 'am';
+  hours = hours % 12;
+  hours = hours ? hours : 12; // the hour '0' should be '12'
+  minutes = (minutes < 10 && minutes > 0) ? '0' + minutes : minutes;
+  var strTime = hours + ':' + minutes + ' ' + ampm;
+  return strTime;
 }
 
 // Append the 'script' element to the document head.
