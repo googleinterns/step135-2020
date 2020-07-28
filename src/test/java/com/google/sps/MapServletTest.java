@@ -19,10 +19,12 @@ import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
 import com.google.sps.Trip;
 import com.google.sps.data.User;
+import com.google.sps.servlets.AuthServlet;
 import com.google.sps.servlets.MapServlet;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -37,14 +39,19 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
-@RunWith(JUnit4.class)
+@RunWith(PowerMockRunner.class)
+@PrepareForTest(AuthServlet.class)
 public final class MapServletTest {
 
   private MapServlet mapServlet;
 
   // User constants
   private static final String EMAIL = "test123@gmail.com";
+  private static final String EMAIL2 = "test456@gmail.com";
 
   // Constants to represent different Trip attributes.
   private static final String TRIP_NAME = "Trip to California";
@@ -144,6 +151,7 @@ public final class MapServletTest {
     HttpServletRequest request = mock(HttpServletRequest.class);       
     HttpServletResponse response = mock(HttpServletResponse.class);  
 
+    // Mock such that the servlet thinks the tripKey exists
     when(request.getParameter("tripKey")).thenReturn("true");
 
     // Create writers to check against actual output.
@@ -174,14 +182,59 @@ public final class MapServletTest {
     // initialize datastore
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 
-    // create user entity
-    Entity userEntity = new Entity(User.USER);
-    userEntity.setProperty(User.USER_EMAIL, EMAIL);
-    datastore.put(userEntity);
-
     mapServlet.doGet(request, response);
 
     String expectedJson = "No trip Key";
+    Assert.assertTrue(stringWriter.toString().contains(expectedJson));
+  }
+
+  /* 
+   * Tests doGet when the trip key is for a different user's trip
+   */
+  @Test
+  public void testWrongTripKey() throws Exception {
+    // Create writers to check against actual output.
+    StringWriter stringWriter = new StringWriter();
+    PrintWriter writer = new PrintWriter(stringWriter);
+
+    // initialize datastore
+    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+
+    // create user entities
+    Entity userEntity1 = new Entity(User.USER);
+    userEntity1.setProperty(User.USER_EMAIL, EMAIL);
+    datastore.put(userEntity1);
+    Key userEntityKey1 = userEntity1.getKey();
+
+    Entity userEntity2 = new Entity(User.USER);
+    userEntity2.setProperty(User.USER_EMAIL, EMAIL2);
+    datastore.put(userEntity2);
+
+    // Add a single Trip to Datastore with the user1's Entity Key.
+    Entity tripEntity = new Entity(Trip.TRIP, userEntityKey1);
+    tripEntity.setProperty(Trip.TRIP_NAME, TRIP_NAME);
+    tripEntity.setProperty(Trip.DESTINATION_NAME, INPUT_DESTINATION);
+    tripEntity.setProperty(Trip.IMAGE_SRC, IMAGE_SRC);
+    tripEntity.setProperty(Trip.START_DATE, TRIP_DAY_OF_TRAVEL);
+    tripEntity.setProperty(Trip.END_DATE, TRIP_DAY_OF_TRAVEL);
+    datastore.put(tripEntity);
+
+    // Mock request such that tripKey provided is user1's trip
+    // Mock response to return mock writer
+    HttpServletRequest request = mock(HttpServletRequest.class);       
+    HttpServletResponse response = mock(HttpServletResponse.class); 
+    String tripKeyString = KeyFactory.keyToString(tripEntity.getKey());
+    when(request.getParameter("tripKey")).thenReturn(tripKeyString);
+    when(response.getWriter()).thenReturn(writer);
+
+    // Mock authServlet such that user2 is currently logged in
+    PowerMockito.mockStatic(AuthServlet.class);
+    PowerMockito.when(AuthServlet.getCurrentUserEntity()).thenReturn(userEntity2);
+
+    mapServlet.doGet(request, response);
+
+    String expectedJson = "No trip found";
+    System.err.println(stringWriter.toString());
     Assert.assertTrue(stringWriter.toString().contains(expectedJson));
   }
 }
