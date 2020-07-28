@@ -40,6 +40,8 @@ import javax.servlet.http.HttpServletResponse;
 @WebServlet("/get-map")
 public class MapServlet extends HttpServlet {
 
+  private final String TRIP_KEY_PARAM = "tripKey";
+
   /**
    * Checks for invalid cases (no user or tripKey).
    * Gets the locations from datastore and prints them to writer.
@@ -55,8 +57,11 @@ public class MapServlet extends HttpServlet {
     // Get current user.
     Entity userEntity = AuthServlet.getCurrentUserEntity();
 
+    // Get tripKey.
+    String stringTripKey = request.getParameter(TRIP_KEY_PARAM);
+
     // if no tripKey return to trips page.
-    if (request.getParameter("tripKey") == null ){
+    if (stringTripKey == null) {
       response.getWriter().println("No trip Key");
       response.sendRedirect("/trips/");
   
@@ -65,7 +70,6 @@ public class MapServlet extends HttpServlet {
       response.getWriter().println("No current User");
       response.sendRedirect("/");
     } else { 
-      String stringTripKey = request.getParameter("tripKey");
       Key tripKey = KeyFactory.stringToKey(stringTripKey);
 
       // Gets the locations from datastore and writes them to .../get-map
@@ -95,7 +99,7 @@ public class MapServlet extends HttpServlet {
 
     // Add origin as the first location.
     List<String> locations = new ArrayList<>();
-    locations.add((String) tripDayEntity.getProperty("origin"));
+    locations.add((String) tripDayEntity.getProperty(TripDay.ORIGIN));
 
     // Add rest of POIs to locations list and write to writer.
     Query locationsQuery = new Query(TripDay.LOCATION_ENTITY_TYPE, tripDayEntity.getKey());
