@@ -120,7 +120,7 @@ function createMap2(modalBody, eventObj) {
   modalBody.appendChild(infoDisplay)
 
   const mapDis = document.createElement('div');
-  mapDis.id = 'map'
+  mapDis.id = 'map';
   modalBody.appendChild(mapDis);
 
   // The location of Uluru
