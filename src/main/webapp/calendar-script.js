@@ -46,6 +46,7 @@ window.initMod = function() {
 
       createMap2(modalBody, eventObj);
       $('#exampleModal').modal('show');
+      console.log("8");
     }
   });
   getEvents(calendar);
