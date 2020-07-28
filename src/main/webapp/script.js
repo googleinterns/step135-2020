@@ -180,7 +180,7 @@ function addHiddenPoiFormTrigger() {
       // Add hidden input to the "start trip" form.
       $('<input>').attr('type', 'hidden')
         .attr('name', 'poiList')
-        .attr('value', poiInput.name)
+        .attr('value', poiInput.innerText)
         .appendTo('#startTripForm');
     });
     return true;
@@ -309,30 +309,49 @@ function addPoi(poi) {
 
 // Build and return a user-added POI HTML object.
 function buildPoiObject(poi) {
-  const formGroupContainer = document.createElement('div');
-  formGroupContainer.className = 'form-group';
-  formGroupContainer.style.display = 'block';
+  // Create POI element, and remove the hover attributes.
+  const poiElement = document.createElement('button');
+  poiElement.className = 'btn-nohover btn-light-nohover';
+  poiElement.id = 'poi-element';
+  poiElement.type = 'button';
 
-  // Create poiInputButton, as well as function to remove the container upon 
-  // click. The submit button is also checked.
-  const poiInputButton = buildInput('button', poi + ' (click to remove)', 
-    'btn btn-secondary poi-input', poi);
-  poiInputButton.onclick = 
-    () => { formGroupContainer.remove(); checkSubmitButton() };
+  // Add span element with POI text.
+  const spanPoiText = document.createElement('span');
+  spanPoiText.className = 'poi-input';
+  spanPoiText.id = 'poi-element-text';
+  spanPoiText.innerText = poi;
 
-  // Add the POI input button to the div container, and return the container.
-  formGroupContainer.appendChild(poiInputButton);
-  return formGroupContainer;
-}
+  // Add span element with spacing between POI text and trash can.
+  const spanPoiSpace = document.createElement('span');
+  spanPoiSpace.id = 'poi-element-space';
+  spanPoiSpace.innerHTML += '&nbsp;&nbsp;&nbsp;&nbsp;';
 
-// Build input attribute (for button); has type, value, className, name params.
-function buildInput(type, value, className, name) {
-  const form = document.createElement('input');
-  form.type = type;
-  form.value = value;
-  form.className = className;
-  form.name = name;
-  return form;
+  // Add trash icon to end of button, and add onclick function to icon.
+  const trashIconButton = document.createElement('i');
+  trashIconButton.id = 'poi-trash-icon';
+  trashIconButton.className = 'fa fa-trash';
+  trashIconButton.onclick = () => {
+    poiElement.remove();
+    checkSubmitButton();
+  };
+
+  // Add hover styling through mouseenter and mouseleave listeners.
+  trashIconButton.addEventListener('mouseenter', function(event) {
+    spanPoiText.style.textDecoration = 'line-through';
+    poiElement.style.backgroundColor = '#e2e6ea';
+    poiElement.style.borderColor = '#dae0e5';
+  });
+  trashIconButton.addEventListener('mouseleave', function(event) {
+    spanPoiText.style.textDecoration = 'none';
+    poiElement.style.backgroundColor = '#f8f9fa';
+    poiElement.style.borderColor = '#f8f9fa';
+  });
+
+  // Add span elements to POI element, and return POI element.
+  poiElement.appendChild(spanPoiText);
+  poiElement.appendChild(spanPoiSpace);
+  poiElement.appendChild(trashIconButton);
+  return poiElement;
 }
 
 // Add text input POI Google Places autofill.
