@@ -115,15 +115,15 @@ public final class MapServletTest {
     datastore.put(tripDayEntity);
 
     // create location entities and put it into datastore
-    Entity DomeEntity = new Entity(TripDay.LOCATION_ENTITY_TYPE, tripDayEntity.getKey());
-    DomeEntity.setProperty(TripDay.NAME, DOME_ADDRESS);
-    DomeEntity.setProperty(TripDay.ORDER, 1);
-    datastore.put(DomeEntity);
+    Entity domeEntity = new Entity(TripDay.LOCATION_ENTITY_TYPE, tripDayEntity.getKey());
+    domeEntity.setProperty(TripDay.NAME, DOME_ADDRESS);
+    domeEntity.setProperty(TripDay.ORDER, 1);
+    datastore.put(domeEntity);
 
-    Entity YosemiteEntity = new Entity(TripDay.LOCATION_ENTITY_TYPE, tripDayEntity.getKey());
-    YosemiteEntity.setProperty(TripDay.NAME, YOSEMITE_ADDRESS);
-    YosemiteEntity.setProperty(TripDay.ORDER, 0);
-    datastore.put(YosemiteEntity);
+    Entity yosemiteEntity = new Entity(TripDay.LOCATION_ENTITY_TYPE, tripDayEntity.getKey());
+    yosemiteEntity.setProperty(TripDay.NAME, YOSEMITE_ADDRESS);
+    yosemiteEntity.setProperty(TripDay.ORDER, 0);
+    datastore.put(yosemiteEntity);
 
     // run do Get
     mapServlet.doGetMap(response, datastore, userEntity, tripEntity.getKey());
