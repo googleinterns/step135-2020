@@ -18,7 +18,8 @@ script.src = 'https://maps.googleapis.com/maps/api/js?key=' + config.API_KEY +
 script.defer = true;
 script.async = true;
 
-var map;
+let map;
+let service;
 
 // Triggered upon DOM load.
 window.initMod = function() {
@@ -45,13 +46,14 @@ window.initMod = function() {
       const modalBody = document.getElementById('exampleModalBody');
 
       createMap2(modalBody, eventObj);
-      $('#exampleModal').modal('show');
       console.log("8");
+      $('#exampleModal').modal('show');
+      console.log("9");
     }
   });
   getEvents(calendar);
   calendar.render();
-};
+}
 
 /**
  * retrives the events from /calculate-trip url and dynamically adds the events
@@ -79,50 +81,6 @@ function getEvents(calendar) {
   });
 }
 
-/**
- * function that initializes map for popup, w specific address as marker
- */
-function createMap(modalBody, eventObj) {
-  var geocoder = new google.maps.Geocoder();
-  var coords;
-
-  // text to dispaly in popover
-  // let infoDisplay = document.createElement('p');
-  // infoDisplay.innerHTML = '<b>Address: </b>' + eventObj.extendedProps.address + '<br>' +
-  // '<b>Opening hours: </b>' + eventObj.extendedProps.openTime + '<br>' +
-  // '<b>Closing hours: </b>' + eventObj.extendedProps.closeTime + '<br>';
-  // modalBody.appendChild(infoDisplay)
-
-  let infoDisplay = document.createElement('p');
-  infoDisplay.innerHTML = '<b>Address: </b>' + eventObj.extendedProps.address + '<br>' +
-  '<b>Opening hours: </b>' + eventObj.extendedProps.openTime + '<br>' +
-  '<b>Closing hours: </b>' + eventObj.extendedProps.closeTime + '<br>';
-  modalBody.appendChild(infoDisplay)
-
-  // create new div to hold map
-  const mapDis = document.createElement('div');
-  mapDis.id = 'map'
-  modalBody.appendChild(mapDis);
-
-  geocoder.geocode({ placeId: eventObj.extendedProps.address}, function(results, status) {
-    if (status == google.maps.GeocoderStatus.OK) {
-      var latitude = results[0].geometry.location.lat();
-      var longitude = results[0].geometry.location.lng();
-      coords = {lat: latitude, lng: longitude};
-    }
-
-    var map = new google.maps.Map(document.getElementById('map'), {
-      zoom: 4,
-      center: coords
-    });
-    var marker = new google.maps.Marker({
-      position: coords,
-      map: map,
-      title: eventObj.title
-    });
-  });
-}
-
 function createMap2(modalBody, eventObj) {
   let infoDisplay = document.createElement('p');
   infoDisplay.innerHTML = '<b>Address: </b>' + eventObj.extendedProps.address + '<br>' +
@@ -142,7 +100,7 @@ function createMap2(modalBody, eventObj) {
     });
 
   console.log("1");
-  var service = new google.maps.places.PlacesService(map);
+  service = new google.maps.places.PlacesService(map);
   console.log("2");
   service.getDetails({
     placeId: eventObj.extendedProps.placeId
@@ -163,6 +121,7 @@ function createMap2(modalBody, eventObj) {
     });
     console.log("7");
   });
+  console.log("end");
 }
 
 // Append the 'script' element to the document head.
