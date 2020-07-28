@@ -20,10 +20,6 @@ script.async = true;
 
 var map;
 var service;
-var emptyString = '';
-
-const daysOfWeek = 
-  ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
 // Triggered upon DOM load.
 window.initMod = function() {
@@ -86,9 +82,7 @@ function getEvents(calendar) {
 function createMap(modalBody, eventObj) {
   const infoDisplay = document.createElement('div');
   let address = document.createElement('p');
-  infoDisplay.innerHTML = '<b>Address: </b>' + eventObj.extendedProps.address + '<br>';// +
-  // '<b>Opening hours: </b>' + eventObj.extendedProps.openTime + '<br>' +
-  // '<b>Closing hours: </b>' + eventObj.extendedProps.closeTime + '<br>';
+  infoDisplay.innerHTML = '<b>Address: </b>' + eventObj.extendedProps.address + '<br>';
   infoDisplay.appendChild(address);
   modalBody.appendChild(infoDisplay)
 
@@ -105,7 +99,6 @@ function createMap(modalBody, eventObj) {
 
   service = new google.maps.places.PlacesService(map);
   service.getDetails({
-    //fields: ['opening_hours', 'geometry', 'formatted_phone_number'],
     placeId: eventObj.extendedProps.placeId
   }, function(result, status) {
     if (status != google.maps.places.PlacesServiceStatus.OK) {
@@ -142,7 +135,7 @@ function createMap(modalBody, eventObj) {
   });
 }
 
-// Accepts a Date object or date string that is recognized by the Date.parse() method
+// takes a string in date format and return the int of the week
 function getintOfWeek(date) {
   const intOfWeek = new Date(date).getDay();    
   return isNaN(intOfWeek) ? null : 
