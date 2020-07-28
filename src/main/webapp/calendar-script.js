@@ -44,7 +44,7 @@ window.initMod = function() {
       $('#exampleModalBody').empty();
       const modalBody = document.getElementById('exampleModalBody');
 
-      createMap(modalBody, eventObj);
+      createMap2(modalBody, eventObj);
       $('#exampleModal').modal('show');
     }
   });
@@ -86,6 +86,12 @@ function createMap(modalBody, eventObj) {
   var coords;
 
   // text to dispaly in popover
+  // let infoDisplay = document.createElement('p');
+  // infoDisplay.innerHTML = '<b>Address: </b>' + eventObj.extendedProps.address + '<br>' +
+  // '<b>Opening hours: </b>' + eventObj.extendedProps.openTime + '<br>' +
+  // '<b>Closing hours: </b>' + eventObj.extendedProps.closeTime + '<br>';
+  // modalBody.appendChild(infoDisplay)
+
   let infoDisplay = document.createElement('p');
   infoDisplay.innerHTML = '<b>Address: </b>' + eventObj.extendedProps.address + '<br>' +
   '<b>Opening hours: </b>' + eventObj.extendedProps.openTime + '<br>' +
@@ -117,29 +123,44 @@ function createMap(modalBody, eventObj) {
 }
 
 function createMap2(modalBody, eventObj) {
-
   let infoDisplay = document.createElement('p');
   infoDisplay.innerHTML = '<b>Address: </b>' + eventObj.extendedProps.address + '<br>' +
   '<b>Opening hours: </b>' + eventObj.extendedProps.openTime + '<br>' +
   '<b>Closing hours: </b>' + eventObj.extendedProps.closeTime + '<br>';
   modalBody.appendChild(infoDisplay)
 
+  // create new div to hold map
   const mapDis = document.createElement('div');
-  mapDis.id = 'map'
+  mapDis.id = 'map';
   modalBody.appendChild(mapDis);
 
-  // The location of Uluru
-  var uluru = {lat: 40.7484, lng: -73.9857};
-
+  // instantiate map
   map = new google.maps.Map(document.getElementById('map'), {
       zoom: 14,
-      center: uluru
-  });
+      center: new google.maps.LatLng(0, 0)
+    });
 
-  var marker = new google.maps.Marker({
-    position: uluru,
-    map: map,
-    title: 'Title'
+  console.log("1");
+  var service = new google.maps.places.PlacesService(map);
+  console.log("2");
+  service.getDetails({
+    placeId: eventObj.extendedProps.placeId
+  }, function(result, status) {
+    console.log("3");
+    if (status != google.maps.places.PlacesServiceStatus.OK) {
+      console.log("4");
+      alert(status);
+      return;
+    }
+    console.log("5");
+    map.setCenter(result.geometry.location);
+
+    console.log("6");
+    var marker = new google.maps.Marker({
+      map: map,
+      position: result.geometry.location
+    });
+    console.log("7");
   });
 }
 
