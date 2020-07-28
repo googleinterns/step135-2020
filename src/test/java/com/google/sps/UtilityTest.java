@@ -14,6 +14,7 @@
  
 package com.google.sps.servlets;
 
+import static org.mockito.Mockito.*;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
@@ -26,6 +27,11 @@ import com.google.sps.data.Event;
 import com.google.sps.data.User;
 import com.google.sps.Trip;
 import com.google.sps.TripDay;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -49,6 +55,11 @@ public class UtilityTest {
   @Before
   public void initDatastore() {
     datastore = DatastoreServiceFactory.getDatastoreService();
+  }
+
+  @Test
+  public void initUtility() {
+    Assert.assertTrue(true);
   }
 
   /**
@@ -106,7 +117,7 @@ public class UtilityTest {
     // This is the User object from Google Appengine (full path given to avoid
     // confusion with local User.java file).
     when(userServiceMock.getCurrentUser()).thenReturn(
-        new com.google.appengine.api.users.User(email, auth_domain));
+        new com.google.appengine.api.users.User(email, authDomain));
     when(userServiceMock.createLogoutURL(AuthServlet.redirectUrl)).thenReturn(logoutUrl);
 
     // PowerMock static getUserService() method, which is used to get the user.
@@ -133,7 +144,7 @@ public class UtilityTest {
   /**
    * Create the TripDay Entity and put it in Datastore.
    */
-  public static TripDay putTripDayInDatastore(String inputDestination, 
+  public static Entity putTripDayInDatastore(String inputDestination, 
     String inputDate) {
     // Create the TripDay Entity and put it in Datastore.
     Entity tripDayEntity = new Entity(TripDay.QUERY_STRING);
@@ -147,8 +158,8 @@ public class UtilityTest {
   /**
    * Create the Event Entity and put it in Datastore.
    */
-  public static Event putEventInDatastore(String name, String address, 
-    String startTime, String travelTime) {
+  public static Entity putEventInDatastore(String name, String address, 
+    LocalDateTime startTime, String travelTime) {
     // Create the Event Entity and put it in Datastore.
     Entity eventEntity = new Entity(Event.QUERY_STRING);
     eventEntity.setProperty("name", name);
