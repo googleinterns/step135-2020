@@ -84,12 +84,18 @@ public class MapServlet extends HttpServlet {
       DatastoreService datastore, Entity userEntity, Key tripEntityKey) throws IOException {
   
     // Get trip Entity based on trip key.
+    // Trip entity is needed to ensure that tripKey corresponds to a Trip under the current user.
     Filter tripKeyFilter =
       new FilterPredicate("__key__", FilterOperator.EQUAL, tripEntityKey);
     Query tripQuery = new Query(Trip.TRIP, userEntity.getKey());
     tripQuery.setFilter(tripKeyFilter);
     PreparedQuery tripResults = datastore.prepare(tripQuery);
     Entity tripEntity = tripResults.asSingleEntity();
+
+    // If no trip is found then redirect
+    if (tripEntity == null) {
+      response.redirect("/");
+    }
 
     // Get TripDay associated with the Trip.
     // Post-MVP: change to select the desired tripDay.
