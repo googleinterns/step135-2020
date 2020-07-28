@@ -18,8 +18,8 @@ script.src = 'https://maps.googleapis.com/maps/api/js?key=' + config.API_KEY +
 script.defer = true;
 script.async = true;
 
-let map;
-let service;
+var map;
+var service;
 
 // Triggered upon DOM load.
 window.initMod = function() {
