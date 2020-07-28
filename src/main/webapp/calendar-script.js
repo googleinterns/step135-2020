@@ -44,11 +44,10 @@ window.initMod = function() {
       // body of pop-up
       $('#exampleModalBody').empty();
       const modalBody = document.getElementById('exampleModalBody');
+      
+      createMap(modalBody, eventObj);
 
-      createMap2(modalBody, eventObj);
       console.log("8");
-      $('#exampleModal').modal('show');
-      console.log("9");
     }
   });
   getEvents(calendar);
@@ -81,7 +80,7 @@ function getEvents(calendar) {
   });
 }
 
-function createMap2(modalBody, eventObj) {
+function createMap(modalBody, eventObj) {
   let infoDisplay = document.createElement('p');
   infoDisplay.innerHTML = '<b>Address: </b>' + eventObj.extendedProps.address + '<br>' +
   '<b>Opening hours: </b>' + eventObj.extendedProps.openTime + '<br>' +
@@ -93,15 +92,18 @@ function createMap2(modalBody, eventObj) {
   mapDis.id = 'map';
   modalBody.appendChild(mapDis);
 
+  console.log("pre-map");
   // instantiate map
   map = new google.maps.Map(document.getElementById('map'), {
       zoom: 14,
       center: new google.maps.LatLng(0, 0)
     });
+  console.log("post-map");
 
   console.log("1");
   service = new google.maps.places.PlacesService(map);
   console.log("2");
+  console.log(eventObj.extendedProps.placeId);
   service.getDetails({
     placeId: eventObj.extendedProps.placeId
   }, function(result, status) {
@@ -112,6 +114,7 @@ function createMap2(modalBody, eventObj) {
       return;
     }
     console.log("5");
+    console.log(result.geometry.location);
     map.setCenter(result.geometry.location);
 
     console.log("6");
@@ -120,6 +123,9 @@ function createMap2(modalBody, eventObj) {
       position: result.geometry.location
     });
     console.log("7");
+    console.log(map);
+    console.log(marker);
+    $('#exampleModal').modal('show');
   });
   console.log("end");
 }
