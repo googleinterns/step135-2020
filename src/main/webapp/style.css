@@ -94,6 +94,11 @@
   padding: 15px;
 }
 
+#add-pois-input-description {
+  width: 100%;
+  padding: 0px 5px;
+}
+
 #header {
   display: none;
   overflow: hidden;
@@ -164,11 +169,11 @@
   }
 }
 
-#site-title {
+.site-title {
   margin: 10px 0;
 }
 
-#site-description {
+.site-description {
   margin: 10px 0;
 }
 
