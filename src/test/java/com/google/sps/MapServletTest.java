@@ -164,6 +164,7 @@ public final class MapServletTest {
   public void testNoTripKeyPassedIn() throws Exception {
     HttpServletRequest request = mock(HttpServletRequest.class);       
     HttpServletResponse response = mock(HttpServletResponse.class); 
+    when(request.getParameter("tripKey")).thenReturn(null);
 
     // Create writers to check against actual output.
     StringWriter stringWriter = new StringWriter();
