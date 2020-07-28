@@ -70,6 +70,7 @@ window.initMap = function() {
     if (status === 'OK') {
       directionsRenderer.setDirections(response);
     } else {
+      // Show error
       window.alert('Directions request failed due to ' + status);
     }
   });
