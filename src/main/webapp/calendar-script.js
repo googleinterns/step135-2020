@@ -36,9 +36,16 @@ function getEvents(calendar) {
   const urlParams = new URLSearchParams(window.location.search);
   const tripKey = urlParams.get('tripKey');
   const tripKeyQuery = (tripKey != null && tripKey != '') ? '?tripKey=' + tripKey : '';
+  var first = true;
 
   fetch('/get-calendar' + tripKeyQuery).then(response => response.json()).then((events) => {
     events.forEach((event) => {
+      if (first) {
+        var initialDate = event.strStartTime.split('T')[0];
+        calendar.gotoDate(initialDate);
+        first = false;
+        createInitialEvent(calendar, initialDate);
+      }
       calendar.addEvent({     
         title: event.name,
         start: event.strStartTime,
@@ -48,3 +55,16 @@ function getEvents(calendar) {
     });
   });
 }
+
+/**
+ * Create the initial event of leaving the hotel
+ */
+function createInitialEvent(calendar, initialDate) {
+  calendar.addEvent({
+    title: 'Depart Hotel',
+    start: initialDate + 'T09:40:00',
+    end: initialDate + 'T10:05:00',
+    allDay: false
+  });
+}
+
