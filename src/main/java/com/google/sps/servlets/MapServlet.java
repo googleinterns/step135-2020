@@ -80,7 +80,7 @@ public class MapServlet extends HttpServlet {
   }
 
   /**
-   * Gets the locations and prints them to writer.
+   * Gets the locations and returns them as a JSON string.
    */
   public String doGetMap(HttpServletResponse response, 
       DatastoreService datastore, Entity userEntity, Key tripEntityKey) throws IOException {
