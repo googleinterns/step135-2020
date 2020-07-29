@@ -65,7 +65,8 @@ public class MapServlet extends HttpServlet {
       response.getWriter().println("No trip Key");
       response.sendRedirect("/trips/");
   
-    // if no user Entity return home.
+    // Redirects to sign in page if no user is signed in
+    // Otherwise redirects to create trips page
     } else if (userEntity == null) {
       response.getWriter().println("No current User");
       response.sendRedirect("/");
