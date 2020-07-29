@@ -169,6 +169,10 @@
   text-align: center;
 }
 
+#card-create-new-trip {
+  height: auto;
+}
+
 .form-group {
   padding: 0 5px;
 }

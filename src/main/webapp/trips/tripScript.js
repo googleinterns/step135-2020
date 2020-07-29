@@ -51,6 +51,7 @@ function addTripCards(trips) {
   if (trips.length === 0) {
     // Create the card container.
     const cardContainer = document.createElement('div');
+    cardContainer.id = 'card-create-new-trip';
     cardContainer.className = 'card text-white bg-primary mb-3';
     cardContainer.style = 'width: 18rem';
 
