@@ -193,6 +193,10 @@ body {
   font-size: 15px;
 }
 
+input[type=date] {
+  font-size: 15px;
+}
+
 #navbar-title {
   font-size: 2em;
   font-family: 'maven-pro';
