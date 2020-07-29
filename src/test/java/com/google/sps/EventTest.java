@@ -73,17 +73,17 @@ public final class EventTest {
   }
 
   @Test(expected = IllegalArgumentException.class)
-  public void testTravelTimeBelowMinPossible()  throws IOException {
+  public void testTravelTimeBelowMinPossible() {
     Event e = new Event (GOLDEN_GATE_PARK, ADDRESS, PLACE_ID, DEF_LDT, -1, HOUR);
   }
 
   @Test(expected = IllegalArgumentException.class)
-  public void testCheckTravelTimeGreaterThanFullDay() throws IOException {
+  public void testCheckTravelTimeGreaterThanFullDay() {
     Event e = new Event (GOLDEN_GATE_PARK, ADDRESS, PLACE_ID, DEF_LDT, 1440, HOUR);
   }
 
   @Test
-  public void testConstructorManualTimeSpent() throws IOException {
+  public void testConstructorManualTimeSpent() {
     // clarifying inputs
     int timeAtLocation = 80;
     LocalDateTime manualEndTime = LocalDateTime.of(
@@ -105,7 +105,7 @@ public final class EventTest {
   }
 
    @Test
-  public void testConstructorDefaultTimeSpent() throws IOException  {
+  public void testConstructorDefaultTimeSpent() {
     // clarifying inputs
     LocalDateTime manualEndTime = LocalDateTime.of(
                           LocalDate.parse("2020-06-25"), LocalTime.of(11, 0));
@@ -125,7 +125,7 @@ public final class EventTest {
   }
 
    @Test
-  public void testEventToEntityCorrectParent() throws IOException {
+  public void testEventToEntityCorrectParent() {
     // initialize datastore
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 
@@ -150,7 +150,7 @@ public final class EventTest {
   }
 
    @Test
-  public void testEventFromEntity() throws IOException {
+  public void testEventFromEntity() {
     // create eventEntity
     Entity eventEntity = new Entity(Event.QUERY_STRING);
     eventEntity.setProperty("name", GOLDEN_GATE_PARK);

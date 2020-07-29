@@ -83,7 +83,7 @@ public class Event {
    * @param timeAtLocation time spent at POI (minutes)
    */
   public Event(String name, String address, String placeId, LocalDateTime startTime, 
-              int travelTime, int timeAtLocation) throws IOException {
+              int travelTime, int timeAtLocation) {
     this.name = name;
     this.address = address;
     this.placeId = placeId;
@@ -105,7 +105,7 @@ public class Event {
    *        Null if last location of the day.
    */
   public Event(String name, String address, String placeId, LocalDateTime startTime, 
-              int travelTime) throws IOException {
+              int travelTime) {
     this(name, address, placeId, startTime, travelTime, HOUR);
   }
 
@@ -144,7 +144,7 @@ public class Event {
   /**
    * Build event from entity
    */
-  public static Event eventFromEntity(Entity eventEntity) throws IOException {
+  public static Event eventFromEntity(Entity eventEntity) {
     String name = (String) eventEntity.getProperty(NAME);
     String address = (String) eventEntity.getProperty(ADDRESS);
     String placeId = (String) eventEntity.getProperty(PLACE_ID);
