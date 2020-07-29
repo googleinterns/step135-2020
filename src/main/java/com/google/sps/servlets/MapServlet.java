@@ -98,7 +98,6 @@ public class MapServlet extends HttpServlet {
     if (tripEntity == null) {
       response.sendRedirect("/");
       return "No trip found";
-      // response.getWriter().println("No trip found");
     } 
 
     // Get TripDay associated with the Trip.
@@ -121,7 +120,6 @@ public class MapServlet extends HttpServlet {
     }
 
     return convertToJson(locations);
-    // response.getWriter().println(convertToJson(locations));    
   }
 
   /**
