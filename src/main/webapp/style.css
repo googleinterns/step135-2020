@@ -169,13 +169,13 @@
 }
 
 @font-face {
-  font-family: 'leckerli-one';
-  src: url('fonts/LeckerliOne-Regular.ttf') format('truetype')
+  font-family: 'maven-pro';
+  src: url('fonts/MavenPro-VariableFont_wght.ttf') format('truetype')
 }
 
 #navbar-title {
   font-size: 2em;
-  font-family: 'leckerli-one';
+  font-family: 'maven-pro';
 }
 
 .nav-item {
