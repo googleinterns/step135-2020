@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+var initialDate;
+
 // Triggered upon DOM load.
 $(document).ready(() => {
   var calendarEl = document.getElementById('calendar');
@@ -25,6 +27,7 @@ $(document).ready(() => {
     navLinks: true,
     dayMaxEvents: true, //alow "more" link when too many events on one day
   });
+  createInitialEvent(calendar);
   getEvents(calendar);
   calendar.render();
 });
@@ -36,9 +39,15 @@ function getEvents(calendar) {
   const urlParams = new URLSearchParams(window.location.search);
   const tripKey = urlParams.get('tripKey');
   const tripKeyQuery = (tripKey != null && tripKey != '') ? '?tripKey=' + tripKey : '';
+  var first = true;
 
   fetch('/get-calendar' + tripKeyQuery).then(response => response.json()).then((events) => {
     events.forEach((event) => {
+      if (first) {
+        initialDate = event.strStartTime.split('T')[0];
+        calendar.gotoDate(initialDate);
+        first = false;
+      }
       calendar.addEvent({     
         title: event.name,
         start: event.strStartTime,
@@ -48,3 +57,13 @@ function getEvents(calendar) {
     });
   });
 }
+
+function createInitialEvent(calendar) {
+  calendar.addEvent({
+    title: 'Depart Hotel',
+    start: initialDate + 'T09:59:00',
+    end: initialDate + 'T10:10:00',
+    allDay: false
+  });
+}
+
