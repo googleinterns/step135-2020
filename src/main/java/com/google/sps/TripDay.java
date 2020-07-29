@@ -31,9 +31,9 @@ public class TripDay {
   private LocalDate date;
 
   // Entity params
-  private static final String ORIGIN = "origin";
-  private static final String DESTINATION = "destination";
-  private static final String DATE = "date";
+  public static final String ORIGIN = "origin";
+  public static final String DESTINATION = "destination";
+  public static final String DATE = "date";
   
   // query string
   public static final String QUERY_STRING = "trip-day";

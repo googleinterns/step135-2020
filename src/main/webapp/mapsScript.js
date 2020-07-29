@@ -25,10 +25,10 @@ var directionsRenderer;
 
 // Attach callback function to the `window` object
 window.initMap = function() {
-  // Manhattan coords
-  const coords = {lat: 40.771, lng: -73.974};
+  // initialize coords
+  const coords = {lat: 0, lng: 0};
 
-  // Create map centered on Manhattan
+  // Create map centered on the (0, 0) coordinates
   map = new google.maps.Map(
       document.getElementById('routeMap'),
       {center: coords, 
@@ -44,26 +44,43 @@ window.initMap = function() {
   directionsRenderer.setMap(map);
   directionsRenderer.setPanel(document.getElementById('rightPanel'));
 
-  // Hard coded place IDs - will replace with user input
-  let timesSquareID = 'ChIJmQJIxlVYwokRLgeuocVOGVU';
-  let centralParkID = 'ChIJ4zGFAZpYwokRGUGph3Mf37k';
-  let worldTradeID = 'ChIJy7cGfBlawokR5l2e93hsoEA';
-  let empireStateID = 'ChIJtcaxrqlZwokRfwmmibzPsTU';
-  let hotelID = 'ChIJ68J3tfpYwokR2HaRoBcB4xg';
+  // Get locations from MapServlet and display directions on map.
+  displayRouteOnMap();
+}
 
-  let waypts = [{location : {'placeId': worldTradeID}},
-                {location : {'placeId': empireStateID}},
-                {location : {'placeId': timesSquareID}},
-                {location : {'placeId': centralParkID}},
-              ];
+/*
+ * Gets locations from MapServlet with the tripKey parameter.
+ * Calls showDirections to show the directions with those locations.
+ */
+function displayRouteOnMap() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const tripKey = urlParams.get('tripKey');
+  const tripKeyQuery = (tripKey != null && tripKey != '') ? '?tripKey=' + tripKey : '';
+  
+  fetch('/get-map' + tripKeyQuery).then(response => response.json()).then((locations) => {
+    showDirections(locations);
+  });
+}
+
+/* 
+ * Parses locations, generations DirectionsRequest with those locations,
+ * and displays on map with DirectionsRenderer.
+ * locations is a list of String addresses where the first element is the origin/destination
+ */
+function showDirections(locations) {
+  let origin = locations[0];
+  let waypts = [];
+
+  for (let i = 1; i < locations.length; i++) {
+    waypts.push({ location : locations[i]});
+  }
 
   // Create a DirectionsRequest with hotel as start/end and 
   // POIs as waypoints (stops on the route)
   directionsService.route({
-    origin: {'placeId': hotelID},
-    destination: {'placeId': hotelID},
+    origin: origin,
+    destination: origin,
     waypoints: waypts,
-    optimizeWaypoints: true,
     travelMode: 'DRIVING'
   }, function(response, status) {
     // Show directions when found
