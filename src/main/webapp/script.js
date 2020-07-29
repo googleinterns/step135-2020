@@ -273,7 +273,7 @@ function toggleStartTripInputStage() {
     document.getElementById('add-pois-container').style.display = 'flex';
     document.getElementById('submit-calculate-trip').style.display = 'inline-block';
     document.getElementById('suggested-location-block-header').style.display = 'block';
-    document.getElementById('suggested-location-block').style.display = 'block';
+    document.getElementById('suggested-location-block').style.display = 'inline-block';
 
     // Change name, location, and date inputs to be readonly.
     document.getElementById('inputTripName').readOnly = true;
@@ -475,6 +475,10 @@ function buildSuggestedLocationWidget(name, vicinity, photoSrc) {
   addressText.className = 'card-title';
   addressText.innerText = vicinity;
 
+  // Create the card footer, where action items ("Add this POI") will be placed.
+  const cardFooter = document.createElement('div');
+  cardFooter.className = 'card-footer';
+
   // Add a button that allows you to add this suggested location as a POI.
   const addSuggestedPoiButton = document.createElement('button');
   addSuggestedPoiButton.className = 'btn btn-primary';
@@ -490,14 +494,17 @@ function buildSuggestedLocationWidget(name, vicinity, photoSrc) {
     cardContainer.remove();
   }
 
-  // Add the title, address, and suggested POI button to the card body.
+  // Add the "Add this POI" button to the footer.
+  cardFooter.appendChild(addSuggestedPoiButton);
+
+  // Add the title and address to the card body.
   cardBodyContainer.appendChild(titleElement);
   cardBodyContainer.appendChild(addressText);
-  cardBodyContainer.appendChild(addSuggestedPoiButton);
 
   // Add the photo element and card body to the card container.
   cardContainer.appendChild(photoElement);
   cardContainer.appendChild(cardBodyContainer);
+  cardContainer.appendChild(cardFooter);
   
   return cardContainer;
 }

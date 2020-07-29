@@ -53,12 +53,12 @@
         </p>
         <form action="/calculate-trip" method="POST" id="startTripForm">
           <div class="form-row">
-            <div class="form-group col-md-3">
+            <div class="form-group col-md-4">
               <label for="inputDestination">Name of Trip</label>
               <input type="text" placeholder="Add a trip name" class="form-control" 
                 name="inputTripName" id="inputTripName">
             </div>
-            <div class="form-group col-md-3">
+            <div class="form-group col-md-4">
               <label for="inputDestination">Hotel (Start Point)</label>
               <input type="text" placeholder="Where will you stay?" 
                 class="form-control" id="inputDestination"
@@ -78,7 +78,7 @@
             <p class="site-description" id="add-pois-input-description">
               Which locations do you want to visit on your trip? Add them all here.
             </p>
-            <div class="form-group col-md-3">
+            <div class="form-group col-md-4">
               <input type="text" placeholder="Point of Interest" id="inputPoi"
                 class="form-control">
             </div>
@@ -93,7 +93,7 @@
             value="Calculate Trip">
         </form>
         <h3 id="suggested-location-block-header">Suggested Points of Interest</h3>
-        <div class="card-columns" id="suggested-location-block">
+        <div class="card-deck" id="suggested-location-block">
         </div>
       </div>
     </div>

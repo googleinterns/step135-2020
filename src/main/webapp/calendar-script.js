@@ -62,8 +62,8 @@ function getEvents(calendar) {
 function createInitialEvent(calendar, initialDate) {
   calendar.addEvent({
     title: 'Depart Hotel',
-    start: initialDate + 'T09:40:00',
-    end: initialDate + 'T10:05:00',
+    start: initialDate + 'T09:30:00',
+    end: initialDate + 'T10:00:00',
     allDay: false
   });
 }
