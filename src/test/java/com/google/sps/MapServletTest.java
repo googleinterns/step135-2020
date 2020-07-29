@@ -303,7 +303,6 @@ public final class MapServletTest {
     mapServlet.doGet(request, response);
 
     String expectedJson = "No trip found";
-    System.err.println(stringWriter.toString());
     Assert.assertTrue(stringWriter.toString().contains(expectedJson));
   }
 }
