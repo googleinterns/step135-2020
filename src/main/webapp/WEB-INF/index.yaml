@@ -1,0 +1,7 @@
+indexes:
+
+- kind: location
+  ancestor: yes
+  properties:
+  - name: order
+  
