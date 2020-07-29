@@ -110,8 +110,9 @@ public class MapServlet extends HttpServlet {
       // Add rest of POIs to locations list and write to writer.
       Query locationsQuery = new Query(TripDay.LOCATION_ENTITY_TYPE, tripDayEntity.getKey());
       locationsQuery.addSort(TripDay.ORDER);
-      PreparedQuery locationResults = datastore.prepare(locationsQuery); 
+      PreparedQuery locationResults = datastore.prepare(locationsQuery);
       for (Entity locationEntity : locationResults.asIterable()) {
+        // Gets location names as Strings (these names include the full address needed for routing)
         locations.add((String) locationEntity.getProperty(TripDay.NAME));
       }
       response.getWriter().println(convertToJson(locations));
