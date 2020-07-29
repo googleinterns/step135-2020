@@ -44,7 +44,7 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest(AuthServlet.class)
+@PrepareForTest({AuthServlet.class, DatastoreServiceFactory.class})
 public final class MapServletTest {
 
   private MapServlet mapServlet;
@@ -84,10 +84,80 @@ public final class MapServletTest {
   }
 
   /* 
-   * Tests that doGet constructs the expected JSON string containing locations in order
+   * Integration test: Tests that doGet writes the correct JSON string containing locations in order
    */
   @Test
-  public void testWriteLocations() throws Exception {
+  public void testDoGet() throws Exception {
+    HttpServletRequest request = mock(HttpServletRequest.class);       
+    HttpServletResponse response = mock(HttpServletResponse.class);    
+
+    // Create writers to check against actual output.
+    StringWriter stringWriter = new StringWriter();
+    PrintWriter writer = new PrintWriter(stringWriter);
+    when(response.getWriter()).thenReturn(writer);
+
+    // Initialize and mock datastore.
+    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+    PowerMockito.mockStatic(DatastoreServiceFactory.class);
+    when(DatastoreServiceFactory.getDatastoreService()).thenReturn(datastore);
+
+    // Create user entity.
+    Entity userEntity = new Entity(User.USER);
+    userEntity.setProperty(User.USER_EMAIL, EMAIL);
+    datastore.put(userEntity);
+    Key userEntityKey = userEntity.getKey();
+
+    // Mock authServlet such that user is currently logged in.
+    PowerMockito.mockStatic(AuthServlet.class);
+    PowerMockito.when(AuthServlet.getCurrentUserEntity()).thenReturn(userEntity);
+
+    // Add a single Trip to Datastore with the User Entity Key.
+    Entity tripEntity = new Entity(Trip.TRIP, userEntityKey);
+    tripEntity.setProperty(Trip.TRIP_NAME, TRIP_NAME);
+    tripEntity.setProperty(Trip.DESTINATION_NAME, INPUT_DESTINATION);
+    tripEntity.setProperty(Trip.IMAGE_SRC, IMAGE_SRC);
+    tripEntity.setProperty(Trip.START_DATE, TRIP_DAY_OF_TRAVEL);
+    tripEntity.setProperty(Trip.END_DATE, TRIP_DAY_OF_TRAVEL);
+    datastore.put(tripEntity);
+
+    // Pass tripKey as query parameter 
+    String tripKeyString = KeyFactory.keyToString(tripEntity.getKey());
+    when(request.getParameter("tripKey")).thenReturn(tripKeyString);
+
+    // create tripDay entity
+    Entity tripDayEntity = new Entity(TripDay.QUERY_STRING, tripEntity.getKey());
+    tripDayEntity.setProperty("origin", INPUT_DESTINATION);
+    tripDayEntity.setProperty("destination", INPUT_DESTINATION);
+    tripDayEntity.setProperty("date", TRIP_DAY_OF_TRAVEL);
+    datastore.put(tripDayEntity);
+
+    // create location entities and put it into datastore
+    Entity domeEntity = new Entity(TripDay.LOCATION_ENTITY_TYPE, tripDayEntity.getKey());
+    domeEntity.setProperty(TripDay.NAME, DOME_ADDRESS);
+    domeEntity.setProperty(TripDay.ORDER, 1);
+    datastore.put(domeEntity);
+
+    Entity yosemiteEntity = new Entity(TripDay.LOCATION_ENTITY_TYPE, tripDayEntity.getKey());
+    yosemiteEntity.setProperty(TripDay.NAME, YOSEMITE_ADDRESS);
+    yosemiteEntity.setProperty(TripDay.ORDER, 0);
+    datastore.put(yosemiteEntity);
+
+    // run do Get
+    mapServlet.doGet(request, response);
+
+    // even though DomeEntity is added first, its order property is 1 so it should appear 
+    // after YosemiteEntity in the JSON.
+    String expectedJson = "[\"" + INPUT_DESTINATION + "\",\""+YOSEMITE_ADDRESS+"\",\""+DOME_ADDRESS+"\"]";
+    
+    writer.flush();
+    Assert.assertTrue(stringWriter.toString().contains(expectedJson));
+  }
+
+  /* 
+   * Tests that doGetMap constructs the expected JSON string containing locations in order
+   */
+  @Test
+  public void testDoGetMap() throws Exception {
     HttpServletRequest request = mock(HttpServletRequest.class);       
     HttpServletResponse response = mock(HttpServletResponse.class);    
 
@@ -133,14 +203,13 @@ public final class MapServletTest {
     datastore.put(yosemiteEntity);
 
     // run do Get
-    mapServlet.doGetMap(response, datastore, userEntity, tripEntity.getKey());
+    String result = mapServlet.doGetMap(response, datastore, userEntity, tripEntity.getKey());
 
     // even though DomeEntity is added first, its order property is 1 so it should appear 
     // after YosemiteEntity in the JSON.
     String expectedJson = "[\"" + INPUT_DESTINATION + "\",\""+YOSEMITE_ADDRESS+"\",\""+DOME_ADDRESS+"\"]";
     
-    writer.flush();
-    Assert.assertTrue(stringWriter.toString().contains(expectedJson));
+    Assert.assertEquals(expectedJson, result);
   }
 
   /* 

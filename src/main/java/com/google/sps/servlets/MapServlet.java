@@ -74,14 +74,15 @@ public class MapServlet extends HttpServlet {
       Key tripKey = KeyFactory.stringToKey(stringTripKey);
 
       // Gets the locations from datastore and writes them to .../get-map
-      doGetMap(response, datastore, userEntity, tripKey);
+      String result = doGetMap(response, datastore, userEntity, tripKey);
+      response.getWriter().println(result);
     }
   }
 
   /**
    * Gets the locations and prints them to writer.
    */
-  public void doGetMap(HttpServletResponse response, 
+  public String doGetMap(HttpServletResponse response, 
       DatastoreService datastore, Entity userEntity, Key tripEntityKey) throws IOException {
   
     // Get trip Entity based on trip key.
@@ -95,29 +96,32 @@ public class MapServlet extends HttpServlet {
 
     // If no trip is found then redirect home
     if (tripEntity == null) {
-      response.getWriter().println("No trip found");
       response.sendRedirect("/");
-    } else {
-      // Get TripDay associated with the Trip.
-      // TODO(eshika): change to select the desired tripDay for multiday trips.
-      Query tripDayQuery = new Query(TripDay.QUERY_STRING, tripEntity.getKey());
-      PreparedQuery tripDayResults = datastore.prepare(tripDayQuery);
-      Entity tripDayEntity = tripDayResults.asSingleEntity();
+      return "No trip found";
+      // response.getWriter().println("No trip found");
+    } 
 
-      // Add origin as the first location.
-      List<String> locations = new ArrayList<>();
-      locations.add((String) tripDayEntity.getProperty(TripDay.ORIGIN));
+    // Get TripDay associated with the Trip.
+    // TODO(eshika): change to select the desired tripDay for multiday trips.
+    Query tripDayQuery = new Query(TripDay.QUERY_STRING, tripEntity.getKey());
+    PreparedQuery tripDayResults = datastore.prepare(tripDayQuery);
+    Entity tripDayEntity = tripDayResults.asSingleEntity();
 
-      // Add rest of POIs to locations list and write to writer.
-      Query locationsQuery = new Query(TripDay.LOCATION_ENTITY_TYPE, tripDayEntity.getKey());
-      locationsQuery.addSort(TripDay.ORDER);
-      PreparedQuery locationResults = datastore.prepare(locationsQuery);
-      for (Entity locationEntity : locationResults.asIterable()) {
-        // Gets location names as Strings (these names include the full address needed for routing)
-        locations.add((String) locationEntity.getProperty(TripDay.NAME));
-      }
-      response.getWriter().println(convertToJson(locations));
+    // Add origin as the first location.
+    List<String> locations = new ArrayList<>();
+    locations.add((String) tripDayEntity.getProperty(TripDay.ORIGIN));
+
+    // Add rest of POIs to locations list and write to writer.
+    Query locationsQuery = new Query(TripDay.LOCATION_ENTITY_TYPE, tripDayEntity.getKey());
+    locationsQuery.addSort(TripDay.ORDER);
+    PreparedQuery locationResults = datastore.prepare(locationsQuery);
+    for (Entity locationEntity : locationResults.asIterable()) {
+      // Gets location names as Strings (these names include the full address needed for routing)
+      locations.add((String) locationEntity.getProperty(TripDay.NAME));
     }
+
+    return convertToJson(locations);
+    // response.getWriter().println(convertToJson(locations));    
   }
 
   /**
