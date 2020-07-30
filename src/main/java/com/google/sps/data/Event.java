@@ -67,7 +67,7 @@ public class Event {
   private static final String DATE = "date";
   private static final String START_TIME = "start-time";
   private static final String TRAVEL_TIME = "travel-time";
-  private static final String PLACE_ID = "place-id";
+  private static final String PLACE_ID = "placeId";
 
   // query string
   public static final String QUERY_STRING = "event";

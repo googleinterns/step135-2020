@@ -62,6 +62,9 @@ function getEvents(calendar) {
 
   fetch('/get-calendar' + tripKeyQuery).then(response => response.json()).then((events) => {
     events.forEach((event) => {
+      console.log(event.placeId);
+      console.log(event.name);
+      console.log(event.address);
       calendar.addEvent({     
         title: event.name,
         start: event.strStartTime,
