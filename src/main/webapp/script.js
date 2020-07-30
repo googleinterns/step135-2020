@@ -143,6 +143,12 @@ function addStartTripOnChangeListeners() {
     checkValidInput('inputDayOfTravel');
     checkNextButton();
   };
+
+  // Input day of travel onchange listeners to check input and and next / submit.
+  document.getElementById('inputEndDate').onchange = () => {
+    checkValidInput('inputEndDate');
+    checkNextButton();
+  };
 }
 
 // Add onclick listeners to buttons that call relevant functions in the 
@@ -206,10 +212,12 @@ function isStartingInputValid() {
   const inputTripName = document.getElementById('inputTripName');
   const inputDestination = document.getElementById('inputDestination');
   const inputDayOfTravel = document.getElementById('inputDayOfTravel');
+  const inputEndDate = document.getElementById('inputEndDate');
 
   return inputTripName.classList.contains('is-valid') &&
     inputDestination.classList.contains('is-valid') && 
-    inputDayOfTravel.classList.contains('is-valid');
+    inputDayOfTravel.classList.contains('is-valid') &&
+    inputEndDate.classList.contains('is-valid');
 }
 
 // Return true if user has submitted a POI; otherwise, false.
@@ -279,6 +287,7 @@ function toggleStartTripInputStage() {
     document.getElementById('inputTripName').readOnly = true;
     document.getElementById('inputDestination').readOnly = true;
     document.getElementById('inputDayOfTravel').readOnly = true;
+    document.getElementById('inputEndDate').readOnly = true;
 
     // Change the text of the toggle button to 'Back'.
     toggleStartTripStageButton.value = 'Back';
@@ -294,6 +303,7 @@ function toggleStartTripInputStage() {
     document.getElementById('inputTripName').readOnly = false;
     document.getElementById('inputDestination').readOnly = false;
     document.getElementById('inputDayOfTravel').readOnly = false;
+    document.getElementById('inputEndDate').readOnly = false;
 
     // Change the text of the toggle button to 'Next'.
     toggleStartTripStageButton.value = 'Next';
