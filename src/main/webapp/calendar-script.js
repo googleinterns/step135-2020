@@ -62,9 +62,6 @@ function getEvents(calendar) {
 
   fetch('/get-calendar' + tripKeyQuery).then(response => response.json()).then((events) => {
     events.forEach((event) => {
-      console.log(event.placeId);
-      console.log(event.name);
-      console.log(event.address);
       calendar.addEvent({     
         title: event.name,
         start: event.strStartTime,
@@ -85,7 +82,9 @@ function getEvents(calendar) {
 function createMap(modalBody, eventObj) {
   const infoDisplay = document.createElement('div');
   let address = document.createElement('p');
-  infoDisplay.innerHTML = '<b>Address: </b>' + eventObj.extendedProps.address + '<br>';
+  var urlFormatAddress = eventObj.extendedProps.address.replace(/\s/g, '+')
+  var url = 'https://www.google.com/maps/search/?api=1&query=' + urlFormatAddress + '&query_place_id=' + eventObj.extendedProps.placeId;
+  infoDisplay.innerHTML = '<b>Address: </b>' + '<a href=' + url + '>' + eventObj.extendedProps.address + '</a>' + '<br>';
   infoDisplay.appendChild(address);
   modalBody.appendChild(infoDisplay)
 
@@ -96,7 +95,7 @@ function createMap(modalBody, eventObj) {
 
   // instantiate map
   map = new google.maps.Map(document.getElementById('map'), {
-      zoom: 14,
+      zoom: 13,
       center: new google.maps.LatLng(0, 0)
     });
 
