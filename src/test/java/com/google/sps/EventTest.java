@@ -23,6 +23,7 @@ import com.google.appengine.api.datastore.Query;
 import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
 import com.google.sps.data.Event;
+import com.google.sps.data.TripDay;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;

@@ -114,17 +114,17 @@ function buildTripCard(tripTitle, destinationName, imageSrc, startDate, endDate,
 
   const calendarButton = document.createElement('a');
   calendarButton.className = 'btn btn-primary trip-button';
-  calendarButton.href = '../calendar.html?tripKey=' + tripKey;
+  calendarButton.href = '../calendar?tripKey=' + tripKey;
   calendarButton.innerText = 'Calendar';
 
   const mapsButton = document.createElement('a');
   mapsButton.className = 'btn btn-primary trip-button';
-  mapsButton.href = '../maps.html?tripKey=' + tripKey;
+  mapsButton.href = '../maps?tripKey=' + tripKey;
   mapsButton.innerText = 'Maps';
 
   const editButton = document.createElement('a');
   editButton.className = 'btn btn-primary trip-button';
-  editButton.href = '../edit.html?tripKey=' + tripKey;
+  editButton.href = '../edit?tripKey=' + tripKey;
   editButton.innerText = 'Edit';
 
   // Create the card footer, where action items (calendar, maps, edit) will be placed.

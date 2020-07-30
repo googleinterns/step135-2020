@@ -27,8 +27,8 @@ import com.google.appengine.api.datastore.Query.Filter;
 import com.google.appengine.api.datastore.Query.FilterOperator;
 import com.google.appengine.api.datastore.Query.FilterPredicate;
 import com.google.gson.Gson;
-import com.google.sps.Trip;
-import com.google.sps.TripDay;
+import com.google.sps.data.Trip;
+import com.google.sps.data.TripDay;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,7 +37,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-@WebServlet("/get-map")
 public class MapServlet extends HttpServlet {
 
   private final String TRIP_KEY_PARAM = "tripKey";
@@ -63,7 +62,7 @@ public class MapServlet extends HttpServlet {
     // if no tripKey return to trips page.
     if (stringTripKey == null) {
       response.getWriter().println("No trip Key");
-      response.sendRedirect("/trips/");
+      response.sendRedirect("/trips");
   
     // Redirects to sign in page if no user is signed in
     // Otherwise redirects to create trips page

@@ -46,11 +46,10 @@ import com.google.maps.model.TransitRoutingPreference;
 import com.google.maps.model.TravelMode;
 import com.google.maps.model.Unit;
 import com.google.gson.Gson;
-import com.google.sps.Trip;
-import com.google.sps.TripDay;
 import com.google.sps.data.Config;
 import com.google.sps.data.Event;
-import com.google.sps.TripDay;
+import com.google.sps.data.Trip;
+import com.google.sps.data.TripDay;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -69,7 +68,6 @@ import javax.servlet.http.HttpServletResponse;
  * calendar, calculates optimal route using Maps Java Client,
  * and puts info into datastore to be pulled by maps and calendar
  */
-@WebServlet("/calculate-trip")
 public class TripServlet extends HttpServlet {
 
   // Constant for picking route
@@ -158,7 +156,7 @@ public class TripServlet extends HttpServlet {
 
     // Redirect to the Maps page of this trip to show the trip that was added.
     String tripKeyString = KeyFactory.keyToString(tripEntity.getKey());
-    response.sendRedirect("/maps.html?tripKey=" + tripKeyString);
+    response.sendRedirect("/maps?tripKey=" + tripKeyString);
   }
 
   /**

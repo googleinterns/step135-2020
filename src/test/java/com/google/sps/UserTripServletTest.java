@@ -27,7 +27,7 @@ import com.google.sps.data.Config;
 import com.google.sps.data.User;
 import com.google.sps.servlets.AuthServlet;
 import com.google.sps.servlets.UserTripServlet;
-import com.google.sps.Trip;
+import com.google.sps.data.Trip;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import javax.servlet.http.HttpServlet;

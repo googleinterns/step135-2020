@@ -118,6 +118,14 @@
       <version>0.14.0</version>
     </dependency>
 
+    <!-- Allows URL rewrite capability, to remove '.html' from file name.
+         See more at https://github.com/paultuckey/urlrewritefilter. -->
+    <dependency>
+      <groupId>org.tuckey</groupId>
+      <artifactId>urlrewritefilter</artifactId>
+      <version>4.0.3</version>
+    </dependency>
+
   </dependencies>
 
   <build>

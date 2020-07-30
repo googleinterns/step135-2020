@@ -24,7 +24,7 @@ import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
 import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
-import com.google.sps.TripDay;
+import com.google.sps.data.TripDay;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;

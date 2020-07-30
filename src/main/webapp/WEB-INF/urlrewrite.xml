@@ -1,0 +1,23 @@
+<urlrewrite use-query-string="true">
+
+  <rule>
+    <from>/trips</from>
+    <to>/trips.html</to>
+  </rule>
+
+  <rule>
+    <from>/edit</from>
+    <to>/edit.html</to>
+  </rule>
+
+  <rule>
+    <from>/calendar</from>
+    <to>/calendar.html</to>
+  </rule>
+
+  <rule>
+    <from>/maps</from>
+    <to>/maps.html</to>
+  </rule>
+
+</urlrewrite>

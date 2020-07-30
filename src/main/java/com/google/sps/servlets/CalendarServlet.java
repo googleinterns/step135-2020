@@ -26,8 +26,8 @@ import com.google.appengine.api.datastore.Query.FilterOperator;
 import com.google.appengine.api.datastore.Query.FilterPredicate;
 import com.google.gson.Gson;
 import com.google.sps.data.Event;
-import com.google.sps.Trip;
-import com.google.sps.TripDay;
+import com.google.sps.data.Trip;
+import com.google.sps.data.TripDay;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -40,7 +40,6 @@ import javax.servlet.http.HttpServletResponse;
  * Servlet that gets events from datastore and writes them to json
  * used from frontend to create events
  */
-@WebServlet("/get-calendar")
 public class CalendarServlet extends HttpServlet {
 
   /**
@@ -59,7 +58,7 @@ public class CalendarServlet extends HttpServlet {
     // if no user Entity return home
     if (request.getParameter("tripKey") == null ){
       response.getWriter().println("No trip Key");
-      response.sendRedirect("/trips/");
+      response.sendRedirect("/trips");
     } else if (userEntity == null) {
       response.getWriter().println("No current User");
       response.sendRedirect("/");

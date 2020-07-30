@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<web-app xmlns="http://java.sun.com/xml/ns/j2ee"
+     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+     xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+     version="2.5">
+
+  <!-- Add filters for the URLRewriteFilter. -->
+
+  <filter>
+    <filter-name>UrlRewriteFilter</filter-name>
+    <filter-class>org.tuckey.web.filters.urlrewrite.UrlRewriteFilter</filter-class>
+  </filter>
+
+  <filter-mapping>
+    <filter-name>UrlRewriteFilter</filter-name>
+    <url-pattern>/*</url-pattern>
+    <dispatcher>REQUEST</dispatcher>
+  </filter-mapping>
+
+  <!-- Add servlet mappings to URLs (these are initially rewritten from the
+       URLRewriteFilter. -->
+  
+  <servlet>
+    <servlet-name>Auth</servlet-name>
+    <servlet-class>com.google.sps.servlets.AuthServlet</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>Auth</servlet-name>
+    <url-pattern>/auth</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>Calendar</servlet-name>
+    <servlet-class>com.google.sps.servlets.CalendarServlet</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>Calendar</servlet-name>
+    <url-pattern>/get-calendar</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>Map</servlet-name>
+    <servlet-class>com.google.sps.servlets.MapServlet</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>Map</servlet-name>
+    <url-pattern>/get-map</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>Trip</servlet-name>
+    <servlet-class>com.google.sps.servlets.TripServlet</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>Trip</servlet-name>
+    <url-pattern>/calculate-trip</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>UserTrip</servlet-name>
+    <servlet-class>com.google.sps.servlets.UserTripServlet</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>UserTrip</servlet-name>
+    <url-pattern>/user-trips</url-pattern>
+  </servlet-mapping>
+
+</web-app>
