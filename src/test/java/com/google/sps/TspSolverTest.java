@@ -12,34 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package com.google.sps.data;
+package com.google.sps;
 
+import com.google.sps.data.algorithm.Tuple;
 import java.time.LocalTime;
-import javafx.util.Pair;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.ArrayList; 
+import java.util.List;
+import java.util.Map;
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 
-public class TspSolver {
+/** */
+@RunWith(JUnit4.class)
+public final class EventTest {
 
-  Double[][] distanceMatrix;
-  boolean[] visited;
-  int currPos;
-  int numNodes;
-  HashMap<int, String> placeIdToInt;
-  LocalTime currentTime;
-  HashMap<int, List<LocalTime>> openHours;
-  int count;
-  int cost;
-  Pair<int, List<int>> ans;
-
-  /**
-   * Create Distance Matrix using DistanceMatrixAPI
-   * 
-   * @param pois list of pois, 0 is in start and stop point
-   */
-  public void createDistanceMatrix(ArrayList<String> pois) {
-
-  }
-
+  @Test
+  public void test
 }
