@@ -84,7 +84,7 @@ function createMap(modalBody, eventObj) {
   let address = document.createElement('p');
   var urlFormatAddress = eventObj.extendedProps.address.replace(/\s/g, '+')
   var url = 'https://www.google.com/maps/search/?api=1&query=' + urlFormatAddress + '&query_place_id=' + eventObj.extendedProps.placeId;
-  infoDisplay.innerHTML = '<b>Address: </b>' + '<a href=' + url + '>' + eventObj.extendedProps.address + '</a>' + '<br>';
+  infoDisplay.innerHTML = '<b>Address: </b><a href=' + url + '>' + eventObj.extendedProps.address + '</a>' + '<br>';
   infoDisplay.appendChild(address);
   modalBody.appendChild(infoDisplay)
 
