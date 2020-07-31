@@ -268,3 +268,86 @@ input[type=date] {
   -moz-border-radius: 8px;
   border-radius: 8px;
 }
+
+#sidenav-action-buttons {
+  height: 100%;
+  width: 30%;
+  position: fixed;
+  z-index: 1;
+  top: 0;
+  right: 0;
+  background-color: lightgray;
+}
+
+#main-edit-page {
+  margin-right: 30%;
+  background-color: lime;
+}
+
+/* Main site body */
+.wrapper {
+    width: 940px;
+    margin: 0 auto;
+    position: relative; /* Ensure absolute positioned child elements are relative to this*/
+}
+
+/* Absolute positioned wrapper for the element you want to fix position */
+.fixed-wrapper {
+    width: 220px;
+    position: absolute;
+    top: 0;
+    left: -240px; /* Move this out to the left of the site body, leaving a 20px gutter */
+}
+
+/* The element you want to fix the position of */
+.fixed {
+    width: 220px;
+    position: fixed;
+    /* Do not set top / left! */
+}
+
+.sidebar-p {
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+  line-height: 1.3;
+}
+
+.sidebar-input-form {
+  padding: 0px;
+}
+
+.hr {
+  background-color: #ededed;
+  height: 1px;
+  margin-bottom: 16px;
+}
+
+.autoscale-text .autoscale-hide-span {
+  margin: 0;
+  padding: 0;
+}
+
+.autoscale-text {
+  border: none;
+  border-bottom: 1px solid black;
+  min-width: 10px;
+  font-size: 2.5rem;
+}
+
+.autoscale-hide-span {
+  display: none;
+  white-space: pre;
+}
+
+.btn-sm {
+  padding: .15rem .3rem;
+  font-size: .75rem;
+  line-height: 1.5;
+  border-radius: .2rem;
+}
+
+.btn-primary-dark {
+  color: #fff;
+  background-color: #3c78d8ff;
+  border-color: #3c78d8ff;
+}

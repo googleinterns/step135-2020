@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <title>TravIS Edit Page</title>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <!-- Add icon library -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" 
       integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
@@ -49,7 +51,230 @@
           <button type="button" class="btn btn-primary btn-xlarge">Edit</button>
         </a>
       </div>
-      <h2>Edit</h2>
-    </div>
+      <div class="row py-3" style="margin-top: -30px;">
+              <div class="col-4 order-2" id="sticky-sidebar" style="">
+                  <div class="sticky-top" style="
+    padding-top: 40px;
+">
+                      
+                  <div class="nav flex-column" style="
+">
+                          
+                          
+                          
+                          
+                          
+                      <div class="nav flex-column" style="
+    background: lightgray;
+    padding: 15px;
+"><div class="form-group sidebar-input-form">
+              <label for="inputDestination" style="
+    color: black;
+">Add a Point of Interest</label>
+              <input type="text" placeholder="Point of Interest" class="form-control pac-target-input" id="inputDestination" name="inputDestination" autocomplete="off">
+            </div>
+    <div class="form-group sidebar-input-form" style="
+">
+              <input type="button" class="btn btn-secondary" value="Snoqualmie Falls" disabled="">
+            </div>
+<div class="form-group sidebar-input-form">
+              <input type="button" class="btn btn-primary" value="Add POI" disabled="">
+            </div>
+
+                          
+                          
+                          
+                          
+                          
+                      <div class="hr">
+              
+            </div><p class="sidebar-p" style="
+">Save the changes you've made so far.</p>
+<div class="form-group sidebar-input-form">
+              <input type="button" class="btn btn-success" value="Save Trip" disabled="">
+            </div><div class="hr">
+              
+            </div><h4 class="sidebar-header">Danger Zone</h4><p class="sidebar-p">Deleting the trip cannot be undone.</p><div class="form-group sidebar-input-form" style="
+    margin-bottom: 0px;
+">
+              <input type="button" class="btn btn-danger" value="Delete Trip" disabled="">
+            </div></div></div></div>
+              </div>
+              <div class="col" id="main" style="padding: 40px;
+"><span class="autoscale-hide-span" style="">My Favorite Trip</span><input class="autoscale-text" type="text" value="My Favorite Trip" style="width: 293.765px;"><button type="button" class="btn btn-primary-dark btn-sm" style="
+    display: block;
+    margin-top: 5px;
+">Changed</button><div class="form-group col-md-3" style="
+    display: inline-block;
+    margin-top: 20px;
+">
+        <label for="inputDayOfTravel">Start Date</label>
+        <input type="date" class="form-control" name="inputDayOfTravel" id="inputDayOfTravel">
+      </div><div class="form-group col-md-3" style="
+    display: inline-block;
+    margin-top: 20px;
+">
+        <label for="inputDayOfTravel">End Date</label>
+        <input type="date" class="form-control" name="inputDayOfTravel" id="inputDayOfTravel" readonly="">
+      </div><h1 style="
+    margin-top: 20px;
+">Friday, 7/24</h1><div class="card" style="width: 500px;display: block;width: 90%;margin: 0px;margin-top: 20px;height: 200px;">
+          <div class="row no-gutters" style="
+    height: 200px;
+">
+              <div class="col-sm-4" style="
+    height: 200px;
+">
+                  <img class="card-img" src="https://lh3.googleusercontent.com/p/AF1QipPywZEmLPoz_sxqzb6UD4--PwLrTugFDHUTA9TR=s1600-w1932" alt="Space Needle" style="
+    height: 200px;
+">
+              </div>
+              <div class="col-sm-8" style="
+    position: relative;
+">
+                  <div class="card-body" style="text-align: left;">
+                      <h4 class="card-title">Space Needle <i class="fa fa-edit"></i></h4>
+                      <p class="card-text">10AM - 11AM</p>
+                      
+                  </div>
+              <h4 class="card-title" style="
+    position: absolute;
+    top: 1.25rem;
+    right: 1.25rem;
+"><i class="fa fa-trash"></i></h4><button type="button" class="btn btn-primary-dark btn-sm" style="
+    display: block;
+    margin-top: 5px;
+    position: absolute;
+    bottom: 1.25rem;
+    left: 1.25rem;
+">Changed</button></div>
+          </div>
+      </div>
+<div class="card" style="width: 500px;display: block;width: 90%;margin: 0px;margin-top: 20px;height: 200px;">
+          <div class="row no-gutters" style="
+    height: 200px;
+">
+              <div class="col-sm-4" style="
+    height: 200px;
+">
+                  <img class="card-img" src="https://lh3.googleusercontent.com/p/AF1QipPywZEmLPoz_sxqzb6UD4--PwLrTugFDHUTA9TR=s1600-w1932" alt="Space Needle" style="
+    height: 200px;
+">
+              </div>
+              <div class="col-sm-8" style="
+    position: relative;
+">
+                  <div class="card-body" style="text-align: left;">
+                      <h4 class="card-title">Space Needle <i class="fa fa-edit"></i></h4>
+                      <p class="card-text">10AM - 11AM</p>
+                      
+                  </div>
+              <h4 class="card-title" style="
+    position: absolute;
+    top: 1.25rem;
+    right: 1.25rem;
+"><i class="fa fa-trash"></i></h4><button type="button" class="btn btn-primary-dark btn-sm" style="
+    display: block;
+    margin-top: 5px;
+    position: absolute;
+    bottom: 1.25rem;
+    left: 1.25rem;
+">Changed</button></div>
+          </div>
+      </div><div class="card" style="width: 500px;display: block;width: 90%;margin: 0px;margin-top: 20px;height: 200px;">
+          <div class="row no-gutters" style="
+    height: 200px;
+">
+              <div class="col-sm-4" style="
+    height: 200px;
+">
+                  <img class="card-img" src="https://lh3.googleusercontent.com/p/AF1QipPywZEmLPoz_sxqzb6UD4--PwLrTugFDHUTA9TR=s1600-w1932" alt="Space Needle" style="
+    height: 200px;
+">
+              </div>
+              <div class="col-sm-8" style="
+    position: relative;
+">
+                  <div class="card-body" style="text-align: left;">
+                      <h4 class="card-title">Space Needle <i class="fa fa-edit"></i></h4>
+                      <p class="card-text">10AM - 11AM</p>
+                      
+                  </div>
+              <h4 class="card-title" style="
+    position: absolute;
+    top: 1.25rem;
+    right: 1.25rem;
+"><i class="fa fa-trash"></i></h4><button type="button" class="btn btn-primary-dark btn-sm" style="
+    display: block;
+    margin-top: 5px;
+    position: absolute;
+    bottom: 1.25rem;
+    left: 1.25rem;
+">Changed</button></div>
+          </div>
+      </div><div class="card" style="width: 500px;display: block;width: 90%;margin: 0px;margin-top: 20px;height: 200px;">
+          <div class="row no-gutters" style="
+    height: 200px;
+">
+              <div class="col-sm-4" style="
+    height: 200px;
+">
+                  <img class="card-img" src="https://lh3.googleusercontent.com/p/AF1QipPywZEmLPoz_sxqzb6UD4--PwLrTugFDHUTA9TR=s1600-w1932" alt="Space Needle" style="
+    height: 200px;
+">
+              </div>
+              <div class="col-sm-8" style="
+    position: relative;
+">
+                  <div class="card-body" style="text-align: left;">
+                      <h4 class="card-title">Space Needle <i class="fa fa-edit"></i></h4>
+                      <p class="card-text">10AM - 11AM</p>
+                      
+                  </div>
+              <h4 class="card-title" style="
+    position: absolute;
+    top: 1.25rem;
+    right: 1.25rem;
+"><i class="fa fa-trash"></i></h4><button type="button" class="btn btn-primary-dark btn-sm" style="
+    display: block;
+    margin-top: 5px;
+    position: absolute;
+    bottom: 1.25rem;
+    left: 1.25rem;
+">Changed</button></div>
+          </div>
+      </div><div class="card" style="width: 500px;display: block;width: 90%;margin: 0px;margin-top: 20px;height: 200px;">
+          <div class="row no-gutters" style="
+    height: 200px;
+">
+              <div class="col-sm-4" style="
+    height: 200px;
+">
+                  <img class="card-img" src="https://lh3.googleusercontent.com/p/AF1QipPywZEmLPoz_sxqzb6UD4--PwLrTugFDHUTA9TR=s1600-w1932" alt="Space Needle" style="
+    height: 200px;
+">
+              </div>
+              <div class="col-sm-8" style="
+    position: relative;
+">
+                  <div class="card-body" style="text-align: left;">
+                      <h4 class="card-title">Space Needle <i class="fa fa-edit"></i></h4>
+                      <p class="card-text">10AM - 11AM</p>
+                      
+                  </div>
+              <h4 class="card-title" style="
+    position: absolute;
+    top: 1.25rem;
+    right: 1.25rem;
+"><i class="fa fa-trash"></i></h4><button type="button" class="btn btn-primary-dark btn-sm" style="
+    display: block;
+    margin-top: 5px;
+    position: absolute;
+    bottom: 1.25rem;
+    left: 1.25rem;
+">Changed</button></div>
+          </div>
+      </div></div>
+    </div>  </div>
   </body>
 </html>

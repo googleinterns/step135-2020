@@ -14,5 +14,35 @@
 
 // Triggered upon DOM load.
 $(document).ready(() => {
-  
+  autoscaleTextInputWidth();
 });
+
+/**
+ * Autoscale the text input width for the edit text inputs.
+ */
+function autoscaleTextInputWidth() {
+  // Constant text width difference and multiple (for changed font size);
+  const textWidthAdd = 8;
+  const textWidthMultiple = 2.5;
+
+  // Get the autoscale text input elements.
+  const autoscaleHideSpans = $('.autoscale-hide-span');
+  const autoscaleTextEls = $('.autoscale-text');
+
+  for (let i = 0; i < autoscaleHideSpans.length; i++) {
+    // Set constants for adding to (for some reason, it's slightly short)
+    // and scaling the width.
+    const autoscaleHideSpan = $(autoscaleHideSpans[i]);
+    const autoscaleText = $(autoscaleTextEls[i]);
+
+    // Set the initial width of the text input.
+    autoscaleHideSpan.text(autoscaleText.val());
+    autoscaleText.width((autoscaleHideSpan.width() + textWidthAdd) * textWidthMultiple);
+
+    // Readjust text input width upon edit.
+    autoscaleText.on('input', () => {
+      autoscaleHideSpan.text(autoscaleText.val());
+      autoscaleText.width(autoscaleHideSpan.width() * textWidthMultiple);
+    });
+  }
+}
