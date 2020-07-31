@@ -23,9 +23,8 @@ var map;
 var directionsService;
 var directionsRenderer;
 
-// Map marker label constants
+// Map marker label constant
 var labels = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-var labelIndex = 1;
 
 // Attach callback function to the `window` object
 window.initMap = function() {
