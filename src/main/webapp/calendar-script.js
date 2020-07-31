@@ -18,13 +18,13 @@ script.src = 'https://maps.googleapis.com/maps/api/js?key=' + config.API_KEY +
 script.defer = true;
 script.async = true;
 
-var map;
-var service;
+// constant for zoom level of map
+const zoomThirteen = 13;
 
 // Triggered upon DOM load.
 window.initMod = function() {
-  var calendarEl = document.getElementById('calendar');
-  var calendar = new FullCalendar.Calendar(calendarEl, {
+  const calendarEl = document.getElementById('calendar');
+  const calendar = new FullCalendar.Calendar(calendarEl, {
     headerToolbar: {
       left: 'prev,next today',
       center: 'title',
@@ -34,7 +34,7 @@ window.initMod = function() {
     navLinks: true,
     dayMaxEvents: true, //alow "more" link when too many events on one day
     eventClick: function(info) {
-      var eventObj = info.event;
+      const eventObj = info.event;
 
       // title of pop-up
       const modalLabel = document.getElementById('exampleModalLabel');
@@ -81,10 +81,26 @@ function getEvents(calendar) {
 
 function createMap(modalBody, eventObj) {
   const infoDisplay = document.createElement('div');
-  let address = document.createElement('p');
-  infoDisplay.innerHTML = '<b>Address: </b>' + eventObj.extendedProps.address + '<br>';
-  infoDisplay.appendChild(address);
-  modalBody.appendChild(infoDisplay)
+  //infoDisplay.innerHTML = '<b>Address: </b><a href=' + url + 'target="_blank" >' + eventObj.extendedProps.address + '</a>' + '<br>';
+
+  const addressLine = document.createElement('p');
+  const boldAddress = document.createElement('b');
+  boldAddress.innerText = 'Address: ';
+  addressLine.appendChild(boldAddress);
+
+  const urlFormatAddress = eventObj.extendedProps.address.replace(/\s/g, '+')
+  const url = 'https://www.google.com/maps/search/?api=1&query=' + urlFormatAddress + '&query_place_id=' + eventObj.extendedProps.placeId;
+  const link = document.createElement('a');
+  link.href = url;
+  link.target = '_blank';
+  link.innerText = eventObj.extendedProps.address
+
+  addressLine.appendChild(link);
+  addressLine.appendChild(document.createElement('br'));
+  infoDisplay.appendChild(addressLine);
+
+  // infoDisplay.appendChild(address);
+  modalBody.appendChild(infoDisplay);
 
   // create new div to hold map
   const mapDis = document.createElement('div');
@@ -92,12 +108,11 @@ function createMap(modalBody, eventObj) {
   modalBody.appendChild(mapDis);
 
   // instantiate map
-  map = new google.maps.Map(document.getElementById('map'), {
-      zoom: 14,
-      center: new google.maps.LatLng(0, 0)
-    });
+  const map = new google.maps.Map(document.getElementById('map'), {
+    zoom: zoomThirteen
+  });
 
-  service = new google.maps.places.PlacesService(map);
+  const service = new google.maps.places.PlacesService(map);
   service.getDetails({
     placeId: eventObj.extendedProps.placeId
   }, function(result, status) {
@@ -113,22 +128,39 @@ function createMap(modalBody, eventObj) {
 
     // if there are open hours display them, otherwise open all day
     try {
-      var stringFullDate = eventObj.extendedProps.stringDate;
-      var dateStr = stringFullDate.split('T')[0]; 
-      var intOfWeek = getintOfWeek(dateStr);
+      const stringFullDate = eventObj.extendedProps.stringDate;
+      const dateStr = stringFullDate.split('T')[0]; 
+      const intOfWeek = getIntOfWeek(dateStr);
 
-      var dateObj = new Date(stringFullDate);
-      var openTime = formatAMPM(result.opening_hours.periods[intOfWeek].open.time);
-      var closeTime = formatAMPM(result.opening_hours.periods[intOfWeek].close.time);
-      openHours.innerHTML = '<b>Open: </b>' +  openTime + '</br>' +
-          '<b>Close: </b>' + closeTime;
+      // create bold open and time element
+      const open = document.createElement('p');
+      const openTime = formatAMPM(result.opening_hours.periods[intOfWeek].open.time); 
+      const boldOpen = document.createElement('b');
+      boldOpen.innerText = 'Open: ';
+      open.appendChild(boldOpen);
+      open.innerHTML += openTime;
+      open.appendChild(document.createElement('br'));
+      openHours.appendChild(open);
+
+      // create bold close and time element
+      const close = document.createElement('p');
+      const closeTime = formatAMPM(result.opening_hours.periods[intOfWeek].close.time);
+      const boldClose = document.createElement('b');
+      boldClose.innerText = 'Close: ';
+      close.appendChild(boldClose);
+      close.innerHTML += closeTime;
+      close.appendChild(document.createElement('br'));
+      openHours.appendChild(close);
     } catch(e) {
-      openHours.innerHTML = '<b> Open All Day </b>';
+      // create bold element open all day if no hours available
+      const boldAllDay = document.createElement('b');
+      boldAllDay.innerText = 'Open All Day ';
+      openHours.appendChild(boldAllDay);
     }
 
     infoDisplay.appendChild(openHours);
 
-    var marker = new google.maps.Marker({
+    const marker = new google.maps.Marker({
       map: map,
       position: result.geometry.location
     });
@@ -136,7 +168,7 @@ function createMap(modalBody, eventObj) {
 }
 
 // takes a string in date format and return the int of the week
-function getintOfWeek(date) {
+function getIntOfWeek(date) {
   const intOfWeek = new Date(date).getDay();    
   return isNaN(intOfWeek) ? null : 
     intOfWeek;
@@ -144,13 +176,13 @@ function getintOfWeek(date) {
 
 // converts from 24hr (hh:mm) to 12hr format (hh:mm AM/PM)
 function formatAMPM(time) {
-  var hours = time.substring(0, 2);
-  var minutes = time.substring(2, 4);
-  var ampm = hours >= 12 ? 'pm' : 'am';
+  let hours = time.substring(0, 2);
+  let minutes = time.substring(2, 4);
+  const ampm = hours >= 12 ? 'pm' : 'am';
   hours = hours % 12;
   hours = hours ? hours : 12; // the hour '0' should be '12'
   minutes = (minutes < 10 && minutes > 0) ? '0' + minutes : minutes;
-  var strTime = hours + ':' + minutes + ' ' + ampm;
+  const strTime = hours + ':' + minutes + ' ' + ampm;
   return strTime;
 }
 

@@ -228,11 +228,11 @@ public class TripServlet extends HttpServlet {
       // create event entity
       String name = address.split(",")[0];
       String placeId = getPlaceIdFromTextSearch(this.context, address);
-      Event event = new Event(name, address, placeId, startDateTime, HALF_HOUR);
+      Event event = new Event(name, address, placeId, startDateTime, travelTimes.get(travelTimeIndex));
       Entity eventEntity = event.eventToEntity(tripDayEntity.getKey());
       eventEntities.add(eventEntity);
 
-      // put entity in datastore     
+      // put entity in datastore
       datastore.put(eventEntity);
 
       // sets start time for next event one hour and travel time after start of prev
