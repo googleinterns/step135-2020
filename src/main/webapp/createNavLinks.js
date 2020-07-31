@@ -18,10 +18,10 @@ $(document).ready(() => {
 });
 
 /**
- * Create the group nav links for the calendar, maps, and edit pages.
+ * Create the group nav links for the calendar and maps pages.
  */
 function createGroupNavLinks() {
-  // Get the calendar, maps, and edit button links.
+  // Get the calendar and maps button links.
   const calendarButton = document.getElementById('button-group-nav-calendar');
   const mapsButton = document.getElementById('button-group-nav-maps');
 
