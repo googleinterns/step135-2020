@@ -17,18 +17,19 @@ package com.google.sps.data.algorithm;
 import java.util.ArrayList; 
 import java.util.List;
 
-public class Tuple<Integer, List<Integer>> {
 
-  private Integer currAns; 
+public class Tuple {
+
+  private int currAns; 
   private List<Integer> currPath; 
 
-  public static final Integer ZERO = 0;
+  public static final int ZERO = 0;
   
-  public Tuple(Integer currAns, ArrayList<Integer> currPath) { 
+  public Tuple(int currAns, List<Integer> currPath) { 
     if (currAns < ZERO) {
       throw new IllegalArgumentException("current answer cannot be less than " + ZERO);
-    } else if (pois.isEmpty()) {
-      throw new IllegalArgumentException("Pois input list is empty");
+    } else if (currPath == null) {
+      throw new IllegalArgumentException("pois list is null");
     }
 
     this.currAns = currAns; 
@@ -38,7 +39,7 @@ public class Tuple<Integer, List<Integer>> {
   /**
    * increment current cost or answer
    */
-  public void incrementCurrAnswer(int inc) {
+  public void incCurrAns(int inc) {
     if (inc < ZERO) {
         throw new IllegalArgumentException("cannot increment by less than " + ZERO);
     }
@@ -48,33 +49,26 @@ public class Tuple<Integer, List<Integer>> {
   /**
    * add int (represents string) to the current path
    */
-  public void addIntPoiToPath(int inc) {
-    if (inc < ZERO) {
-        throw new IllegalArgumentException("cannot increment by less than " + ZERO);
+  public void addIntPoiToPath(int addPoi, int numberOfPois) {
+    if (addPoi < ZERO) {
+      throw new IllegalArgumentException("cannot increment by less than " + ZERO);
+    } else if (addPoi >= numberOfPois) {
+      throw new IllegalArgumentException("index of Poi is greater than number of Pois: " + numberOfPois);  
     }
-    this.currAns += inc;
+    this.currPath.add(addPoi);
   }
 
   /**
    * Checks structural equality of the two objects
    */
-  @Override
-  public boolean equals(Object other) {
+  public boolean areEqual(Tuple other) {
     if (other == this) {
         return true;
     }
 
-    if (!(other instanceof Tuple)){
-        return false;
-    }
-
-    // cast to Tuple class
-    Tuple<Integer, List<Integer>> otherTuple = (Tuple<Integer, List<Integer>> ) other;
-
     // check that currAns and currPath are the same
-    return (otherTuple.getCurrPath().equals(this.currPath)) && 
-        (otherTuple.getCurrAns == this.currAns);
-
+    return (other.getCurrPath().equals(this.currPath)) && 
+        (other.getCurrAns() == this.currAns);
   }
 
   //getter methods
@@ -82,7 +76,7 @@ public class Tuple<Integer, List<Integer>> {
     return this.currAns;
   }
 
-  public List<Integer> getCurrPath() {
+  public List getCurrPath() {
     return this.currPath;
   }
 }

@@ -20,7 +20,6 @@ import java.util.HashMap;
 import java.util.ArrayList; 
 import java.util.List;
 import java.util.Map;
-import java.util.AbstractMap.SimpleEntry;
 
 public class TspSolver {
 
@@ -36,7 +35,7 @@ public class TspSolver {
   LocalTime currentTime;
   int count;
   int cost;
-  Tuple<Integer, List<Integer>> ans;
+  Tuple ans;
 
   /**
    * Create Distance Matrix using DistanceMatrixAPI
