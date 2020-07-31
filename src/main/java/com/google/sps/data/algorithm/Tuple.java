@@ -17,16 +17,16 @@ package com.google.sps.data.algorithm;
 import java.util.ArrayList; 
 import java.util.List;
 
-public class Tuple {
+public class Tuple<Integer, List<Integer>> {
 
-  public final Integer currAns; 
-  public final List<Integer> currPath; 
+  private Integer currAns; 
+  private List<Integer> currPath; 
 
   public static final Integer ZERO = 0;
   
   public Tuple(Integer currAns, ArrayList<Integer> currPath) { 
-    if (currAns < 0) {
-      throw new IllegalArgumentException("current Answer cannot be less than " + ZERO);
+    if (currAns < ZERO) {
+      throw new IllegalArgumentException("current answer cannot be less than " + ZERO);
     } else if (pois.isEmpty()) {
       throw new IllegalArgumentException("Pois input list is empty");
     }
@@ -35,7 +35,54 @@ public class Tuple {
     this.currPath = currPath;
   }
 
-  public void incrementAnswer(int inc) {
+  /**
+   * increment current cost or answer
+   */
+  public void incrementCurrAnswer(int inc) {
+    if (inc < ZERO) {
+        throw new IllegalArgumentException("cannot increment by less than " + ZERO);
+    }
     this.currAns += inc;
+  }
+
+  /**
+   * add int (represents string) to the current path
+   */
+  public void addIntPoiToPath(int inc) {
+    if (inc < ZERO) {
+        throw new IllegalArgumentException("cannot increment by less than " + ZERO);
+    }
+    this.currAns += inc;
+  }
+
+  /**
+   * Checks structural equality of the two objects
+   */
+  @Override
+  public boolean equals(Object other) {
+    if (other == this) {
+        return true;
+    }
+
+    if (!(other instanceof Tuple)){
+        return false;
+    }
+
+    // cast to Tuple class
+    Tuple<Integer, List<Integer>> otherTuple = (Tuple<Integer, List<Integer>> ) other;
+
+    // check that currAns and currPath are the same
+    return (otherTuple.getCurrPath().equals(this.currPath)) && 
+        (otherTuple.getCurrAns == this.currAns);
+
+  }
+
+  //getter methods
+  public int getCurrAns() {
+    return this.currAns;
+  }
+
+  public List<Integer> getCurrPath() {
+    return this.currPath;
   }
 }

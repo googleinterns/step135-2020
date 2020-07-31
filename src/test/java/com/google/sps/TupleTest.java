@@ -14,7 +14,7 @@
 
 package com.google.sps;
 
-//import com.google.sps.data.algorithm.Tuple;
+import com.google.sps.data.algorithm.Tuple;
 import java.time.LocalTime;
 import java.util.HashMap;
 import java.util.ArrayList; 
@@ -29,10 +29,20 @@ import org.junit.runners.JUnit4;
 
 /** */
 @RunWith(JUnit4.class)
-public final class TspSolverTest {
+public final class TupleTest {
+
+  private static final CURR_ANS = 27;
 
   @Test
   public void testConstructor() {
+    List<Integer> path = new ArrayList<>();
+    path.add(4);
+    path.add(3);
+    path.add(7);
 
+    Tuple<Integer, List<Integer>> tuple = new Tuple(CURR_ANS, path);
+
+    Assert.assertEquals(tuple.getCurrAns(), CURR_ANS);
+    Assert.assertEquals(tuple.getCurrPath(), path);
   }
 }
