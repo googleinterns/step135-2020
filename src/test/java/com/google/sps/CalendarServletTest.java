@@ -164,6 +164,7 @@ public final class CalendarServletTest {
             "\"time\":{\"hour\":11,\"minute\":30,\"second\":0,\"nano\":0}}," + 
             "\"endTime\":{\"date\":{\"year\":2020,\"month\":7,\"day\":22}," +
             "\"time\":{\"hour\":12,\"minute\":30,\"second\":0,\"nano\":0}}," +
+            "\"placeId\":\"1234\"," +
             "\"strStartTime\":\"2020-07-22T11:30:00\",\"strEndTime\":\"2020-07-22T12:30:00\"," +
             "\"travelTime\":30}," +
             "{\"name\":\"Upper Yosemite Fall\",\"address\":\"Upper Yosemite Fall\"," +
@@ -171,11 +172,12 @@ public final class CalendarServletTest {
             "\"time\":{\"hour\":10,\"minute\":0,\"second\":0,\"nano\":0}}," + 
             "\"endTime\":{\"date\":{\"year\":2020,\"month\":7,\"day\":22}," +
             "\"time\":{\"hour\":11,\"minute\":0,\"second\":0,\"nano\":0}}," +
+            "\"placeId\":\"1234\"," +
             "\"strStartTime\":\"2020-07-22T10:00:00\",\"strEndTime\":\"2020-07-22T11:00:00\"," +
             "\"travelTime\":30}]";
     
     writer.flush();
-    //Assert.assertTrue(stringWriter.toString().contains(expectedJson));
+    Assert.assertTrue(stringWriter.toString().contains(expectedJson));
   }
 
   @Test
