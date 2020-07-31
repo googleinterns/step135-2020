@@ -351,6 +351,7 @@ public final class TripServletTest {
     final String tripName = "Family Vacation";
     final String destinationName = "Island of Hawai'i";
     final String tripDayOfTravel = "2020-07-17";
+    final String tripEndDate = "2020-07-24";
     final String photoSrc = "../images/placeholder_image.png";
 
     // Mock UserService methods as logged-in user.
@@ -368,7 +369,7 @@ public final class TripServletTest {
 
     // Run storeTripEntity(...), with the User logged in (so trip is stored).
     Entity tripEntityReturn = tripServlet.storeTripEntity(responseMock,
-      tripName, destinationName, tripDayOfTravel, photoSrc, datastore);
+      tripName, destinationName, tripDayOfTravel, tripEndDate, photoSrc, datastore);
 
     // Retrieve the datastore results.
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
@@ -381,7 +382,7 @@ public final class TripServletTest {
     Assert.assertEquals(tripName, listResults.get(0).getProperty(Trip.TRIP_NAME));
     Assert.assertEquals(destinationName, listResults.get(0).getProperty(Trip.DESTINATION_NAME));
     Assert.assertEquals(tripDayOfTravel, listResults.get(0).getProperty(Trip.START_DATE));
-    Assert.assertEquals(tripDayOfTravel, listResults.get(0).getProperty(Trip.END_DATE));
+    Assert.assertEquals(tripEndDate, listResults.get(0).getProperty(Trip.END_DATE));
     Assert.assertEquals(photoSrc, listResults.get(0).getProperty(Trip.IMAGE_SRC));
     
     // Confirm that the Entity in the database matches the method return.
@@ -397,6 +398,7 @@ public final class TripServletTest {
     final String tripName = "Family Vacation";
     final String destinationName = "Island of Hawai'i";
     final String tripDayOfTravel = "2020-07-17";
+    final String tripEndDate = "2020-07-22";
     final String photoSrc = "../images/placeholder_image.png";
 
     // Mock UserService methods as logged-in user.
@@ -414,7 +416,7 @@ public final class TripServletTest {
 
     // Run storeTripEntity(...), with the User logged in (so trip is stored).
     tripServlet.storeTripEntity(responseMock, tripName, destinationName, 
-      tripDayOfTravel, photoSrc, datastore);
+      tripDayOfTravel, tripEndDate, photoSrc, datastore);
 
     // Retrieve the datastore results.
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
@@ -438,6 +440,7 @@ public final class TripServletTest {
     final String tripName = "Family Vacation";
     final String destinationName = "Island of Hawai'i";
     final String tripDayOfTravel = "2020-07-17";
+    final String tripEndDate = "2020-07-27";
     final String photoSrc = "../images/placeholder_image.png";
 
     // Mock UserService methods as logged-out user.
@@ -451,7 +454,7 @@ public final class TripServletTest {
 
     // Run storeTripEntity(...), with the User not logged in (so nothing is stored).
     Entity tripEntityReturn = tripServlet.storeTripEntity(responseMock,
-      tripName, destinationName, tripDayOfTravel, photoSrc, datastore);
+      tripName, destinationName, tripDayOfTravel, tripEndDate, photoSrc, datastore);
 
     // Retrieve the datastore results.
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
