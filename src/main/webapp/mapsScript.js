@@ -157,7 +157,7 @@ function addInfoWindow(results, marker) {
   const urlFormatAddress = results[0].name.replace(/\s/g, '+');
   const url = 'https://www.google.com/maps/search/?api=1&query=' + urlFormatAddress 
               + '&query_place_id=' + results[0].placeId;
-  contentString += "<a href=\""+url+"\">View on Google Maps</a>";
+  contentString += "<a href=\""+url+"\" target=\"_blank\">View on Google Maps</a>";
   // Construct infoWindow.
   const infoWindow = new google.maps.InfoWindow({
     content: contentString,
