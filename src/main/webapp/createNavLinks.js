@@ -31,6 +31,6 @@ function createGroupNavLinks() {
   const tripKeyQuery = (tripKey != null && tripKey != '') ? '?tripKey=' + tripKey : '';
 
   // Add the href links to the buttons.
-  calendarButton.href = '/calendar.html' + tripKeyQuery;
-  mapsButton.href = '/maps.html' + tripKeyQuery;
+  calendarButton.href = '/calendar' + tripKeyQuery;
+  mapsButton.href = '/maps' + tripKeyQuery;
 }
