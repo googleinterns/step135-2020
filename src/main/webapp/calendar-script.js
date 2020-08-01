@@ -79,10 +79,69 @@ function getEvents(calendar) {
   });
 }
 
+/**
+ * Dyanmically displays the address (w/ link), open and closing hours
+ * and the map and marker of the event
+ */
 function createMap(modalBody, eventObj) {
+  // infoDisplay holds address and openHours
   const infoDisplay = document.createElement('div');
-  //infoDisplay.innerHTML = '<b>Address: </b><a href=' + url + 'target="_blank" >' + eventObj.extendedProps.address + '</a>' + '<br>';
+  
+  // create the address with link
+  createAddressLine(modalBody, eventObj, infoDisplay);
 
+  // create new div to hold map
+  instantiateMapDiv(modalBody);
+
+  // instantiate map
+  const map = new google.maps.Map(document.getElementById('map'), {
+    zoom: zoomThirteen
+  });
+  const service = new google.maps.places.PlacesService(map);
+  service.getDetails({
+    placeId: eventObj.extendedProps.placeId
+  }, function(result, status) {
+    if (status != google.maps.places.PlacesServiceStatus.OK) {
+      alert(status);
+      return;
+    }
+    // set center of map
+    map.setCenter(result.geometry.location);
+  
+    // add open hours to mod info Display
+    let openHours = document.createElement('p');
+
+    // if there are open hours display them, otherwise open all day
+    let openTime;
+    let closeTime;
+    try {
+      const stringFullDate = eventObj.extendedProps.stringDate;
+      const dateStr = stringFullDate.split('T')[0]; 
+      const intOfWeek = getIntOfWeek(dateStr);
+
+      openTime = formatAMPM(result.opening_hours.periods[intOfWeek].open.time); 
+      closeTime = formatAMPM(result.opening_hours.periods[intOfWeek].close.time);
+
+      createOpenCloseHours('Open', openTime, openHours);
+      createOpenCloseHours('Close', closeTime, openHours);
+    } catch(e) {
+      // create bold element open all day if no hours available
+      const boldAllDay = document.createElement('b');
+      boldAllDay.innerText = 'Open All Day ';
+      openHours.appendChild(boldAllDay);
+    }
+
+    infoDisplay.appendChild(openHours);
+
+    const marker = new google.maps.Marker({
+      map: map,
+      position: result.geometry.location
+    });
+  });
+}
+
+// create the address in the popup, add it to modalBody
+function createAddressLine(modalBody, eventObj, infoDisplay) {
   const addressLine = document.createElement('p');
   const boldAddress = document.createElement('b');
   boldAddress.innerText = 'Address: ';
@@ -101,70 +160,13 @@ function createMap(modalBody, eventObj) {
 
   // infoDisplay.appendChild(address);
   modalBody.appendChild(infoDisplay);
+}
 
-  // create new div to hold map
+// create div to hold map
+function instantiateMapDiv(modalBody, map) {
   const mapDis = document.createElement('div');
   mapDis.id = 'map';
   modalBody.appendChild(mapDis);
-
-  // instantiate map
-  const map = new google.maps.Map(document.getElementById('map'), {
-    zoom: zoomThirteen
-  });
-
-  const service = new google.maps.places.PlacesService(map);
-  service.getDetails({
-    placeId: eventObj.extendedProps.placeId
-  }, function(result, status) {
-    if (status != google.maps.places.PlacesServiceStatus.OK) {
-      alert(status);
-      return;
-    }
-    // set center of map
-    map.setCenter(result.geometry.location);
-  
-    // add open hours to mod info Display
-    let openHours = document.createElement('p');
-
-    // if there are open hours display them, otherwise open all day
-    try {
-      const stringFullDate = eventObj.extendedProps.stringDate;
-      const dateStr = stringFullDate.split('T')[0]; 
-      const intOfWeek = getIntOfWeek(dateStr);
-
-      // create bold open and time element
-      const open = document.createElement('p');
-      const openTime = formatAMPM(result.opening_hours.periods[intOfWeek].open.time); 
-      const boldOpen = document.createElement('b');
-      boldOpen.innerText = 'Open: ';
-      open.appendChild(boldOpen);
-      open.innerHTML += openTime;
-      open.appendChild(document.createElement('br'));
-      openHours.appendChild(open);
-
-      // create bold close and time element
-      const close = document.createElement('p');
-      const closeTime = formatAMPM(result.opening_hours.periods[intOfWeek].close.time);
-      const boldClose = document.createElement('b');
-      boldClose.innerText = 'Close: ';
-      close.appendChild(boldClose);
-      close.innerHTML += closeTime;
-      close.appendChild(document.createElement('br'));
-      openHours.appendChild(close);
-    } catch(e) {
-      // create bold element open all day if no hours available
-      const boldAllDay = document.createElement('b');
-      boldAllDay.innerText = 'Open All Day ';
-      openHours.appendChild(boldAllDay);
-    }
-
-    infoDisplay.appendChild(openHours);
-
-    const marker = new google.maps.Marker({
-      map: map,
-      position: result.geometry.location
-    });
-  });
 }
 
 // takes a string in date format and return the int of the week
@@ -181,9 +183,22 @@ function formatAMPM(time) {
   const ampm = hours >= 12 ? 'pm' : 'am';
   hours = hours % 12;
   hours = hours ? hours : 12; // the hour '0' should be '12'
-  minutes = (minutes < 10 && minutes > 0) ? '0' + minutes : minutes;
   const strTime = hours + ':' + minutes + ' ' + ampm;
   return strTime;
+}
+
+// create bolded hours section
+function createOpenCloseHours(type, time, openHours) {
+  if (type === 'open' || type === 'close') {
+    throw new IllegalArgumentException("hours must be open or close")
+  }
+  const holder = document.createElement('p');
+  const boldType = document.createElement('b');
+  boldType.innerText = type + ': ';
+  holder.appendChild(boldType);
+  holder.innerHTML += time;
+  holder.appendChild(document.createElement('br'));
+  openHours.appendChild(holder);
 }
 
 // Append the 'script' element to the document head.

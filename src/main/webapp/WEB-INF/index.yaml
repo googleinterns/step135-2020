@@ -1,0 +1,8 @@
+indexes:
+
+# This index is needed when querying locations to sort them in an optimized route order.
+- kind: location
+  ancestor: yes
+  properties:
+  - name: order
+  
