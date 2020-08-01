@@ -151,7 +151,7 @@
   display: inline-flex;
   width: 30%;
   height: 400px;
-  margin: 15px 15px;
+  margin: 15px 30px 15px 0px;
   box-shadow: 0 5px 5px 0 rgba(0,0,0,0.2), 0 6px 15px 0 rgba(0,0,0,0.19);
 }
 

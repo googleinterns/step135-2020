@@ -18,13 +18,12 @@ $(document).ready(() => {
 });
 
 /**
- * Create the group nav links for the calendar, maps, and edit pages.
+ * Create the group nav links for the calendar and maps pages.
  */
 function createGroupNavLinks() {
-  // Get the calendar, maps, and edit button links.
+  // Get the calendar and maps button links.
   const calendarButton = document.getElementById('button-group-nav-calendar');
   const mapsButton = document.getElementById('button-group-nav-maps');
-  const editButton = document.getElementById('button-group-nav-edit');
 
   // Get the tripKey from the URL to add to the button links.
   const urlParams = new URLSearchParams(window.location.search);
@@ -34,5 +33,4 @@ function createGroupNavLinks() {
   // Add the href links to the buttons.
   calendarButton.href = '/calendar.html' + tripKeyQuery;
   mapsButton.href = '/maps.html' + tripKeyQuery;
-  editButton.href = '/edit.html' + tripKeyQuery;
 }
