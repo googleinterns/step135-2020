@@ -6,11 +6,6 @@
   </rule>
 
   <rule>
-    <from>/edit</from>
-    <to>/edit.html</to>
-  </rule>
-
-  <rule>
     <from>/calendar</from>
     <to>/calendar.html</to>
   </rule>
