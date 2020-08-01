@@ -269,6 +269,10 @@ input[type=date] {
   border-radius: 8px;
 }
 
+/**
+ * NEW ADDITIONS
+ */
+
 #sidenav-action-buttons {
   height: 100%;
   width: 30%;
@@ -279,31 +283,22 @@ input[type=date] {
   background-color: lightgray;
 }
 
-#main-edit-page {
-  margin-right: 30%;
-  background-color: lime;
+#edit-page-columns {
+  margin-top: -30px;
 }
 
-/* Main site body */
-.wrapper {
-    width: 940px;
-    margin: 0 auto;
-    position: relative; /* Ensure absolute positioned child elements are relative to this*/
+#sidebar-container {
+  padding-top: 40px;
+  z-index: 1;
 }
 
-/* Absolute positioned wrapper for the element you want to fix position */
-.fixed-wrapper {
-    width: 220px;
-    position: absolute;
-    top: 0;
-    left: -240px; /* Move this out to the left of the site body, leaving a 20px gutter */
+#sidebar-bg {
+  background: lightgray;
+  padding: 15px;
 }
 
-/* The element you want to fix the position of */
-.fixed {
-    width: 220px;
-    position: fixed;
-    /* Do not set top / left! */
+#delete-trip-button-container {
+  margin-bottom: 0px;
 }
 
 .sidebar-p {
@@ -322,32 +317,6 @@ input[type=date] {
   margin-bottom: 16px;
 }
 
-.autoscale-text .autoscale-hide-span {
-  margin: 0;
-  padding: 0;
-}
-
-.autoscale-text {
-  border: none;
-  border-bottom: 1px solid black;
-  min-width: 10px;
-  font-size: 2.5rem;
-}
-
-.autoscale-hide-span {
-  display: none;
-  white-space: pre;
-}
-
-.btn-sm {
-  padding: .15rem .3rem;
-  font-size: .75rem;
-  line-height: 1.5;
-  border-radius: .2rem;
-}
-
-.btn-primary-dark {
-  color: #fff;
-  background-color: #3c78d8ff;
-  border-color: #3c78d8ff;
+#edit-page-left-column {
+  padding: 40px;
 }

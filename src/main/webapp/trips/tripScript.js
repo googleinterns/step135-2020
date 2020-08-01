@@ -101,8 +101,8 @@ function buildTripCard(tripTitle, destinationName, imageSrc, startDate, endDate,
   const cardBodyContainer = document.createElement('div');
   cardBodyContainer.className = 'card-body';
 
-  // Create a title, destination and dates, and action buttons (calendar and 
-  // maps) for the card.
+  // Create a title, destination and dates, and action buttons (calendar, maps, 
+  // and edit) for the card.
   const titleElement = document.createElement('h5');
   titleElement.className = 'card-title';
   titleElement.innerText = tripTitle;
@@ -122,13 +122,19 @@ function buildTripCard(tripTitle, destinationName, imageSrc, startDate, endDate,
   mapsButton.href = '../maps.html?tripKey=' + tripKey;
   mapsButton.innerText = 'Maps';
 
-  // Create the card footer, where action items (calendar, maps) will be placed.
+  const editButton = document.createElement('a');
+  editButton.className = 'btn btn-primary trip-button';
+  editButton.href = '../edit.html?tripKey=' + tripKey;
+  editButton.innerText = 'Edit';
+
+  // Create the card footer, where action items (calendar, maps, edit) will be placed.
   const cardFooter = document.createElement('div');
   cardFooter.className = 'card-footer';
 
-  // Add the calendar and maps buttons to the footer.
+  // Add the calendar, maps, and edit buttons to the footer.
   cardFooter.appendChild(calendarButton);
   cardFooter.appendChild(mapsButton);
+  cardFooter.appendChild(editButton);
 
   // Add the body elements to the card body container.
   cardBodyContainer.appendChild(titleElement);
