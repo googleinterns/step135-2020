@@ -22,6 +22,7 @@ script.async = true;
 // Attach callback function to the 'window' object.
 window.initEditScript = () => {
   addInputPoiLocationAutofill();
+  autoscaleTextInputWidth();
 }
 
 // Add text input POI Google Places autofill.
@@ -41,6 +42,33 @@ function addInputPoiLocationAutofill() {
     inputPoi.classList.add('is-valid');
   });
 }
+
+/**
+ * Autoscale the text input width for the edit text inputs.
+ */
+function autoscaleTextInputWidth() {
+  // Get the autoscale text input elements.
+  const autoscaleHideSpans = $('.autoscale-hide-span');
+  const autoscaleTextEls = $('.autoscale-text');
+
+  for (let i = 0; i < autoscaleHideSpans.length; i++) {
+    // Set constants for adding to (for some reason, it's slightly short)
+    // and scaling the width.
+    const autoscaleHideSpan = $(autoscaleHideSpans[i]);
+    const autoscaleText = $(autoscaleTextEls[i]);
+
+    // Set the initial width of the text input.
+    autoscaleHideSpan.text(autoscaleText.val());
+    autoscaleText.width(autoscaleHideSpan.width());
+
+    // Readjust text input width upon edit.
+    autoscaleText.on('input', () => {
+      autoscaleHideSpan.text(autoscaleText.val());
+      autoscaleText.width(autoscaleHideSpan.width());
+    });
+  }
+}
+
 
 // Append the 'script' element to the document head.
 document.head.appendChild(script);

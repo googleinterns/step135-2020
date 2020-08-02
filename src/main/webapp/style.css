@@ -53,7 +53,7 @@
 }
 
 #rightPanel {
-  font-family: 'maven-pro';
+  /* font-family: 'maven-pro'; */
   line-height: 30px;
   padding-left: 10px;
   height: 500px;
@@ -147,7 +147,7 @@
   margin: 20px 0;
 }
 
-.card {
+.main-card {
   display: inline-flex;
   width: 30%;
   height: 400px;
@@ -297,10 +297,110 @@ input[type=date] {
   margin-bottom: 0px;
 }
 
+.sidebar-p {
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+  line-height: 1.3;
+}
+
 .sidebar-input-form {
   padding: 0px;
+}
+
+hr {
+  margin: 8px 0px 16px 0px;
+  border: 2px solid #ededed;
+  width: 100%;
+  border-top: none;
 }
 
 #edit-page-left-column {
   padding: 40px;
 }
+
+.autoscale-text {
+  border: none;
+  border-bottom: 1px solid black;
+  min-width: 10px;
+  margin-bottom: 5px;
+}
+
+#inputDayOfTravelContainer {
+  margin: 20px 0;
+}
+
+.edit-card {
+  display: block;
+  width: 90%;
+  margin: 0px;
+  margin-top: 20px;
+  height: 200px;
+  box-shadow: 0 5px 5px 0 rgba(0,0,0,0.2), 0 6px 15px 0 rgba(0,0,0,0.19);
+}
+
+.edit-trip-title-size {
+  font-size: 2.5rem;
+}
+
+.edit-trip-icon {
+  font-size: 2rem;
+  margin-left: 5px;
+}
+
+.edit-card-title-size {
+  font-size: 1.5rem;
+}
+
+.edit-card-icon {
+  font-size: 1.25rem;
+  margin-left: 5px;
+}
+
+.edit-card-text {
+  font-size: 1.25rem;
+  margin: 0.5rem 0;
+}
+
+.edit-card-delete {
+  font-size: 1.5rem;
+  position: absolute;
+  top: 1.5rem;
+  right: 1.5rem;
+}
+
+.edit-card-changed-button {
+  position: absolute;
+  bottom: 1.25rem;
+  left: 1.25rem;
+}
+
+.edit-card-height {
+  height: 200px;
+}
+
+.edit-card-align {
+  text-align: left;
+}
+
+.changed-button-display {
+  display: block;
+}
+
+.autoscale-hide-span {
+  display: none;
+  white-space: pre;
+}
+
+.btn-sm {
+  padding: .15rem .3rem;
+  font-size: .75rem;
+  line-height: 1.5;
+  border-radius: .2rem;
+}
+
+.btn-primary-dark {
+  color: #fff;
+  background-color: #3c78d8ff;
+  border-color: #3c78d8ff;
+}
+

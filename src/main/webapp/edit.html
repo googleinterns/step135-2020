@@ -62,13 +62,74 @@
                   name="inputPoi" autocomplete="off">
               </div>
               <div class="form-group sidebar-input-form">
+                <button class="btn-nohover btn-light-nohover" type="button">
+                  <span class="poi-input" id="poi-element-text">Gas Works Park</span>
+                  <span id="poi-element-space">&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                  <i id="poi-trash-icon" class="fa fa-trash"></i>
+                </button>
+              </div>
+              <div class="form-group sidebar-input-form">
                 <input type="button" class="btn btn-primary" value="Add POI">
+              </div>
+              <hr>
+              <p class="sidebar-p">Save the changes you've made so far.</p>
+              <div class="form-group sidebar-input-form">
+                <input type="button" class="btn btn-success" value="Save Trip">
+              </div>
+              <hr>
+              <h4 class="sidebar-header">Danger Zone</h4>
+              <p class="sidebar-p">Deleting the trip cannot be undone.</p>
+              <div class="form-group sidebar-input-form" id="delete-trip-button-container">
+                <input type="button" class="btn btn-danger" value="Delete Trip">
               </div>
             </div>
           </div>
         </div>
         <div class="col" id="edit-page-left-column">
-          <h1>Example Trip Name</h1>
+          <span class="autoscale-hide-span edit-trip-title-size"></span>
+          <input class="autoscale-text edit-trip-title-size" type="text" value="My Favorite Trip">
+          <i class="fa fa-edit edit-trip-icon"></i>
+          <button type="button" class="btn btn-primary-dark btn-sm changed-button-display">Changed</button>
+          <div class="form-group col-md-4" id="inputDayOfTravelContainer">
+            <label for="inputDayOfTravel">Day Of Travel</label>
+            <input type="date" class="form-control" name="inputDayOfTravel" value="2020-08-15">
+          </div>
+          <h1>Saturday, 8/15</h1>
+          <div class="card edit-card">
+            <div class="row no-gutters edit-card-height">
+              <div class="col-sm-4 edit-card-height">
+                <img class="card-img edit-card-height" src="https://lh3.googleusercontent.com/p/AF1QipPywZEmLPoz_sxqzb6UD4--PwLrTugFDHUTA9TR=s1600-w1932" alt="Space Needle">
+              </div>
+              <div class="col-sm-8">
+                <div class="card-body edit-card-align">
+                  <span class="autoscale-hide-span edit-card-title-size">Space Needle</span>
+                  <input class="autoscale-text edit-card-title-size" type="text" value="Space Needle">
+                  <i class="fa fa-edit edit-card-icon"></i>
+                  <p class="edit-card-text">400 Broad Street, Seattle</p>
+                  <p class="edit-card-text">10AM - 11AM</p>  
+                </div>
+                <i class="fa fa-trash edit-card-delete"></i>
+              </div>
+            </div>
+          </div>
+          <div class="card edit-card">
+            <div class="row no-gutters edit-card-height">
+              <div class="col-sm-4 edit-card-height">
+                <img class="card-img edit-card-height" src="https://lh3.googleusercontent.com/p/AF1QipNcuesYJkpIpPg1MgSYBRxOUVh8eTswgtTLywhw=s1600-w6000" alt="Space Needle">
+              </div>
+              <div class="col-sm-8">
+                <div class="card-body edit-card-align">
+                  <span class="autoscale-hide-span edit-card-title-size">Woodland Park Zoo</span>
+                  <input class="autoscale-text edit-card-title-size" type="text" value="Woodland Park Zoo">
+                  <i class="fa fa-edit edit-card-icon"></i>
+                  <p class="edit-card-text">5500 Phinney Avenue North, Seattle</p>
+                  <p class="edit-card-text">10AM - 11AM</p>
+                </div>
+                <i class="fa fa-trash edit-card-delete"></i>
+                <button type="button" class="btn btn-primary-dark btn-sm edit-card-changed-button">Changed</button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>

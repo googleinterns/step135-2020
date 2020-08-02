@@ -89,7 +89,7 @@ function addTripCards(trips) {
 function buildTripCard(tripTitle, destinationName, imageSrc, startDate, endDate, tripKey) {
   // Create the card container.
   const cardContainer = document.createElement('div');
-  cardContainer.className = 'card';
+  cardContainer.className = 'card main-card';
 
   // Create a trip image object (image of the destination).
   const tripImage = document.createElement('img');
