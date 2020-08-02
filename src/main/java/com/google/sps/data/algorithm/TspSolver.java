@@ -25,13 +25,13 @@ public class TspSolver {
 
   // variables to create before alg
   Double[][] distanceMatrix;
+  HashMap<Integer, String> placeIdToInt;
   boolean[] visited;
   HashMap<Integer, List<LocalTime>> openHours;
 
   // variables used for tracking
   int currPos;
   int numNodes;
-  HashMap<Integer, String> placeIdToInt;
   LocalTime currentTime;
   int count;
   int cost;
@@ -65,4 +65,56 @@ public class TspSolver {
     this.numNodes = size;
   }
 
+  /**
+   * Populate placeIdToInt
+   */ 
+  private void populatePlaceIdToInt(String center, String[] pois) {
+    this.placeIdToInt = new HashMap<>();
+    this.placeIdToInt.add(0, center);
+
+    for (int i = 1; i <= pois.length(); i++) {
+      this.placeIdToInt.add(i, pois[i]);
+    }
+  }
+
+  // getter functions
+  public Double[][] getDistanceMatrix() {
+    return this.distanceMatrix;
+  }
+
+  public HashMap<Integer, String> getPlaceIdToInt() {
+    return this.placeIdToInt;
+  }
+
+  public boolean[] visited getVisited() {
+    return this.visited;
+  }
+
+  public HashMap<Integer, List<LocalTime>> getOpenHours() {
+    return this.openHours;
+  }
+
+  public int getCurrPos() {
+    return this.currPos;
+  }
+
+  public int getNumNodes() {
+    return this.numNodes;
+  }
+
+  public LocalTime getCurrPos() {
+    return this.currPos;
+  }
+
+  public int getCount() {
+    return this.count;
+  }
+
+  public int getCost() {
+    return this.cost;
+  }
+
+  public Tuple getAns() {
+    return this.ans;
+  }
 }
