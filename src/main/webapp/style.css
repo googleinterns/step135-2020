@@ -297,21 +297,8 @@ input[type=date] {
   margin-bottom: 0px;
 }
 
-.sidebar-p {
-  margin-top: 0;
-  margin-bottom: 0.5rem;
-  line-height: 1.3;
-}
-
 .sidebar-input-form {
   padding: 0px;
-}
-
-hr {
-  margin: 8px 0px 16px 0px;
-  border: 2px solid #ededed;
-  width: 100%;
-  border-top: none;
 }
 
 #edit-page-left-column {
