@@ -21,21 +21,65 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Solves the traveling Salesman problem by backtracking using DFS
+ * Checks opening hours for locations visited
+ */
 public class TspSolver {
 
+  private static final int START_POSITION = 0;
+  private static final int START_COUNT = 0;
+  private static final LocalTime START_Time = LocalTime.of(10, 0);
+
   // variables to create before alg
+  // DISTANCE SHOULD PROBS BE AN AMOUNT OF TIME RIGHT? YES ANSWER TO MY OWN Q
   Double[][] distanceMatrix;
   HashMap<Integer, String> placeIdToInt;
-  boolean[] visited;
   HashMap<Integer, List<LocalTime>> openHours;
 
-  // variables used for tracking
-  int currPos;
-  int numNodes;
-  LocalTime currentTime;
-  int count;
-  int cost;
-  Tuple ans;
+ 
+  
+  public TspSolver(String center, String[] pois) {
+
+    // variables used for tracking
+    int currPos;
+    int numNodes;
+    LocalTime currentTime;
+    int count;
+    int cost;
+    Tuple ans;
+    boolean[] visited;
+
+    // TODO: call functions to set these values and the solver
+
+  }
+
+  private Tuple solver(int currPos, int numNodes, LocalTime currentTime, 
+      int count, int cost, Tuple ans, boolean[] visited) {
+    /**
+     * If last node is reached and shares an edge w/ start node
+     * Calculate min of cost and currAns
+     * return and keep traversing the graph/matrix
+     */
+    // QUESTION: DO I ADD THE CENTER TO THE PATH AS WELL? CHECK W/ EHIKA
+    if (count == numNodes) && distanceMatrix[currPos][0] > 0) {
+      int min = Math.min(ans.getCurrAns(), cost + distanceMatrix[currPos][0]]);
+      ans.setCurrAns(min);
+      return ans;
+    }
+
+    for (int i = 0; i < numNodes; i++) {
+      // if node is unvisited and greater than 0, i.e. not the same node
+      if (!visited[i] && graph[currPos][i] > 0 /**&& CHECK IF IS OPEN!!!!!!*/) {
+        visited[i] = true;
+        currenTime.plusHours((long) 1); // ADD TRAVELTIME, SHOULD DIST MATRIX BE TIME??
+        ans = solver(i, numNodes, currentTime, count + 1, cost + graph[currPos][i], 
+            ans, visited);
+        visited[i] = false;
+      }
+    }
+    return ans;
+  }
 
   /**
    * Create Distance Matrix using DistanceMatrixAPI
@@ -70,10 +114,10 @@ public class TspSolver {
    */ 
   private void populatePlaceIdToInt(String center, String[] pois) {
     this.placeIdToInt = new HashMap<>();
-    this.placeIdToInt.add(0, center);
+    this.placeIdToInt.put(0, center);
 
-    for (int i = 1; i <= pois.length(); i++) {
-      this.placeIdToInt.add(i, pois[i]);
+    for (int i = 1; i <= pois.length; i++) {
+      this.placeIdToInt.put(i, pois[i]);
     }
   }
 
@@ -86,7 +130,7 @@ public class TspSolver {
     return this.placeIdToInt;
   }
 
-  public boolean[] visited getVisited() {
+  public boolean[] getVisited() {
     return this.visited;
   }
 
@@ -102,8 +146,8 @@ public class TspSolver {
     return this.numNodes;
   }
 
-  public LocalTime getCurrPos() {
-    return this.currPos;
+  public LocalTime getCurrentTime() {
+    return this.currentTime;
   }
 
   public int getCount() {
