@@ -269,10 +269,6 @@ input[type=date] {
   border-radius: 8px;
 }
 
-/**
- * NEW ADDITIONS
- */
-
 #sidenav-action-buttons {
   height: 100%;
   width: 30%;
@@ -311,10 +307,11 @@ input[type=date] {
   padding: 0px;
 }
 
-.hr {
-  background-color: #ededed;
-  height: 1px;
-  margin-bottom: 16px;
+hr {
+  margin: 8px 0px 16px 0px;
+  border: 2px solid #ededed;
+  width: 100%;
+  border-top: none;
 }
 
 #edit-page-left-column {
