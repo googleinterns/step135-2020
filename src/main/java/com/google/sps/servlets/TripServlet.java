@@ -243,7 +243,7 @@ public class TripServlet extends HttpServlet {
   /**
    * Get the PlaceDetails object from the place ID.
    */
-  private PlaceDetails getPlaceDetailsFromPlaceId(GeoApiContext context, String placeId)
+  public static PlaceDetails getPlaceDetailsFromPlaceId(GeoApiContext context, String placeId)
     throws IOException {
 
     PlaceDetailsRequest placeDetailsRequest = PlacesApi.placeDetails(context, 

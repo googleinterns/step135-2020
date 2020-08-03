@@ -20,6 +20,8 @@ import com.google.maps.DirectionsApi.RouteRestriction;
 import com.google.maps.GeoApiContext;
 import com.google.maps.model.DirectionsLeg;
 import com.google.maps.model.DirectionsResult;
+import com.google.maps.model.OpeningHours;
+import com.google.maps.model.PlaceDetails;
 import com.google.maps.model.TravelMode;
 import com.google.sps.data.algorithm.Tuple;
 import com.google.sps.servlets.TripServlet;
@@ -42,6 +44,7 @@ public class TspSolver {
   private static final int START_COST = 0;
   private static final int START_ANS = Integer.MAX_VALUE;
   private static final LocalTime START_TIME = LocalTime.of(10, 0);
+  private static final int HALF_HOUR = 30;
 
   private GeoApiContext context;
 
@@ -49,16 +52,27 @@ public class TspSolver {
   // DISTANCE SHOULD PROBS BE AN AMOUNT OF TIME RIGHT? YES ANSWER TO MY OWN Q
   int[][] timeMatrix;
   HashMap<Integer, String> placeIdToInt;
-  HashMap<Integer, List<LocalTime>> openHours;
+  HashMap<Integer, OpeningHours.Period> openHours;
+  // Sunday is 0, Saturday is 6
+  int intOfWeek;
 
   // var to output
   Tuple finalAnswer;
  
-  
-  public TspSolver(String center, List<String> pois, GeoApiContext context) 
+  /**
+   * Initializes and solves the TSP-TW problem, sets final answer so in order to access
+   * must call getFinalAnswer()
+   * 
+   * @param center central location
+   * @param pois list of pois to visit
+   * @param context geoContext from TripServlet
+   * @param intOfWeek day of week as an int (Sunday:0 through Saturday:6) from TripDay
+   */
+  public TspSolver(String center, List<String> pois, GeoApiContext context, int intOfWeek) 
       throws IOException {
-    // set GeoApiContext to be same as TripServlet
+    // set class constants from TripServlet
     this.context = context;
+    this.intOfWeek = intOfWeek;
 
     // variables used for tracking
     int currPos = START_POS;
@@ -71,7 +85,8 @@ public class TspSolver {
 
     // TODO: call functions to set these values and the solver
     createTimeMatrix(center, pois);
-    // TODO: create openHours
+    populateIntMapAndOpenHours(center, pois);
+
     
     visited[0] = true;
     this.finalAnswer = solver(currPos, numNodes, currentTime, count, cost, ans, visited);
@@ -92,10 +107,19 @@ public class TspSolver {
     }
 
     for (int i = 0; i < numNodes; i++) {
+      LocalTime open = openHours.get(i).open.time;
+      LocalTime close = openHours.get(i).close.time;
+      close.minusMinutes(HALF_HOUR);
+    
+      // check if location is open at currentTime along path
+      boolean isOpen = (currentTime.compareTo(open) >= 0) && 
+          (currentTime.compareTo(close) <= 0);
+
       // if node is unvisited and greater than 0, i.e. not the same node
       if (!visited[i] && timeMatrix[currPos][i] > 0 /**&& CHECK IF IS OPEN!!!!!!*/) {
         visited[i] = true;
         currentTime.plusHours((long) 1); // ADD TRAVELTIME, SHOULD DIST MATRIX BE TIME??
+        currentTime.plusMinutes((long) timeMatrix[currPos][i]);
         ans = solver(i, numNodes, currentTime, count + 1, 
             cost + timeMatrix[currPos][i], ans, visited);
         visited[i] = false;
@@ -107,7 +131,8 @@ public class TspSolver {
   /**
    * Create time Matrix using DistanceMatrixAPI
    * 
-   * @param pois list of pois, 0 is in start and stop point
+   * @param center central location
+   * @param pois list of pois other than central location
    */
   private void createTimeMatrix(String center, List<String> pois) 
       throws IOException {
@@ -139,6 +164,35 @@ public class TspSolver {
   }
 
   /**
+   * Populate placeIdToInt and call setOpenHours for each placeId
+
+   */ 
+  private HashMap<Integer, String> populateIntMapAndOpenHours(String center, 
+      List<String> pois) throws IOException{
+    HashMap<Integer, String> placeIdToInt = new HashMap<>();
+    placeIdToInt.put(0, center);
+    setOpenHours(0, center);
+
+    for (int i = 0; i < pois.size(); i++) {
+      placeIdToInt.put(i+1, pois.get(i));
+      setOpenHours(i+1, pois.get(i));
+    }
+
+    return placeIdToInt;
+  }
+
+  /**
+   * Sets the openHours for each placeId (as int), as an OpeningHours.Period[]
+   * 
+   * @param placeId placeId to search openHours for
+   * @param index index to put the openHours in the HashMap
+   */
+  private void setOpenHours(int index, String placeId) throws IOException {
+    PlaceDetails placeDetails = TripServlet.getPlaceDetailsFromPlaceId(this.context, placeId);
+    this.openHours.put(index, placeDetails.openingHours.periods[this.intOfWeek]);
+  }
+
+    /**
    * Get travel time in seconds between two locations
    * 
    * @param origin start location
@@ -162,20 +216,6 @@ public class TspSolver {
     return travelTime;
   }
 
-  /**
-   * Populate placeIdToInt
-   */ 
-  private HashMap<Integer, String> populatePlaceIdToInt(String center, String[] pois) {
-    HashMap<Integer, String> placeIdToInt = new HashMap<>();
-    placeIdToInt.put(0, center);
-
-    for (int i = 1; i <= pois.length; i++) {
-      placeIdToInt.put(i, pois[i]);
-    }
-
-    return placeIdToInt;
-  }
-
   // getter functions
   public int[][] getTimeMatrix() {
     return this.timeMatrix;
@@ -185,7 +225,11 @@ public class TspSolver {
     return this.placeIdToInt;
   }
 
-  public HashMap<Integer, List<LocalTime>> getOpenHours() {
+  public HashMap<Integer, OpeningHours.Period> getOpenHours() {
     return this.openHours;
+  }
+
+  public Tuple getFinalAnswer() {
+    return this.finalAnswer;
   }
 }
