@@ -30,7 +30,7 @@ function addInputPoiLocationAutofill() {
   let locationAutocomplete = new google.maps.places.Autocomplete(inputPoi);
 
   /**
-   * Any time the input changes through user typing, remove the 'is-valid' class
+   * Any time the input changes through user typing, remove the 'is-valid' class.
    * Note: this will not be called if the user clicks on the Google Place autofill.
    */
   inputPoi.addEventListener('input', () => {
