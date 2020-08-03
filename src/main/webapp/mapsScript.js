@@ -44,20 +44,28 @@ window.initMap = function() {
   directionsRenderer.setMap(map);
   directionsRenderer.setPanel(document.getElementById('rightPanel'));
 
+  document.getElementById('inputMapDate').onchange = () => {
+    const date = document.getElementById('inputMapDate').value
+    if (date !== '') {
+      displayRouteOnMap(date);
+    }
+  };
+
   // Get locations from MapServlet and display directions on map.
-  displayRouteOnMap();
+  displayRouteOnMap('');
 }
 
 /*
  * Gets locations from MapServlet with the tripKey parameter.
  * Calls showDirections to show the directions with those locations.
  */
-function displayRouteOnMap() {
+function displayRouteOnMap(date) {
   const urlParams = new URLSearchParams(window.location.search);
   const tripKey = urlParams.get('tripKey');
   const tripKeyQuery = (tripKey != null && tripKey != '') ? '?tripKey=' + tripKey : '';
+  const dateQuery = (date != null && date != '') ? '&date=' + date : '';
   
-  fetch('/get-map' + tripKeyQuery).then(response => response.json()).then((locations) => {
+  fetch('/get-map' + tripKeyQuery + dateQuery).then(response => response.json()).then((locations) => {
     showDirections(locations);
   });
 }
