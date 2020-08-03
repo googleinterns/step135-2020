@@ -116,7 +116,7 @@ public class TspSolver {
           (currentTime.compareTo(close) <= 0);
 
       // if node is unvisited and greater than 0, i.e. not the same node
-      if (!visited[i] && timeMatrix[currPos][i] > 0 /**&& CHECK IF IS OPEN!!!!!!*/) {
+      if (!visited[i] && timeMatrix[currPos][i] > 0 && isOpen) {
         visited[i] = true;
         currentTime.plusHours((long) 1); // ADD TRAVELTIME, SHOULD DIST MATRIX BE TIME??
         currentTime.plusMinutes((long) timeMatrix[currPos][i]);
