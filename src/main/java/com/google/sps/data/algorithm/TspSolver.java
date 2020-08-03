@@ -14,7 +14,16 @@
 
 package com.google.sps.data.algorithm;
 
+import com.google.maps.DirectionsApi;
+import com.google.maps.DirectionsApiRequest;
+import com.google.maps.DirectionsApi.RouteRestriction;
+import com.google.maps.GeoApiContext;
+import com.google.maps.model.DirectionsLeg;
+import com.google.maps.model.DirectionsResult;
+import com.google.maps.model.TravelMode;
 import com.google.sps.data.algorithm.Tuple;
+import com.google.sps.servlets.TripServlet;
+import java.io.IOException;
 import java.time.LocalTime;
 import java.util.HashMap;
 import java.util.ArrayList; 
@@ -27,10 +36,14 @@ import java.util.Map;
  */
 public class TspSolver {
 
-  private static final int START_POSITION = 0;
+  // class constants
+  private static final int START_POS = 0;
   private static final int START_COUNT = 0;
-  private static final int START_COST = Integer.MAX_VALUE;
-  private static final LocalTime START_Time = LocalTime.of(10, 0);
+  private static final int START_COST = 0;
+  private static final int START_ANS = Integer.MAX_VALUE;
+  private static final LocalTime START_TIME = LocalTime.of(10, 0);
+
+  private GeoApiContext context;
 
   // variables to create before alg
   // DISTANCE SHOULD PROBS BE AN AMOUNT OF TIME RIGHT? YES ANSWER TO MY OWN Q
@@ -38,21 +51,30 @@ public class TspSolver {
   HashMap<Integer, String> placeIdToInt;
   HashMap<Integer, List<LocalTime>> openHours;
 
+  // var to output
+  Tuple finalAnswer;
  
   
-  public TspSolver(String center, String[] pois) {
+  public TspSolver(String center, List<String> pois, GeoApiContext context) 
+      throws IOException {
+    // set GeoApiContext to be same as TripServlet
+    this.context = context;
 
     // variables used for tracking
-    int currPos = START_POSITION;
-    int numNodes = pois.length + 1;
-    LocalTime currentTime;
+    int currPos = START_POS;
+    int numNodes = pois.size() + 1; // total nodes: #locations & center
+    LocalTime currentTime = START_TIME;
     int count = START_COUNT;
     int cost = START_COST;
-    Tuple ans;
-    boolean[] visited = createVisitedAllFalse(numNodes);
+    Tuple ans = new Tuple(START_ANS, new ArrayList<>());
+    boolean[] visited = new boolean[numNodes]; // sets values to "false"  
 
     // TODO: call functions to set these values and the solver
-
+    createTimeMatrix(center, pois);
+    // TODO: create openHours
+    
+    visited[0] = true;
+    this.finalAnswer = solver(currPos, numNodes, currentTime, count, cost, ans, visited);
   }
 
   private Tuple solver(int currPos, int numNodes, LocalTime currentTime, 
@@ -74,8 +96,8 @@ public class TspSolver {
       if (!visited[i] && timeMatrix[currPos][i] > 0 /**&& CHECK IF IS OPEN!!!!!!*/) {
         visited[i] = true;
         currentTime.plusHours((long) 1); // ADD TRAVELTIME, SHOULD DIST MATRIX BE TIME??
-        ans = solver(i, numNodes, currentTime, count + 1, cost + timeMatrix[currPos][i], 
-            ans, visited);
+        ans = solver(i, numNodes, currentTime, count + 1, 
+            cost + timeMatrix[currPos][i], ans, visited);
         visited[i] = false;
       }
     }
@@ -87,20 +109,57 @@ public class TspSolver {
    * 
    * @param pois list of pois, 0 is in start and stop point
    */
-  private void timeMatrix(ArrayList<String> pois) {
+  private void createTimeMatrix(String center, List<String> pois) 
+      throws IOException {
     if (pois == null) {
       throw new IllegalArgumentException("Pois input list is null");
     } else if (pois.isEmpty()) {
       throw new IllegalArgumentException("Pois input list is empty");
+    } else if (center == null) {
+      throw new IllegalArgumentException("center poi is null");
     }
     // TODO
+
+    List<String> allPois = new ArrayList<>();
+    allPois.add(center);
+    allPois.addAll(pois);
+
+    // fill timeMatrix diagonal with 0's
+    for (int i = 0; i < allPois.size(); i++) {
+      timeMatrix[i][i] = 0;
+    }
+
+    for (int i = 0; i < allPois.size(); i++) {
+      for (int j = i; j < allPois.size(); j++) {
+        int travelTime = getTravelTimeMins(allPois.get(i), allPois.get(j));
+        timeMatrix[i][j] = travelTime;
+        timeMatrix[j][i] = travelTime;
+      }
+    }
   }
 
   /**
-   * Create empty visited array
+   * Get travel time in seconds between two locations
+   * 
+   * @param origin start location
+   * @param destination end location
+   * @return time in seconds to travel from start to end
    */
-  private boolean[] createVisitedAllFalse(int size) {
-    return new boolean[size];
+  private int getTravelTimeMins(String origin, String destination) 
+      throws IOException {
+    // generate directions request w/ origin, destination by driving
+    DirectionsApiRequest directionsRequest = DirectionsApi.newRequest(this.context)
+        .originPlaceId(origin)
+        .destinationPlaceId(destination)
+        .mode(TravelMode.DRIVING);
+
+    // get directions Result from directionsRequest
+    DirectionsResult dirResult = TripServlet.getDirectionsResult(directionsRequest);
+
+    // get the time in minutes of the first the trip
+    DirectionsLeg leg  = dirResult.routes[TripServlet.ROUTE_INDEX].legs[0];
+    int travelTime = (int) leg.duration.inSeconds / TripServlet.SECONDS_IN_MIN;
+    return travelTime;
   }
 
   /**
