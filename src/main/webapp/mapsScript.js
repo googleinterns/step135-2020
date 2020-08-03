@@ -151,16 +151,32 @@ function addPoiMarker(location, isOrigin, index) {
  */
 function addInfoWindow(results, marker) {
   // Format and add place name, address, and link to Google Maps.
-  let contentString = "";
-  contentString += "<b>" + results[0].name + "</b>";
-  contentString += "<p>" + results[0].formatted_address + "</p>";
+  const info = document.createElement('div');
+  info.id = 'infoWindow';
+
+  // Add place name in bold.
+  const boldName = document.createElement('b');
+  boldName.innerText = results[0].name;
+  info.appendChild(boldName);
+
+  // Add formatted address.
+  const address = document.createElement('p');
+  address.innerText = results[0].formatted_address;
+  info.appendChild(address);
+
+  // Add link to Google Maps.
   const urlFormatAddress = results[0].name.replace(/\s/g, '+');
   const url = 'https://www.google.com/maps/search/?api=1&query=' + urlFormatAddress 
               + '&query_place_id=' + results[0].placeId;
-  contentString += "<a href=\""+url+"\" target=\"_blank\">View on Google Maps</a>";
+  const link = document.createElement('a');
+  link.href = url;
+  link.target = '_blank';
+  link.innerText = 'View on Google Maps';
+  info.appendChild(link);
+
   // Construct infoWindow.
   const infoWindow = new google.maps.InfoWindow({
-    content: contentString,
+    content: info,
     maxWidth: 200
   });
   // Open/close infoWindow on marker click.
