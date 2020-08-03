@@ -15,48 +15,16 @@
 package com.google.sps.servlets;
 
 import static org.mockito.Mockito.*;
-import com.google.appengine.api.datastore.DatastoreService;
-import com.google.appengine.api.datastore.DatastoreServiceFactory;
-import com.google.appengine.api.datastore.Entity;
-import com.google.appengine.api.datastore.FetchOptions;
-import com.google.appengine.api.datastore.PreparedQuery;
-import com.google.appengine.api.datastore.Query;
-import com.google.appengine.api.datastore.Key;
-import com.google.appengine.api.datastore.KeyFactory;
-import com.google.appengine.api.users.UserService;
-import com.google.appengine.api.users.UserServiceFactory;
-import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
-import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
 import com.google.maps.DirectionsApi;
 import com.google.maps.DirectionsApiRequest;
 import com.google.maps.FindPlaceFromTextRequest;
 import com.google.maps.GeoApiContext;
 import com.google.maps.PlaceDetailsRequest;
 import com.google.maps.PlacesApi;
-import com.google.maps.model.DirectionsResult;
-import com.google.maps.model.DirectionsRoute;
-import com.google.maps.model.DirectionsLeg;
-import com.google.maps.model.Duration;
 import com.google.maps.model.FindPlaceFromText;
 import com.google.maps.model.PlaceDetails;
 import com.google.maps.model.PlacesSearchResult;
-import com.google.maps.model.TravelMode;
-import com.google.sps.Trip;
-import com.google.sps.data.Event;
-import com.google.sps.data.User;
 import com.google.sps.data.Utility;
-import com.google.sps.servlets.AuthServlet;
-import com.google.sps.servlets.TripServlet;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.List;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -73,8 +41,8 @@ import org.powermock.modules.junit4.PowerMockRunner;
  * This is different from UtilityTest.java, as that provides useful functions
  * for the testing methods.
  */
-@RunWith(PowerMockRunner.class,PlacesApi.class)
-@PrepareForTest(FindPlaceFromTextRequest.class)
+@RunWith(PowerMockRunner.class)
+@PrepareForTest({FindPlaceFromTextRequest.class,PlacesApi.class})
 public class TestUtils {
 
   // Create Utility object.
@@ -89,6 +57,7 @@ public class TestUtils {
   private static final String TEXT_LOCATION_SEARCH = "Big Island, Hawaii, USA";
   private static final String PLACE_ID = "ChIJWTr3xcHnU3kRNIHX-ZKkVRQ";
 
+  @Test
   public void testGetPlaceIdFromTextSearchCandidatesPresent() throws Exception {
     // Mock the GeoApiContext object to be passed into PlacesApi methods,
     // and the FindPlaceFromTextRequest.
