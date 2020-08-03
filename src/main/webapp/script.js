@@ -208,7 +208,7 @@ function checkValidInput(elementId) {
 
 // Returns true if all name, location, and date inputs are valid; otherwise, false;
 function isStartingInputValid() {
-  // Get three input fields.
+  // Get four input fields.
   const inputTripName = document.getElementById('inputTripName');
   const inputDestination = document.getElementById('inputDestination');
   const inputDayOfTravel = document.getElementById('inputDayOfTravel');
