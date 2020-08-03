@@ -150,17 +150,67 @@ public class TripServlet extends HttpServlet {
     List<Integer> travelTimes = getTravelTimes(dirResult);
     List<String> orderedLocationStrings = getOrderedWaypoints(dirResult, poiStrings);
 
-    // put TripDay entity into datastore
-    Entity tripDayEntity = putTripDayInDatastore(this.tripDestination, datastore, LocalDate.parse(tripDayOfTravel), tripEntity.getKey());
+    int numDays = Trip.calcNumDays(LocalDate.parse(this.tripDayOfTravel), LocalDate.parse(this.tripEndDate));
 
-    List<Entity> locationEntities = TripDay.locationsToEntities(orderedLocationStrings, tripDayEntity.getKey());
-    TripDay.storeLocationsInDatastore(locationEntities, this.datastore);
+    String[][] poiSplit = multiDaySplitPois(orderedLocationStrings, numDays);
+
+    multiDayStorage(poiSplit, this.tripDestination, this.datastore, this.tripDayOfTravel, tripEntity.getKey(), this.context);
+
+    // // put TripDay entity into datastore
+    // Entity tripDayEntity = putTripDayInDatastore(this.tripDestination, datastore, LocalDate.parse(tripDayOfTravel), tripEntity.getKey());
+
+    // List<Entity> locationEntities = TripDay.locationsToEntities(orderedLocationStrings, tripDayEntity.getKey());
+    // TripDay.storeLocationsInDatastore(locationEntities, this.datastore);
     
-    // put Event entities in datastore
-    putEventsInDatastore(tripDayEntity, LocalDate.parse(tripDayOfTravel), datastore, orderedLocationStrings, travelTimes);
+    // // put Event entities in datastore
+    // putEventsInDatastore(tripDayEntity, LocalDate.parse(tripDayOfTravel), datastore, orderedLocationStrings, travelTimes);
 
     // Redirect to the "/trips/" page to show the trip that was added.
     response.sendRedirect("/trips/");
+  }
+
+  public static String[][] multiDaySplitPois(List<String> orderedLocationStrings, int numDays) {
+    int numPois = orderedLocationStrings.size();
+    int poisPerDay = numPois / numDays;
+    int startIndex = 0;
+    int i = 0;
+    String[] orderedLocationArray = new String[numPois];
+    orderedLocationArray = orderedLocationStrings.toArray(orderedLocationArray);
+    String[][] poiSplit = new String[numDays][];
+    while (i < numDays - 1) {
+      poiSplit[i] = new String[poisPerDay];
+      poiSplit[i] = Arrays.copyOfRange(orderedLocationArray, startIndex, startIndex + poisPerDay);
+      startIndex += poisPerDay;
+      i++;
+    }
+    poiSplit[i] = Arrays.copyOfRange(orderedLocationArray, startIndex, numPois);
+    return poiSplit;
+  }
+
+  public void multiDayStorage(String[][] poiSplit, String tripDestination, DatastoreService datastore, 
+    String tripDayOfTravel, Key tripEntityKey, GeoApiContext context) throws IOException {
+
+    LocalDate currentDate = LocalDate.parse(tripDayOfTravel);
+    for (String[] dailyLocations : poiSplit) {
+      
+      List<String> dailyLocationsList = Arrays.asList(dailyLocations);  
+
+      DirectionsApiRequest dirRequest = generateDirectionsRequest(tripDestination, tripDestination, dailyLocations, context);
+      DirectionsResult dirResult = getDirectionsResult(dirRequest);
+      List<Integer> travelTimes = getTravelTimes(dirResult);        
+
+      // put TripDay entity into datastore
+      Entity tripDayEntity = putTripDayInDatastore(tripDestination, datastore, currentDate, tripEntityKey);
+
+      List<Entity> locationEntities = TripDay.locationsToEntities(dailyLocationsList, tripDayEntity.getKey());
+      TripDay.storeLocationsInDatastore(locationEntities, datastore);
+      
+      // put Event entities in datastore
+      putEventsInDatastore(tripDayEntity, currentDate, datastore, dailyLocationsList, travelTimes);
+
+      // increment date by 1
+      currentDate = currentDate.plusDays(1);
+    }
   }
 
   /**
