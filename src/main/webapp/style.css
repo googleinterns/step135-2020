@@ -141,3 +141,8 @@
 .trip-button {
   margin-right: 5px;
 }
+
+#map {
+  height: 250px;
+  width: 100%
+}
