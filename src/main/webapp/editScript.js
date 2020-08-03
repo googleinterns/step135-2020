@@ -29,14 +29,18 @@ function addInputPoiLocationAutofill() {
   const inputPoi = document.getElementById('inputPoi');
   let locationAutocomplete = new google.maps.places.Autocomplete(inputPoi);
 
-  // Any time the input changes through user typing, remove the 'is-valid' class
-  // Note: this will not be called if the user clicks on the Google Place autofill.
+  /**
+   * Any time the input changes through user typing, remove the 'is-valid' class
+   * Note: this will not be called if the user clicks on the Google Place autofill.
+   */
   inputPoi.addEventListener('input', () => {
     inputPoi.classList.remove('is-valid');
   });
 
-  // If the user changes the place (click on Google Place autofill), add
-  // 'is-valid' class.
+  /** 
+   * If the user changes the place (click on Google Place autofill), add
+   * 'is-valid' class.
+   */
   locationAutocomplete.addListener('place_changed', () => {
     inputPoi.classList.add('is-valid');
   });
