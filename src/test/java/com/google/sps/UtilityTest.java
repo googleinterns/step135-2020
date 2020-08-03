@@ -81,14 +81,13 @@ public class UtilityTest {
   /**
    * Add a Trip Entity to Datastore under the passed-in Key of the User Entity.
    *
-   * @param userEntityKey The Key from the User Entity in Datastore. Must be 
-   * non-null.
-   * @param tripName The human-readable name for the trip. Must be non-null.
-   * @param destinationName The name of the destination the user is heading to.
-   * @param tripKey The key of the trip as created by the Trip Entity.
-   * @param imageSrc The image source / URL to represent the trip.
-   * @param startDate The start date for the trip. Must be non-null. Must be in yyyy-MM-dd date format.
-   * @param endDate The end date for the trip. Must be non-null. Must be in yyyy-MM-dd date format.
+   * @param userEntityKey The Key from the User Entity in Datastore. 
+   * @param tripName The human-readable name for the trip. 
+   * @param destinationName The name of the destination the user is heading to. 
+   * @param tripKey The key of the trip as created by the Trip Entity. 
+   * @param imageSrc The image source / URL to represent the trip. 
+   * @param startDate The start date for the trip. Should be in yyyy-MM-dd date format.
+   * @param endDate The end date for the trip. Should be in yyyy-MM-dd date format.
    */
   public static Entity addTripEntityToDatastoreUnderUser(Key userEntityKey,
     String tripName, String destinationName, String imageSrc, String startDate, 
@@ -170,5 +169,4 @@ public class UtilityTest {
     datastore.put(eventEntity);
     return eventEntity;
   }
-
 }
