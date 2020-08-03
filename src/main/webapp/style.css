@@ -340,6 +340,7 @@ hr {
 
 .edit-trip-title-size {
   font-size: 2.5rem;
+  max-width: 500px;
 }
 
 .edit-trip-icon {
@@ -349,6 +350,7 @@ hr {
 
 .edit-card-title-size {
   font-size: 1.5rem;
+  max-width: 300px;
 }
 
 .edit-card-icon {
@@ -382,8 +384,9 @@ hr {
   text-align: left;
 }
 
-.changed-button-display {
+.changed-button {
   display: block;
+  color: white!important;
 }
 
 .autoscale-hide-span {
