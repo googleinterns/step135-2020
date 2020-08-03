@@ -26,9 +26,7 @@ function createGroupNavLinks() {
   const mapsButton = document.getElementById('button-group-nav-maps');
 
   // Get the tripKey from the URL to add to the button links.
-  const urlParams = new URLSearchParams(window.location.search);
-  const tripKey = urlParams.get('tripKey');
-  const tripKeyQuery = (tripKey != null && tripKey != '') ? '?tripKey=' + tripKey : '';
+  const tripKeyQuery = getTripKeyQuery();
 
   // Add the href links to the buttons.
   calendarButton.href = '/calendar.html' + tripKeyQuery;

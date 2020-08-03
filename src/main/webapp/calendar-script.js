@@ -33,9 +33,7 @@ $(document).ready(() => {
  * retrives the events from /calculate-trip url and dynamically adds the events
  */
 function getEvents(calendar) {
-  const urlParams = new URLSearchParams(window.location.search);
-  const tripKey = urlParams.get('tripKey');
-  const tripKeyQuery = (tripKey != null && tripKey != '') ? '?tripKey=' + tripKey : '';
+  const tripKeyQuery = getTripKeyQuery();
   var first = true;
 
   fetch('/get-calendar' + tripKeyQuery).then(response => response.json()).then((events) => {
@@ -67,4 +65,3 @@ function createInitialEvent(calendar, initialDate) {
     allDay: false
   });
 }
-
