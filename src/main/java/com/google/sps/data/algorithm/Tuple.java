@@ -20,6 +20,7 @@ import java.util.List;
 
 public class Tuple {
 
+  // represents number of seconds
   private int currAns; 
   private List<Integer> currPath; 
 

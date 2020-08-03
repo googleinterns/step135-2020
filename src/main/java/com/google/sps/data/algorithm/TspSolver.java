@@ -29,11 +29,12 @@ public class TspSolver {
 
   private static final int START_POSITION = 0;
   private static final int START_COUNT = 0;
+  private static final int START_COST = Integer.MAX_VALUE;
   private static final LocalTime START_Time = LocalTime.of(10, 0);
 
   // variables to create before alg
   // DISTANCE SHOULD PROBS BE AN AMOUNT OF TIME RIGHT? YES ANSWER TO MY OWN Q
-  Double[][] distanceMatrix;
+  int[][] timeMatrix;
   HashMap<Integer, String> placeIdToInt;
   HashMap<Integer, List<LocalTime>> openHours;
 
@@ -42,13 +43,13 @@ public class TspSolver {
   public TspSolver(String center, String[] pois) {
 
     // variables used for tracking
-    int currPos;
-    int numNodes;
+    int currPos = START_POSITION;
+    int numNodes = pois.length + 1;
     LocalTime currentTime;
-    int count;
-    int cost;
+    int count = START_COUNT;
+    int cost = START_COST;
     Tuple ans;
-    boolean[] visited;
+    boolean[] visited = createVisitedAllFalse(numNodes);
 
     // TODO: call functions to set these values and the solver
 
@@ -62,18 +63,18 @@ public class TspSolver {
      * return and keep traversing the graph/matrix
      */
     // QUESTION: DO I ADD THE CENTER TO THE PATH AS WELL? CHECK W/ EHIKA
-    if (count == numNodes) && distanceMatrix[currPos][0] > 0) {
-      int min = Math.min(ans.getCurrAns(), cost + distanceMatrix[currPos][0]]);
+    if ((count == numNodes) && timeMatrix[currPos][0] > 0) {
+      int min = Math.min(ans.getCurrAns(), cost + timeMatrix[currPos][0]);
       ans.setCurrAns(min);
       return ans;
     }
 
     for (int i = 0; i < numNodes; i++) {
       // if node is unvisited and greater than 0, i.e. not the same node
-      if (!visited[i] && graph[currPos][i] > 0 /**&& CHECK IF IS OPEN!!!!!!*/) {
+      if (!visited[i] && timeMatrix[currPos][i] > 0 /**&& CHECK IF IS OPEN!!!!!!*/) {
         visited[i] = true;
-        currenTime.plusHours((long) 1); // ADD TRAVELTIME, SHOULD DIST MATRIX BE TIME??
-        ans = solver(i, numNodes, currentTime, count + 1, cost + graph[currPos][i], 
+        currentTime.plusHours((long) 1); // ADD TRAVELTIME, SHOULD DIST MATRIX BE TIME??
+        ans = solver(i, numNodes, currentTime, count + 1, cost + timeMatrix[currPos][i], 
             ans, visited);
         visited[i] = false;
       }
@@ -82,11 +83,11 @@ public class TspSolver {
   }
 
   /**
-   * Create Distance Matrix using DistanceMatrixAPI
+   * Create time Matrix using DistanceMatrixAPI
    * 
    * @param pois list of pois, 0 is in start and stop point
    */
-  private void createDistanceMatrix(ArrayList<String> pois) {
+  private void timeMatrix(ArrayList<String> pois) {
     if (pois == null) {
       throw new IllegalArgumentException("Pois input list is null");
     } else if (pois.isEmpty()) {
@@ -98,67 +99,34 @@ public class TspSolver {
   /**
    * Create empty visited array
    */
-  private void createVisitedAllFalse(int size) {
-    this.visited = new boolean[size];
-  }
-
-  /**
-   * Calculate number of locations
-   */
-  private void setNumberOfLocations(int size) {
-    this.numNodes = size;
+  private boolean[] createVisitedAllFalse(int size) {
+    return new boolean[size];
   }
 
   /**
    * Populate placeIdToInt
    */ 
-  private void populatePlaceIdToInt(String center, String[] pois) {
-    this.placeIdToInt = new HashMap<>();
-    this.placeIdToInt.put(0, center);
+  private HashMap<Integer, String> populatePlaceIdToInt(String center, String[] pois) {
+    HashMap<Integer, String> placeIdToInt = new HashMap<>();
+    placeIdToInt.put(0, center);
 
     for (int i = 1; i <= pois.length; i++) {
-      this.placeIdToInt.put(i, pois[i]);
+      placeIdToInt.put(i, pois[i]);
     }
+
+    return placeIdToInt;
   }
 
   // getter functions
-  public Double[][] getDistanceMatrix() {
-    return this.distanceMatrix;
+  public int[][] getTimeMatrix() {
+    return this.timeMatrix;
   }
 
   public HashMap<Integer, String> getPlaceIdToInt() {
     return this.placeIdToInt;
   }
 
-  public boolean[] getVisited() {
-    return this.visited;
-  }
-
   public HashMap<Integer, List<LocalTime>> getOpenHours() {
     return this.openHours;
-  }
-
-  public int getCurrPos() {
-    return this.currPos;
-  }
-
-  public int getNumNodes() {
-    return this.numNodes;
-  }
-
-  public LocalTime getCurrentTime() {
-    return this.currentTime;
-  }
-
-  public int getCount() {
-    return this.count;
-  }
-
-  public int getCost() {
-    return this.cost;
-  }
-
-  public Tuple getAns() {
-    return this.ans;
   }
 }
