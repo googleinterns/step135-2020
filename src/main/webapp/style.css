@@ -81,6 +81,16 @@
   text-align: center;
 }
 
+#inputMapDate {
+  width: 200px;
+  margin: auto;
+  margin-bottom: .75rem;
+}
+
+#dateInput {
+  width: 100%;
+}
+
 #index-start-trip-block {
   padding: 15px;
 }
