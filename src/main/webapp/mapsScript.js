@@ -169,8 +169,7 @@ function addInfoWindow(results, marker) {
     if (infoWindowOpen) {
       infoWindow.close();
       infoWindowOpen = false;
-    }
-    else {
+    } else {
       infoWindow.open(map, marker);
       infoWindowOpen = true;            
     }
