@@ -32,6 +32,7 @@ import com.google.sps.data.Event;
 import com.google.sps.Trip;
 import com.google.sps.TripDay;
 import java.io.IOException;
+import java.lang.IllegalArgumentException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -72,7 +73,29 @@ public class EditServlet extends HttpServlet {
       response.sendRedirect("/trips/");
       return;
     }
-    Key tripKey = KeyFactory.stringToKey(stringTripKey);
+
+    // Write the edit trip content to the file.
+    try {
+      Key tripKey = KeyFactory.stringToKey(stringTripKey);
+      writeEditTripContentToFile(response, userEntity, tripKey, datastore);
+    } catch (IllegalArgumentException e) {
+      // If String cannot be converted to Key, redirect to Trips page.
+      response.sendRedirect("/trips/");
+    }
+  }
+
+  /**
+   * Write the Edit Trip Content to the file. If Trip is not under the User,
+   * or the tripKey is invalid, or there are no TripDays under the Trip, 
+   * redirect to the Trips page.
+   *
+   * @param response The HttpServletResponse used to sendRedirect and write to file.
+   * @param userEntity The Entity object of the current user.
+   * @param tripKey The Key of the trip being searched for, passed in through the URL.
+   * @param datastore The datastore object to use when searching for the trip.
+   */
+  public void writeEditTripContentToFile(HttpServletResponse response, 
+    Entity userEntity, Key tripKey, DatastoreService datastore) throws IOException {
 
     // If no trip is returned, redirect to trips page.
     Entity tripEntity = getTripFromTripKey(userEntity, tripKey, datastore);
@@ -81,9 +104,9 @@ public class EditServlet extends HttpServlet {
       return;
     }
 
-    // Get the Trip Day list; if none are returned, redirect to trips page.
+    // Get the Trip Day list; if an empty list is returned, redirect to trips page.
     List<Entity> tripDayList = getTripDaysFromTrip(tripEntity.getKey(), datastore);
-    if (tripDayList == null || tripDayList.isEmpty()) {
+    if (tripDayList.isEmpty()) {
       response.sendRedirect("/trips/");
       return;
     }
@@ -103,9 +126,9 @@ public class EditServlet extends HttpServlet {
     }
 
     /**
-     * Create a custom object to hold the Trip, TripDay, and Event information.
-     * Use this object to create a JSON response which is returned.
-     */
+    * Create a custom object to hold the Trip, TripDay, and Event information.
+    * Use this object to create a JSON response which is returned.
+    */
     EditTrip editTripObject = 
       new EditTrip(Trip.buildTripFromEntity(tripEntity), dateEventMap);
     String json = convertToJson(editTripObject);
