@@ -35,6 +35,7 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -68,7 +69,6 @@ public class EditServlet extends HttpServlet {
     // Get tripKey, redirect to trips page if trip key is invalid.
     String stringTripKey = request.getParameter(TRIP_KEY_PARAM);
     if (stringTripKey == null) {
-      response.getWriter().println("Trip key is not present.");
       response.sendRedirect("/trips/");
       return;
     }
@@ -78,27 +78,20 @@ public class EditServlet extends HttpServlet {
     Entity tripEntity = getTripFromTripKey(userEntity, tripKey, datastore);
     if (tripEntity == null) {
       response.sendRedirect("/trips/");
+      return;
     }
-
-    // Construct part of the trip as JSON.
 
     // Get the Trip Day list; if none are returned, redirect to trips page.
     List<Entity> tripDayList = getTripDaysFromTrip(tripEntity.getKey(), datastore);
     if (tripDayList == null || tripDayList.isEmpty()) {
       response.sendRedirect("/trips/");
+      return;
     }
-
-    // Construct the trip days and events after
 
     // Get the events, and put them in a map relating the date to the Event list.
     Map<String, List<Event>> dateEventMap = new HashMap<>();
     for (Entity tripDay : tripDayList) {
       List<Event> eventList = getEventsFromTripDay(tripDay.getKey(), datastore);
-      // TODO: I don't know if this is necessary.
-      if (eventList == null) {
-        eventList = new ArrayList<>();
-      }
-      Collections.sort(eventList);
 
       // Create the dateString and add the event list.
       LocalDate localDate = LocalDate.parse((String) tripDay.getProperty(TripDay.DATE));
@@ -109,8 +102,10 @@ public class EditServlet extends HttpServlet {
       dateEventMap.put(dateString, eventList);
     }
 
-    // Create a custom object to hold the Trip, TripDay, and Event information.
-    // Use this object to create a JSON response which is returned.
+    /**
+     * Create a custom object to hold the Trip, TripDay, and Event information.
+     * Use this object to create a JSON response which is returned.
+     */
     EditTrip editTripObject = 
       new EditTrip(Trip.buildTripFromEntity(tripEntity), dateEventMap);
     String json = convertToJson(editTripObject);
@@ -127,7 +122,7 @@ public class EditServlet extends HttpServlet {
    * @param datastore The datastore object to use when searching for the trip.
    * @return The Trip Entity that is under the current user and matches the Trip Key.
    */
-  private Entity getTripFromTripKey(Entity userEntity, Key tripKey, 
+  public Entity getTripFromTripKey(Entity userEntity, Key tripKey, 
     DatastoreService datastore) {
 
     // Construct Filter and Query to get all trips with the current user ancestor.
@@ -152,24 +147,37 @@ public class EditServlet extends HttpServlet {
    * @param datastore The datastore object to use when searching for the TripDay objects.
    * @return The List of TripDay Entity objects under the passed-in Trip Key.
    */
-  private List<Entity> getTripDaysFromTrip(Key tripKey, DatastoreService datastore) {
+  public List<Entity> getTripDaysFromTrip(Key tripKey, DatastoreService datastore) {
     // Construct Query to get all TripDays with the Trip ancestor.
     Query tripDayQuery = new Query(TripDay.QUERY_STRING, tripKey);
     PreparedQuery tripDayResults = datastore.prepare(tripDayQuery);
+    
 
     // Return the list of TripDay Entity objects under the provided Trip.
-    return tripDayResults.asList(FetchOptions.Builder.withDefaults());
+    List<Entity> tripDayList = 
+      tripDayResults.asList(FetchOptions.Builder.withDefaults());
+    Collections.sort(tripDayList, new Comparator<Entity>() {
+      // Create custom compare function that sorts by date.
+      public int compare(Entity tripDayEntity1, Entity tripDayEntity2) {
+        LocalDate localDate1 = LocalDate.parse((String) 
+          tripDayEntity1.getProperty(TripDay.DATE));
+        LocalDate localDate2 = LocalDate.parse((String) 
+          tripDayEntity2.getProperty(TripDay.DATE));
+        return localDate1.compareTo(localDate2);
+      }
+    });
+    return tripDayList;
   }
 
   /**
    * Get the Event objects from datastore that are under the passed-in TripDay 
-   * Entity Key.
+   * Entity Key. The returned list is ordered by time.
    * 
    * @param tripDayKey The Key of the TripDay used as an ancestor of the Event objects.
    * @param datastore The datastore object to use when searching for the Event objects.
-   * @return The List of Event objects under the passed-in TripDay Key.
+   * @return The List of ordered Event objects under the passed-in TripDay Key.
    */
-  private List<Event> getEventsFromTripDay(Key tripDayKey, DatastoreService datastore) {
+  public List<Event> getEventsFromTripDay(Key tripDayKey, DatastoreService datastore) {
     // Construct Query to get all Events with the TripDay ancestor.
     Query eventQuery = new Query(Event.QUERY_STRING, tripDayKey);
     PreparedQuery eventResults = datastore.prepare(eventQuery);
@@ -182,6 +190,7 @@ public class EditServlet extends HttpServlet {
     for (Entity eventEntity : eventEntityList) {
       eventList.add(Event.eventFromEntity(eventEntity));
     }
+    Collections.sort(eventList);
     return eventList;
   }
 
