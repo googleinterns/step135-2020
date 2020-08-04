@@ -198,7 +198,7 @@ function getImageFromPlaceId(placeId) {
   return new Promise((resolve, reject) => {
     let service = new google.maps.places.PlacesService(document.createElement('div'));
     let request = {
-        placeId: placeId   
+      placeId: placeId
     };
     service.getDetails(request, (place, status) => {
       if (status == google.maps.places.PlacesServiceStatus.OK && place.photos.length > 0) {
