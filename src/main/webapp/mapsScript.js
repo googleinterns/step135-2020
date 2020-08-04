@@ -23,6 +23,9 @@ var map;
 var directionsService;
 var directionsRenderer;
 
+// Map marker label constant
+var labels = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+
 // Attach callback function to the `window` object
 window.initMap = function() {
   // initialize coords
@@ -40,7 +43,7 @@ window.initMap = function() {
   directionsService = new google.maps.DirectionsService;
 
   // Create a renderer for directions (shows directions on map and panel).
-  directionsRenderer = new google.maps.DirectionsRenderer;
+  directionsRenderer = new google.maps.DirectionsRenderer({suppressMarkers: true});
   directionsRenderer.setMap(map);
   directionsRenderer.setPanel(document.getElementById('rightPanel'));
 
@@ -97,6 +100,109 @@ function showDirections(locations) {
     } else {
       window.alert('Directions request failed due to ' + status);
     }
+  });
+
+  // Add markers to map.
+  addPoiMarker(origin, true, 0);  
+  // Markers must be added after map is recentered by directionsRenderer (above).
+  for (let i = 0; i < waypts.length; i++) {
+    let index = i + 1;
+    addPoiMarker(waypts[i].location, false, index);
+  }
+}
+
+/* 
+ * Adds marker to map with appropriate letter label and an info window.
+ * location: String name or address of the POI.
+ * isOrigin: boolean indicating if the location is the origin (hotel) or not.
+             Used to determine the icon of the map marker.
+ * index: index of waypoint. Used to determine marker label.
+ */
+function addPoiMarker(location, isOrigin, index) {
+  // Query the location String to get Place details.
+  var service = new google.maps.places.PlacesService(map);
+  service.textSearch({
+    location: map.getCenter(),
+    radius: '50000',
+    query: location
+    }, function(results, status) {
+      if (status == google.maps.places.PlacesServiceStatus.OK) {
+        // Add marker to map.
+        let marker = new google.maps.Marker({
+          map: map,
+          place: {
+            placeId: results[0].place_id,
+            location: results[0].geometry.location
+          },
+        });
+        // Change icon to green if the location is the origin.
+        if (isOrigin) {
+          marker.setIcon("http://maps.google.com/mapfiles/ms/icons/green-dot.png");
+        } else {
+          marker.setLabel({
+            color: "white",
+            // Set text to correct letter label.
+            text: labels[index % labels.length]
+          });
+        } 
+        // Add info window to marker.     
+        addInfoWindow(results, marker);
+      } else {
+        alert(status);
+        return;
+      }
+  });
+}
+
+/* 
+ * Adds info window to a marker.
+ * Info window includes place name, address, and link to Google Maps.
+ */
+function addInfoWindow(results, marker) {
+  // Format and add place name, address, and link to Google Maps.
+  const info = document.createElement('div');
+  info.id = 'infoWindow';
+
+  // Add place name in bold.
+  const boldName = document.createElement('b');
+  boldName.innerText = results[0].name;
+  info.appendChild(boldName);
+
+  // Add formatted address.
+  const address = document.createElement('p');
+  address.innerText = results[0].formatted_address;
+  info.appendChild(address);
+
+  // Add link to Google Maps.
+  const urlFormatAddress = results[0].name.replace(/\s/g, '+');
+  const url = 'https://www.google.com/maps/search/?api=1&query=' + urlFormatAddress 
+              + '&query_place_id=' + results[0].placeId;
+  const link = document.createElement('a');
+  link.href = url;
+  link.target = '_blank';
+  link.innerText = 'View on Google Maps';
+  info.appendChild(link);
+
+  // Construct infoWindow.
+  const infoWindow = new google.maps.InfoWindow({
+    content: info,
+    maxWidth: 200
+  });
+  // Open/close infoWindow on marker click.
+  let infoWindowOpen = false;
+  marker.addListener("click", () => {
+    if (infoWindowOpen) {
+      infoWindow.close();
+      infoWindowOpen = false;
+    } else {
+      infoWindow.open(map, marker);
+      infoWindowOpen = true;            
+    }
+  });
+  // Close infoWindow on map click.
+  map.addListener("click", () => {
+    infoWindow.close();
+    infoWindowOpen = false;
   });
 }
 
