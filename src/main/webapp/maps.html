@@ -6,28 +6,52 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" 
       integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="style.css">
     <script src="config.js"></script>
+    <script src="utility.js"></script>
     <script src="mapsScript.js"></script>
     <script src="authScript.js"></script>
+    <script src="createNavLinks.js"></script>
   </head>
   <body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark" id="header">
+      <div id="header-text-container">
+        <a class="navbar-brand" href="/" id="navbar-title">TravIS</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarText">
+          <ul class="nav navbar-nav navbar-right ml-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="/">Create New Trip</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/trips/">Trips</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link"id="sign-out-link">Sign out</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
     <div id="mapsContent">
-      <div id="header">
-        <a href="/"><h3 class="header-child float-left" id="header-title">TravIS</h3>
-        <div class="header-child float-right">
-          <a class="btn btn-primary" id="sign-out-link">Sign out</a>
-        </div>
-        <div class="header-child float-right">
-          <a class="btn btn-primary" href="/trips/">Trips</a>
-        </div>
+      <div id="button-group-nav">
+        <a id="button-group-nav-calendar">
+          <button type="button" class="btn btn-outline-primary btn-xlarge">Calendar</button>
+        </a>
+        <a id="button-group-nav-maps">
+          <button type="button" class="btn btn-primary btn-xlarge">Maps</button>
+        </a>
       </div>
       <h2>My Trip Map</h2>
       <div id ="dateInput">
           <label for="inputMapDate">Display Map for:</label>
           <input type="date" class="form-control" name="inputMapDate" 
                 id="inputMapDate">
-      </div>
       <div id="routeMap"></div>
       <div id="rightPanel"></div>
     </div>
