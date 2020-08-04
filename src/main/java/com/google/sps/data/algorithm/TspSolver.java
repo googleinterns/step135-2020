@@ -44,7 +44,7 @@ public class TspSolver {
   private static final int START_COST = 0;
   private static final int START_ANS = Integer.MAX_VALUE;
   private static final LocalTime START_TIME = LocalTime.of(10, 0);
-  private static final int HALF_HOUR = 30;
+  private static final int HOUR = 60;
 
   private GeoApiContext context;
 
@@ -109,7 +109,7 @@ public class TspSolver {
     for (int i = 0; i < numNodes; i++) {
       LocalTime open = openHours.get(i).open.time;
       LocalTime close = openHours.get(i).close.time;
-      close.minusMinutes(HALF_HOUR);
+      close.minusMinutes(HOUR);
     
       // check if location is open at currentTime along path
       boolean isOpen = (currentTime.compareTo(open) >= 0) && 
