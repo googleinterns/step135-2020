@@ -269,6 +269,7 @@ input[type=date] {
   border-radius: 8px;
 }
 
+<<<<<<< HEAD
 #sidenav-action-buttons {
   height: 100%;
   width: 30%;
@@ -407,3 +408,7 @@ hr {
   border-color: #3c78d8ff;
 }
 
+#map {
+  height: 250px;
+  width: 100%;
+}

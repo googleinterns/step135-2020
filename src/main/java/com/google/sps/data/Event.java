@@ -16,21 +16,34 @@ package com.google.sps.data;
 
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.Key;
+import com.google.maps.model.FindPlaceFromText;
+import com.google.maps.errors.ApiException;
+import com.google.maps.FindPlaceFromTextRequest;
+import com.google.maps.GeoApiContext;
+import com.google.maps.model.FindPlaceFromText;
+import com.google.maps.model.PlaceDetails;
+import com.google.maps.PlaceDetailsRequest;
+import com.google.maps.PlacesApi;
+import com.google.sps.servlets.TripServlet;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
 
 /**
  * Class that creates an event specific to a POI 
  */
 public class Event {
- 
+
   // inputs
   private String name;
   private String address;
   private LocalDateTime startTime;
   private LocalDateTime endTime;
+  private String placeId;
 
   /**
    * format (yyyy-MM-dd'T'HH:mm:ss)
@@ -54,6 +67,7 @@ public class Event {
   private static final String DATE = "date";
   private static final String START_TIME = "start-time";
   private static final String TRAVEL_TIME = "travel-time";
+  private static final String PLACE_ID = "placeId";
 
   // query string
   public static final String QUERY_STRING = "event";
@@ -68,10 +82,11 @@ public class Event {
    *        Null if last location of the day.
    * @param timeAtLocation time spent at POI (minutes)
    */
-  public Event(String name, String address, LocalDateTime startTime, 
+  public Event(String name, String address, String placeId, LocalDateTime startTime, 
               int travelTime, int timeAtLocation) {
     this.name = name;
     this.address = address;
+    this.placeId = placeId;
     this.startTime = startTime;
     this.endTime = startTime.plusMinutes(Long.valueOf(timeAtLocation));
     this.travelTime = Long.valueOf(travelTime);
@@ -89,9 +104,9 @@ public class Event {
    * @param travelTime time spent traveling to next location (minutes). 
    *        Null if last location of the day.
    */
-  public Event(String name, String address, LocalDateTime startTime, 
+  public Event(String name, String address, String placeId, LocalDateTime startTime, 
               int travelTime) {
-    this(name, address, startTime, travelTime, HOUR);
+    this(name, address, placeId, startTime, travelTime, HOUR);
   }
 
   /**
@@ -122,6 +137,7 @@ public class Event {
     eventEntity.setProperty(START_TIME, 
                   DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(startTime));
     eventEntity.setProperty(TRAVEL_TIME, Long.toString(this.travelTime));
+    eventEntity.setProperty(PLACE_ID, this.placeId);
     return eventEntity;
   } 
 
@@ -131,9 +147,10 @@ public class Event {
   public static Event eventFromEntity(Entity eventEntity) {
     String name = (String) eventEntity.getProperty(NAME);
     String address = (String) eventEntity.getProperty(ADDRESS);
+    String placeId = (String) eventEntity.getProperty(PLACE_ID);
     String startDateTimeStr = (String) eventEntity.getProperty(START_TIME);
     String travelTime = (String) eventEntity.getProperty(TRAVEL_TIME);
-    Event event = new Event(name, address, LocalDateTime.parse(startDateTimeStr),
+    Event event = new Event(name, address, placeId, LocalDateTime.parse(startDateTimeStr),
                           Integer.parseInt(travelTime));
     return event;
   }
