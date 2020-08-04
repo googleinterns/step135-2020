@@ -78,11 +78,13 @@ public final class EditServletTest {
     "Space Needle, Broad Street, Seattle, WA, USA";
   private static final LocalDateTime SPACE_NEEDLE_START_TIME = 
       LocalDateTime.of(LocalDate.parse("2020-08-22"), LocalTime.of(11, 30));
+  private static final String SPACE_NEEDLE_PLACE_ID = "1234";
   private static final String WOODLAND = "Woodland Park Zoo";
   private static final String WOODLAND_ADDRESS = 
     "Woodland Park Zoo, Phinney Avenue North, Seattle, WA, USA";
   private static final LocalDateTime WOODLAND_START_TIME = 
       LocalDateTime.of(LocalDate.parse("2020-08-22"), LocalTime.of(10, 00));
+  private static final String WOODLAND_PLACE_ID = "1234";
   private static final int HALF_HOUR = 30;
 
   private final LocalServiceTestHelper helper =
@@ -357,11 +359,13 @@ public final class EditServletTest {
     datastore.put(tripDayEntity);
 
     // Add two Events to Datastore, in backwards order.
-    Event e1 = new Event(SPACE_NEEDLE, SPACE_NEEDLE_ADDRESS, SPACE_NEEDLE_START_TIME, HALF_HOUR);
+    Event e1 = new Event(SPACE_NEEDLE, SPACE_NEEDLE_ADDRESS, SPACE_NEEDLE_PLACE_ID, 
+      SPACE_NEEDLE_START_TIME, HALF_HOUR);
     Entity event1 = e1.eventToEntity(tripDayEntity.getKey());
     datastore.put(event1);
 
-    Event e2 = new Event(WOODLAND, WOODLAND_ADDRESS, WOODLAND_START_TIME, HALF_HOUR);
+    Event e2 = new Event(WOODLAND, WOODLAND_ADDRESS, WOODLAND_PLACE_ID, 
+      WOODLAND_START_TIME, HALF_HOUR);
     Entity event2 = e2.eventToEntity(tripDayEntity.getKey());
     datastore.put(event2);
 
@@ -376,10 +380,12 @@ public final class EditServletTest {
     Assert.assertEquals(2, eventEntityReturn.size());
     Assert.assertEquals(WOODLAND, eventEntityReturn.get(0).getName());
     Assert.assertEquals(WOODLAND_ADDRESS, eventEntityReturn.get(0).getAddress());
+    Assert.assertEquals(WOODLAND_PLACE_ID, eventEntityReturn.get(0).getPlaceId());
     Assert.assertEquals(WOODLAND_START_TIME, eventEntityReturn.get(0).getStartTime());
     Assert.assertEquals(HALF_HOUR, eventEntityReturn.get(0).getTravelTime());
     Assert.assertEquals(SPACE_NEEDLE, eventEntityReturn.get(1).getName());
     Assert.assertEquals(SPACE_NEEDLE_ADDRESS, eventEntityReturn.get(1).getAddress());
+    Assert.assertEquals(SPACE_NEEDLE_PLACE_ID, eventEntityReturn.get(1).getPlaceId());
     Assert.assertEquals(SPACE_NEEDLE_START_TIME, eventEntityReturn.get(1).getStartTime());
     Assert.assertEquals(HALF_HOUR, eventEntityReturn.get(1).getTravelTime());
   }
@@ -395,7 +401,8 @@ public final class EditServletTest {
     datastore.put(tripDayEntity);
 
     // Add one Event to Datastore.
-    Event e1 = new Event(SPACE_NEEDLE, SPACE_NEEDLE_ADDRESS, SPACE_NEEDLE_START_TIME, HALF_HOUR);
+    Event e1 = new Event(SPACE_NEEDLE, SPACE_NEEDLE_ADDRESS, SPACE_NEEDLE_PLACE_ID, 
+      SPACE_NEEDLE_START_TIME, HALF_HOUR);
     Entity event1 = e1.eventToEntity(tripDayEntity.getKey());
     datastore.put(event1);
 
@@ -410,6 +417,7 @@ public final class EditServletTest {
     Assert.assertEquals(1, eventEntityReturn.size());
     Assert.assertEquals(SPACE_NEEDLE, eventEntityReturn.get(0).getName());
     Assert.assertEquals(SPACE_NEEDLE_ADDRESS, eventEntityReturn.get(0).getAddress());
+    Assert.assertEquals(SPACE_NEEDLE_PLACE_ID, eventEntityReturn.get(0).getPlaceId());
     Assert.assertEquals(SPACE_NEEDLE_START_TIME, eventEntityReturn.get(0).getStartTime());
     Assert.assertEquals(HALF_HOUR, eventEntityReturn.get(0).getTravelTime());
   }
@@ -447,7 +455,8 @@ public final class EditServletTest {
     datastore.put(tripDayEntity);
 
     // Add one Event to Datastore.
-    Event e1 = new Event(SPACE_NEEDLE, SPACE_NEEDLE_ADDRESS, SPACE_NEEDLE_START_TIME, HALF_HOUR);
+    Event e1 = new Event(SPACE_NEEDLE, SPACE_NEEDLE_ADDRESS, SPACE_NEEDLE_PLACE_ID, 
+      SPACE_NEEDLE_START_TIME, HALF_HOUR);
     Entity event1 = e1.eventToEntity(tripDayEntity.getKey());
     datastore.put(event1);
 

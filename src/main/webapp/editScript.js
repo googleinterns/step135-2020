@@ -23,230 +23,52 @@ script.async = true;
 window.initEditScript = () => {
   // Populate the edit page with content.
   populateEditPage();
-
-  addInputPoiLocationAutofill();
-  autoscaleTextInputWidth();
 }
 
 function populateEditPage() {
   // Hard-coded edit content, as no servlet is set up yet.
-  let editContent = {
-    "trip":{
-        "tripName":"My Favorite Trip",
-        "destinationName":"Hotel Seattle",
-        "tripKey":"aglub19hcHBfaWRyIgsSBHVzZXIYgICAgICAkAoMCxIEdHJpcBiAgICAgIDwCQw",
-        "imageSrc":"https://maps.googleapis.com/maps/api/place/photo?maxwidth\u003d400\u0026photoreference\u003dCmRaAAAA_xIcyHJDhBA73aeywi0a2fK5R9BgDPLkH-DVNED6lMjEDsfehkyME3tlU5EgPc5QGQ8DZOTKebRtAIPDiHLi4NqkkHV-JKJ3TYibe4e_UduH_nlI2TfK5jvWeO34op7fEhAxDp_H3_noI6rIgEBcUhvJGhTzVxhoeC264Eh8YZWN6whQp7jRTw\u0026key\u003dAIzaSyCmQyeeWI_cV0yvh1SuXYGoLej3g_D9NbY",
-        "startDate":{
-          "year":2020,
-          "month":8,
-          "day":6
-        },
-        "endDate":{
-          "year":2020,
-          "month":8,
-          "day":6
-        },
-        "numDays":1
-    },
-    "dateEventMap":{
-        "Thursday, 8/6/2020":[
-          {
-              "name":"Space Needle",
-              "address":"Space Needle",
-              "startTime":{
-                "date":{
-                    "year":2020,
-                    "month":8,
-                    "day":6
-                },
-                "time":{
-                    "hour":10,
-                    "minute":7,
-                    "second":0,
-                    "nano":0
-                }
-              },
-              "endTime":{
-                "date":{
-                    "year":2020,
-                    "month":8,
-                    "day":6
-                },
-                "time":{
-                    "hour":11,
-                    "minute":7,
-                    "second":0,
-                    "nano":0
-                }
-              },
-              "strStartTime":"2020-08-06T10:07:00",
-              "strEndTime":"2020-08-06T11:07:00",
-              "travelTime":10
-          },
-          {
-              "name":"Gas Works Park",
-              "address":"Gas Works Park",
-              "startTime":{
-                "date":{
-                    "year":2020,
-                    "month":8,
-                    "day":6
-                },
-                "time":{
-                    "hour":11,
-                    "minute":17,
-                    "second":0,
-                    "nano":0
-                }
-              },
-              "endTime":{
-                "date":{
-                    "year":2020,
-                    "month":8,
-                    "day":6
-                },
-                "time":{
-                    "hour":12,
-                    "minute":17,
-                    "second":0,
-                    "nano":0
-                }
-              },
-              "strStartTime":"2020-08-06T11:17:00",
-              "strEndTime":"2020-08-06T12:17:00",
-              "travelTime":9
-          },
-          {
-              "name":"Woodland Park Zoo",
-              "address":"Woodland Park Zoo",
-              "startTime":{
-                "date":{
-                    "year":2020,
-                    "month":8,
-                    "day":6
-                },
-                "time":{
-                    "hour":12,
-                    "minute":26,
-                    "second":0,
-                    "nano":0
-                }
-              },
-              "endTime":{
-                "date":{
-                    "year":2020,
-                    "month":8,
-                    "day":6
-                },
-                "time":{
-                    "hour":13,
-                    "minute":26,
-                    "second":0,
-                    "nano":0
-                }
-              },
-              "strStartTime":"2020-08-06T12:26:00",
-              "strEndTime":"2020-08-06T13:26:00",
-              "travelTime":3
-          },
-          {
-              "name":"Aurora Bridge",
-              "address":"Aurora Bridge",
-              "startTime":{
-                "date":{
-                    "year":2020,
-                    "month":8,
-                    "day":6
-                },
-                "time":{
-                    "hour":13,
-                    "minute":29,
-                    "second":0,
-                    "nano":0
-                }
-              },
-              "endTime":{
-                "date":{
-                    "year":2020,
-                    "month":8,
-                    "day":6
-                },
-                "time":{
-                    "hour":14,
-                    "minute":29,
-                    "second":0,
-                    "nano":0
-                }
-              },
-              "strStartTime":"2020-08-06T13:29:00",
-              "strEndTime":"2020-08-06T14:29:00",
-              "travelTime":38
-          },
-          {
-              "name":"Snoqualmie Falls",
-              "address":"Snoqualmie Falls",
-              "startTime":{
-                "date":{
-                    "year":2020,
-                    "month":8,
-                    "day":6
-                },
-                "time":{
-                    "hour":15,
-                    "minute":7,
-                    "second":0,
-                    "nano":0
-                }
-              },
-              "endTime":{
-                "date":{
-                    "year":2020,
-                    "month":8,
-                    "day":6
-                },
-                "time":{
-                    "hour":16,
-                    "minute":7,
-                    "second":0,
-                    "nano":0
-                }
-              },
-              "strStartTime":"2020-08-06T15:07:00",
-              "strEndTime":"2020-08-06T16:07:00",
-              "travelTime":33
-          }
-        ]
+  fetch('/get-edit-content' + getTripKeyQuery()).then(response => {
+    if (response.redirected) {
+      window.location.href = response.url;
+    } else {
+      return response.json();
     }
-  };
+  }).then(editContent => {
+    console.log(editContent);
+    // Set the trip title element text and width.
+    const tripTitleInput = document.getElementById('edit-trip-title-input');
+    const tripTitleSpan = document.getElementById('edit-trip-title-span');
+    tripTitleInput.value = editContent.trip.tripName;
+    tripTitleSpan.value = editContent.trip.tripName;
 
-  // Set the trip title element text and width.
-  const tripTitleInput = document.getElementById('edit-trip-title-input');
-  const tripTitleSpan = document.getElementById('edit-trip-title-span');
-  tripTitleInput.value = editContent.trip.tripName;
-  tripTitleSpan.value = editContent.trip.tripName;
+    // Set the trip day of travel, and add '0' to the month and day if needed.
+    const tripDayOfTravelInput = document.getElementById('inputDayOfTravel');
+    editContent.trip.startDate.month = (editContent.trip.startDate.month < 10) ?
+      '0' + editContent.trip.startDate.month : editContent.trip.startDate.month;
+    editContent.trip.startDate.day = (editContent.trip.startDate.day < 10) ?
+      '0' + editContent.trip.startDate.day : editContent.trip.startDate.day;
+    tripDayOfTravelInput.value = editContent.trip.startDate.year + '-' + 
+      editContent.trip.startDate.month + '-' + editContent.trip.startDate.day;
 
-  // Set the trip day of travel, and add '0' to the month and day if needed.
-  const tripDayOfTravelInput = document.getElementById('inputDayOfTravel');
-  editContent.trip.startDate.month = (editContent.trip.startDate.month < 10) ?
-    '0' + editContent.trip.startDate.month : editContent.trip.startDate.month;
-  editContent.trip.startDate.day = (editContent.trip.startDate.day < 10) ?
-    '0' + editContent.trip.startDate.day : editContent.trip.startDate.day;
-  tripDayOfTravelInput.value = editContent.trip.startDate.year + '-' + 
-    editContent.trip.startDate.month + '-' + editContent.trip.startDate.day;
+    // Add the trip content to the body of the edit page.
+    const editPageBody = document.getElementById('edit-page-left-column');
+    for (date in editContent.dateEventMap) {
+      const dateHeaderElement = document.createElement('h1');
+      dateHeaderElement.innerText = date;
+      editPageBody.appendChild(dateHeaderElement);
 
-  // Add the trip content to the body of the edit page.
-  const editPageBody = document.getElementById('edit-page-left-column');
-  for (date in editContent.dateEventMap) {
-    const dateHeaderElement = document.createElement('h1');
-    dateHeaderElement.innerText = date;
-    editPageBody.appendChild(dateHeaderElement);
+      // Add the edit cards to the body of the edit page.
+      editContent.dateEventMap[date].forEach(event => {
+        editPageBody.appendChild(buildEditCard(event));
+      });
+      editPageBody.appendChild(document.createElement('br'));
+    }
 
-    // Add the edit cards to the body of the edit page.
-    editContent.dateEventMap[date].forEach(event => {
-      editPageBody.appendChild(buildEditCard(event));
-    });
-    editPageBody.appendChild(document.createElement('br'));
-  }
+    addInputPoiLocationAutofill();
+    autoscaleTextInputWidth();
+  }).catch (error => {
+    console.error(error);
+  });
 }
 
 // Add text input POI Google Places autofill.
@@ -314,12 +136,13 @@ function buildEditCard(event) {
   editCardInnerContainer.appendChild(imageCardContainer);
 
   // Create the img HTML object and add it to the image column container.
-  const imageElement = document.createElement('img');
-  imageElement.className = 'card-img edit-card-height';
-  // TODO(chris): Set up event image titles through datastore and servlets.
-  imageElement.src = '../images/placeholder_image.png';
-  imageElement.alt = 'Image of ' + event.name;
-  imageCardContainer.appendChild(imageElement);
+  getImageFromPlaceId(event.placeId).then(imageUrl => {
+    const imageElement = document.createElement('img');
+    imageElement.className = 'card-img edit-card-height';
+    imageElement.src = imageUrl;
+    imageElement.alt = 'Image of ' + event.name;
+    imageCardContainer.appendChild(imageElement);
+  });
 
   // Craete text body column container and add it to editCardInnerContainer.
   const textBodyContainer = document.createElement('div');
@@ -370,10 +193,27 @@ function buildEditCard(event) {
   return editCardContainer;
 }
 
+// Get the image URL from the placeId.
+function getImageFromPlaceId(placeId) {  
+  return new Promise((resolve, reject) => {
+    let service = new google.maps.places.PlacesService(document.createElement('div'));
+    let request = {
+        placeId: placeId   
+    };
+    service.getDetails(request, (place, status) => {
+      if (status == google.maps.places.PlacesServiceStatus.OK && place.photos.length > 0) {
+        resolve(place.photos[0].getUrl());
+      } else {
+        resolve('../images/placeholder_image.png');
+      }
+    });
+  });
+}
+
 // Create a time string from an event.
 function createTimeStringFromEvent(event) {
   let timeString = event.strStartTime.substring(event.strStartTime.indexOf('T') + 1) +
-    event.strEndTime.substring(event.strEndTime.indexOf('T') + 1);
+    ' - ' + event.strEndTime.substring(event.strEndTime.indexOf('T') + 1);
   return timeString;
 }
 

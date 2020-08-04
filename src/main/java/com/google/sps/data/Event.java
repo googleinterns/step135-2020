@@ -36,13 +36,8 @@ import javax.servlet.http.HttpServlet;
 /**
  * Class that creates an event specific to a POI 
  */
-<<<<<<< HEAD
-public class Event {
-
-=======
 public class Event implements Comparable<Event> {
  
->>>>>>> 658c581e1f94134863a9c5ea21443f46426b232b
   // inputs
   private String name;
   private String address;
@@ -172,6 +167,10 @@ public class Event implements Comparable<Event> {
   public LocalDateTime getStartTime() {
     return this.startTime;
   } 
+
+  public String getPlaceId() {
+    return this.placeId;
+  }
 
   public LocalDateTime getEndTime() {
     return this.endTime;
