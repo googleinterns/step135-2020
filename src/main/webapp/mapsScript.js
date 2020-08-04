@@ -96,6 +96,7 @@ function showDirections(locations) {
 
   // Add markers to map.
   addPoiMarker(origin, true, 0);  
+  // Markers must be added after map is recentered by directionsRenderer (above).
   for (let i = 0; i < waypts.length; i++) {
     let index = i + 1;
     addPoiMarker(waypts[i].location, false, index);
@@ -114,7 +115,7 @@ function addPoiMarker(location, isOrigin, index) {
   var service = new google.maps.places.PlacesService(map);
   service.textSearch({
     location: map.getCenter(),
-    radius: '500',
+    radius: '50000',
     query: location
     }, function(results, status) {
       if (status == google.maps.places.PlacesServiceStatus.OK) {
