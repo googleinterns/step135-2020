@@ -78,10 +78,10 @@ public class TspSolver {
   public void solver(String center, List<String> pois) throws IOException {
     // variables used for tracking
     int currPos = START_POS;
-    int numNodes = pois.size() + 1; // total nodes: #locations & center
+    int numNodes = pois.size(); // total nodes: #locations & center
     LocalTime currentTime = START_TIME;
     int count = START_COUNT;
-    int cost = START_COST;
+    Tuple cost = new Tuple(START_COST, new ArrayList<>());
     Tuple ans = new Tuple(START_ANS, new ArrayList<>());
     boolean[] visited = new boolean[numNodes]; // sets values to "false"  
 
@@ -95,7 +95,8 @@ public class TspSolver {
   }
 
   private Tuple solverHelper(int currPos, int numNodes, LocalTime currentTime, 
-      int count, int cost, Tuple ans, boolean[] visited) {
+      int count, Tuple cost, Tuple ans, boolean[] visited) {
+    System.out.println("\n" + "currCost: " + cost.toString() + " currCount: " + count);
     /**
      * If last node is reached and shares an edge w/ start node
      * Calculate min of cost and currAns
@@ -103,9 +104,13 @@ public class TspSolver {
      */
     // QUESTION: DO I ADD THE CENTER TO THE PATH AS WELL? CHECK W/ EHIKA
     if ((count == numNodes) && timeMatrix[currPos][0] > 0) {
-      int min = Math.min(ans.getCurrAns(), cost + timeMatrix[currPos][0]);
-      ans.setCurrAns(min);
-      return ans;
+      System.out.println("in return statement");
+      if (ans.getCurrAns() < cost.getCurrAns() + timeMatrix[currPos][0]) {
+        return ans;
+      } else {
+        cost.incCurrAns(timeMatrix[currPos][0]);
+        return cost;
+      }
     }
 
     for (int i = 0; i < numNodes; i++) {
@@ -113,8 +118,13 @@ public class TspSolver {
       if (openHours.get(i) != null) {
         LocalTime open = openHours.get(i).open.time;
         LocalTime close = openHours.get(i).close.time;
-        close.minusMinutes(HOUR);
-      
+        
+        // edge case where close time is next day at 0:00
+        if (close.compareTo(LocalTime.parse("00:00")) == 0) {
+          close = LocalTime.of(23, 59);
+        } else {
+          close.minusMinutes(HOUR);
+        }  
         // check if location is open at currentTime along path
         isOpen = (currentTime.compareTo(open) >= 0) && 
             (currentTime.compareTo(close) <= 0);
@@ -123,16 +133,25 @@ public class TspSolver {
       }
       System.err.println("Open: " + isOpen);
       System.err.println("visited node: " + visited[i]);
-      System.err.println("currPos: " + currPos + " i " + i + " timeMat: " + timeMatrix[currPos][i]);
+      System.err.println("currPos: " + currPos + " i: " + i + " timeMat: " + timeMatrix[currPos][i]);
+      System.err.println("placeId: " + placeIdToInt.get(i));
+      System.err.println("CurrentTime: " + currentTime.toString());
+      System.err.println("openHours: " + openHours.get(i) + "\n");
 
       // if node is unvisited and greater than 0, i.e. not the same node
       if (!visited[i] && timeMatrix[currPos][i] > 0 && isOpen) {
-        System.err.println("in Here");
+        //System.err.println("in Here");
         visited[i] = true;
-        currentTime.plusHours((long) 1); // ADD TRAVELTIME, SHOULD DIST MATRIX BE TIME??
-        currentTime.plusMinutes((long) timeMatrix[currPos][i]);
-        ans = solverHelper(i, numNodes, currentTime, count + 1, 
-            cost + timeMatrix[currPos][i], ans, visited);
+        LocalTime timePostUpdate = currentTime.plusMinutes((long) 
+            (timeMatrix[currPos][i] + HOUR));
+        //System.err.println("currenTime: in if statement " + timePostUpdate);
+        List<Integer> costPath = cost.getCurrPath();
+        List<Integer> updatePath = new Arraylist<>();
+        updatedPath.addAll(costPath);
+        updatedPath.add(i);
+        Tuple updateTuple = new Tuple(cost.getCurrAns() + timeMatrix[currPos][i], updatedPath);
+        ans = solverHelper(i, numNodes, timePostUpdate, count + 1, 
+            updateTuple, ans, visited);
         visited[i] = false;
       }
     }
@@ -179,19 +198,17 @@ public class TspSolver {
    * Populate placeIdToInt and call setOpenHours for each placeId
 
    */ 
-  private HashMap<Integer, String> populateIntMapAndOpenHours(String center, 
+  private void populateIntMapAndOpenHours(String center, 
       List<String> pois) throws IOException{
     this.openHours = new HashMap<>();
-    HashMap<Integer, String> placeIdToInt = new HashMap<>();
-    placeIdToInt.put(0, center);
+    this.placeIdToInt = new HashMap<>();
+    this.placeIdToInt.put(0, center);
     setOpenHours(0, center);
 
     for (int i = 0; i < pois.size(); i++) {
-      placeIdToInt.put(i+1, pois.get(i));
+      this.placeIdToInt.put(i+1, pois.get(i));
       setOpenHours(i+1, pois.get(i));
     }
-
-    return placeIdToInt;
   }
 
   /**

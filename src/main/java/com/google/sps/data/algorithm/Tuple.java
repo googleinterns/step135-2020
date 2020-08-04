@@ -85,7 +85,7 @@ public class Tuple {
   public String toString() {
     String output = "";
     output += "Current Answer: " + currAns + "\n";
-    output += "Current Path: " +currPath.toString();
+    output += "Current Path: " + currPath.toString();
     return output;
   }
 
@@ -94,7 +94,7 @@ public class Tuple {
     return this.currAns;
   }
 
-  public List getCurrPath() {
+  public List<Integer> getCurrPath() {
     return this.currPath;
   }
 }
