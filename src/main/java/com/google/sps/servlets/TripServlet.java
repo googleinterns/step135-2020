@@ -48,6 +48,8 @@ import com.google.maps.model.Unit;
 import com.google.gson.Gson;
 import com.google.sps.Trip;
 import com.google.sps.TripDay;
+import com.google.sps.data.algorithm.TspSolver;
+import com.google.sps.data.algorithm.Tuple;
 import com.google.sps.data.Config;
 import com.google.sps.data.Event;
 import com.google.sps.TripDay;
@@ -71,6 +73,16 @@ import javax.servlet.http.HttpServletResponse;
  */
 @WebServlet("/calculate-trip")
 public class TripServlet extends HttpServlet {
+
+  //ADDED
+  private static final int MONDAY_INT = 1;
+  private static final String GEARY_HOTEL_ID = "ChIJb-VpERaHhYARLSiOPmNcZzE";
+  private static final String DUTCH_WINDMILL_ID =  "ChIJyzM7ebmHhYARKXUIhJF_VOI";
+  private static final String MANDARIN_REST_ID = "ChIJI8kEiXp9j4ARByCiwa0PF-Q";
+  private static final String CITY_COLLEGE_ID = "ChIJ32IQ69R9j4ARubnrNf2KXk8";
+  private static final String BILLY_HILL_ID = "ChIJKfERrm9-j4AROcxSCHx2gE0";
+  private static final String FABLE_REST_ID = "ChIJ369T0Rp-j4ARftWt7DRMdo4";
+  //ADDED
 
   // Constant for picking route
   public static final int ROUTE_INDEX = 0;
@@ -153,6 +165,10 @@ public class TripServlet extends HttpServlet {
     
     // put Event entities in datastore
     putEventsInDatastore(tripDayEntity, LocalDate.parse(tripDayOfTravel), datastore, orderedLocationStrings, travelTimes);
+
+    //ADDED
+    test();
+    //ADDED
 
     // Redirect to the "/trips/" page to show the trip that was added.
     response.sendRedirect("/trips/");
@@ -408,4 +424,20 @@ public class TripServlet extends HttpServlet {
     String json = gson.toJson(events);
     return json;
   }
+
+  //ADDED
+  private void test() 
+      throws IOException {
+    List<String> pois = new ArrayList<>();
+    pois.add(FABLE_REST_ID);
+    pois.add(CITY_COLLEGE_ID);
+    pois.add(BILLY_HILL_ID);
+    pois.add(DUTCH_WINDMILL_ID);
+    pois.add(MANDARIN_REST_ID);
+    TspSolver tsp = new TspSolver(this.context, MONDAY_INT);
+    tsp.solver(GEARY_HOTEL_ID, pois);
+    Tuple ans = tsp.getFinalAnswer();
+    System.err.println(ans.toString());
+  }
+  //Added
 }

@@ -109,13 +109,18 @@ public class TspSolver {
     }
 
     for (int i = 0; i < numNodes; i++) {
-      LocalTime open = openHours.get(i).open.time;
-      LocalTime close = openHours.get(i).close.time;
-      close.minusMinutes(HOUR);
-    
-      // check if location is open at currentTime along path
-      boolean isOpen = (currentTime.compareTo(open) >= 0) && 
-          (currentTime.compareTo(close) <= 0);
+      boolean isOpen;
+      if (openHours.get(i) != null) {
+        LocalTime open = openHours.get(i).open.time;
+        LocalTime close = openHours.get(i).close.time;
+        close.minusMinutes(HOUR);
+      
+        // check if location is open at currentTime along path
+        isOpen = (currentTime.compareTo(open) >= 0) && 
+            (currentTime.compareTo(close) <= 0);
+      } else {
+        isOpen = true;
+      }
 
       // if node is unvisited and greater than 0, i.e. not the same node
       if (!visited[i] && timeMatrix[currPos][i] > 0 && isOpen) {
@@ -172,6 +177,7 @@ public class TspSolver {
    */ 
   private HashMap<Integer, String> populateIntMapAndOpenHours(String center, 
       List<String> pois) throws IOException{
+    this.openHours = new HashMap<>();
     HashMap<Integer, String> placeIdToInt = new HashMap<>();
     placeIdToInt.put(0, center);
     setOpenHours(0, center);
@@ -192,7 +198,15 @@ public class TspSolver {
    */
   private void setOpenHours(int index, String placeId) throws IOException {
     PlaceDetails placeDetails = TripServlet.getPlaceDetailsFromPlaceId(this.context, placeId);
-    this.openHours.put(index, placeDetails.openingHours.periods[this.intOfWeek]);
+
+    System.err.println(placeDetails.openingHours.periods.length);
+    System.err.println(placeDetails.openingHours.periods == null);
+    // if there are open hours put them in, otherwise null
+    if (placeDetails.openingHours.periods.length != 1) {
+      this.openHours.put(index, placeDetails.openingHours.periods[this.intOfWeek]);
+    } else {
+      this.openHours.put(index, null);
+    } 
   }
 
     /**

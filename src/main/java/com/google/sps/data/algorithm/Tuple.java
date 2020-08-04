@@ -79,6 +79,16 @@ public class Tuple {
         (other.getCurrAns() == this.currAns);
   }
 
+  /**
+   * return string representation of the tuple
+   */ 
+  public String toString() {
+    String output = "";
+    output += "Current Answer: " + currAns + "\n";
+    output += "Current Path: " +currPath.toString();
+    return output;
+  }
+
   //getter methods
   public int getCurrAns() {
     return this.currAns;
