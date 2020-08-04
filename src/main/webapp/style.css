@@ -269,6 +269,7 @@ input[type=date] {
   border-radius: 8px;
 }
 
+<<<<<<< HEAD
 #sidenav-action-buttons {
   height: 100%;
   width: 30%;
@@ -303,4 +304,9 @@ input[type=date] {
 
 #edit-page-left-column {
   padding: 40px;
+}
+
+#map {
+  height: 250px;
+  width: 100%;
 }

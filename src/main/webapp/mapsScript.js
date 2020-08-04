@@ -53,11 +53,7 @@ window.initMap = function() {
  * Calls showDirections to show the directions with those locations.
  */
 function displayRouteOnMap() {
-  const urlParams = new URLSearchParams(window.location.search);
-  const tripKey = urlParams.get('tripKey');
-  const tripKeyQuery = (tripKey != null && tripKey != '') ? '?tripKey=' + tripKey : '';
-  
-  fetch('/get-map' + tripKeyQuery).then(response => response.json()).then((locations) => {
+  fetch('/get-map' + getTripKeyQuery()).then(response => response.json()).then((locations) => {
     showDirections(locations);
   });
 }
