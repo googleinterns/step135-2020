@@ -41,6 +41,7 @@ import javax.servlet.http.HttpServletResponse;
 public class MapServlet extends HttpServlet {
 
   private final String TRIP_KEY_PARAM = "tripKey";
+  private final String DATE_PARAM = "date";
 
   /**
    * Checks for invalid cases (no user or tripKey).
@@ -73,8 +74,9 @@ public class MapServlet extends HttpServlet {
     } else { 
       Key tripKey = KeyFactory.stringToKey(stringTripKey);
 
+      String date = request.getParameter(DATE_PARAM);
       // Gets the locations from datastore and writes them to .../get-map
-      String result = doGetMap(response, datastore, userEntity, tripKey);
+      String result = doGetMap(response, datastore, userEntity, tripKey, date);
       response.getWriter().println(result);
     }
   }
@@ -83,7 +85,7 @@ public class MapServlet extends HttpServlet {
    * Gets the locations and returns them as a JSON string.
    */
   public String doGetMap(HttpServletResponse response, 
-      DatastoreService datastore, Entity userEntity, Key tripEntityKey) throws IOException {
+      DatastoreService datastore, Entity userEntity, Key tripEntityKey, String date) throws IOException {
   
     // Get trip Entity based on trip key.
     // Trip entity is needed to ensure that tripKey corresponds to a Trip under the current user.
@@ -100,9 +102,16 @@ public class MapServlet extends HttpServlet {
       return "No trip found";
     } 
 
+    if (date == "" || date == null) {
+      date = (String) tripEntity.getProperty(Trip.START_DATE);
+    }
+
     // Get TripDay associated with the Trip.
     // TODO(eshika): change to select the desired tripDay for multiday trips.
+    Filter tripDayFilter =
+      new FilterPredicate(TripDay.DATE, FilterOperator.EQUAL, date);
     Query tripDayQuery = new Query(TripDay.QUERY_STRING, tripEntity.getKey());
+    tripDayQuery.setFilter(tripDayFilter);
     PreparedQuery tripDayResults = datastore.prepare(tripDayQuery);
     Entity tripDayEntity = tripDayResults.asSingleEntity();
 
