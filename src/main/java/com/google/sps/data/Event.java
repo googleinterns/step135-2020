@@ -24,7 +24,7 @@ import java.time.format.DateTimeFormatter;
 /**
  * Class that creates an event specific to a POI 
  */
-public class Event {
+public class Event implements Comparable<Event> {
  
   // inputs
   private String name;
@@ -157,5 +157,10 @@ public class Event {
 
   public long getTravelTime() {
     return this.travelTime;
+  }
+
+  @Override
+  public int compareTo(Event event) {
+    return this.getStartTime().compareTo(event.getStartTime());
   }
 }
