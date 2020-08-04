@@ -159,8 +159,9 @@ public class TripServlet extends HttpServlet {
     // Store information for each of these TripDays in Datastore.
     multiDayStorage(poiSplit, this.tripDestination, this.datastore, this.tripDayOfTravel, tripEntity.getKey(), this.context);
 
-    // Redirect to the "/trips/" page to show the trip that was added.
-    response.sendRedirect("/trips/");
+    // Redirect to the Maps page of this trip to show the trip that was added.
+    String tripKeyString = KeyFactory.keyToString(tripEntity.getKey());
+    response.sendRedirect("/maps.html?tripKey=" + tripKeyString);
   }
 
   public static String[][] multiDaySplitPois(List<String> orderedLocationStrings, int numDays) {
@@ -218,7 +219,7 @@ public class TripServlet extends HttpServlet {
    */ 
   public String getPlaceIdFromTextSearch(GeoApiContext context, String textSearch) 
     throws IOException {
-
+    
     FindPlaceFromTextRequest findPlaceRequest = PlacesApi.findPlaceFromText(context, 
       textSearch, FindPlaceFromTextRequest.InputType.TEXT_QUERY);
 
@@ -274,18 +275,17 @@ public class TripServlet extends HttpServlet {
     for (String address : pois) {
       // create event entity
       String name = address.split(",")[0];
-      Event event = new Event(name, address, startDateTime, travelTimes.get(travelTimeIndex));
+      String placeId = getPlaceIdFromTextSearch(this.context, address);
+      Event event = new Event(name, address, placeId, startDateTime, travelTimes.get(travelTimeIndex));
       Entity eventEntity = event.eventToEntity(tripDayEntity.getKey());
       eventEntities.add(eventEntity);
 
-      // put entity in datastore   
+      // put entity in datastore
       datastore.put(eventEntity);
 
       // sets start time for next event one hour and travel time after start of prev
       startDateTime = startDateTime.plusMinutes(Long.valueOf(ONE_HOUR + travelTimes.get(travelTimeIndex)));
       travelTimeIndex++;
-
-
     }
     return eventEntities;
   }

@@ -20,7 +20,7 @@
 // Triggered upon DOM load.
 $(document).ready(() => {
   // Set the content width of the site.
-  setContentWidth('800px');
+  setContentWidth('1100px');
 
   // Add the trip cards to the site.
   getAndAddTripCards();
@@ -45,14 +45,50 @@ function getAndAddTripCards() {
 
 // Add the trip cards to the site.
 function addTripCards(trips) {
-  trips.forEach((trip) => {
-    const tripCardContainer = document.getElementById('trips-cards-container');
+  const tripCardContainer = document.getElementById('trips-cards-container');
 
+  // If no trips are present, then add a "Create a New Trip" button card.
+  if (trips.length === 0) {
+    tripCardContainer.appendChild(buildCreateNewTripCard());
+  }
+
+  trips.forEach((trip) => {
     // Build and add the trip card.
     const tripCard = buildTripCard(trip.tripName, trip.destinationName, 
       trip.imageSrc, trip.startDate, trip.endDate, trip.tripKey);
     tripCardContainer.appendChild(tripCard);
   });
+}
+
+// Build HTML "Create a New Trip" card.
+function buildCreateNewTripCard() {
+  // Create the card container.
+  const cardContainer = document.createElement('div');
+  cardContainer.id = 'card-create-new-trip';
+  cardContainer.className = 'card text-white bg-primary mb-3';
+  cardContainer.style = 'width: 18rem';
+
+  // Create a container for the card body.
+  const cardBodyContainer = document.createElement('div');
+  cardBodyContainer.className = 'card-body';
+
+  // Create the title for the card body.
+  const cardBodyTitle = document.createElement('h5');
+  cardBodyTitle.className = 'card-title';
+  cardBodyTitle.innerText = 'Create a New Trip';
+
+  // Create a stretched link so that the card links to the homepage.
+  const stretchedLinkSubheader = document.createElement('a');
+  stretchedLinkSubheader.href = '/';
+  stretchedLinkSubheader.className = 'stretched-link card-text text-white';
+  stretchedLinkSubheader.innerText = 'Add POIs and go!';
+
+  // Append all the different components, and add the card to the UI.
+  cardBodyContainer.appendChild(cardBodyTitle);
+  cardBodyContainer.appendChild(stretchedLinkSubheader);
+  cardContainer.appendChild(cardBodyContainer);
+
+  return cardContainer;
 }
 
 // Build HTML trip card to display.
@@ -92,15 +128,22 @@ function buildTripCard(tripTitle, destinationName, imageSrc, startDate, endDate,
   mapsButton.href = '../maps.html?tripKey=' + tripKey;
   mapsButton.innerText = 'Maps';
 
+  // Create the card footer, where action items (calendar, maps) will be placed.
+  const cardFooter = document.createElement('div');
+  cardFooter.className = 'card-footer';
+
+  // Add the calendar and maps buttons to the footer.
+  cardFooter.appendChild(calendarButton);
+  cardFooter.appendChild(mapsButton);
+
   // Add the body elements to the card body container.
   cardBodyContainer.appendChild(titleElement);
   cardBodyContainer.appendChild(datesDestinationElement);
-  cardBodyContainer.appendChild(calendarButton);
-  cardBodyContainer.appendChild(mapsButton);
 
   // Add the trip image and card body to the card container.
   cardContainer.appendChild(tripImage);
   cardContainer.appendChild(cardBodyContainer);
+  cardContainer.appendChild(cardFooter);
 
   return cardContainer;
 }
