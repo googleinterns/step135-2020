@@ -13,6 +13,7 @@
 }
 
 #content {
+  width: 1100px;
   margin-left: auto;
   margin-right: auto;
   line-height: 1.1;
@@ -52,7 +53,7 @@
 }
 
 #rightPanel {
-  font-family: 'Roboto','sans-serif';
+  font-family: 'maven-pro';
   line-height: 30px;
   padding-left: 10px;
   height: 500px;
@@ -77,12 +78,56 @@
 }
 
 #mapsContent {
+  width: 1100px;
+  margin-left: auto;
+  margin-right: auto;
+  line-height: 1.1;
   overflow: hidden;
   text-align: center;
 }
 
+#mapsTitle {
+  margin-bottom: 10px;
+}
+
 #index-start-trip-block {
   padding: 15px;
+}
+
+#add-pois-input-description {
+  width: 100%;
+  padding: 0px 5px;
+}
+
+#poi-element {
+  display: block;
+  margin-bottom: 10px;
+}
+
+#poi-trash-icon {
+  font-size: 20px;
+}
+
+.btn-nohover {
+  display: inline-block;
+  font-weight: 400;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: middle;
+  -webkit-user-select: none;
+  user-select: none;
+  border: 1px solid transparent;
+  padding: .375rem .75rem;
+  font-size: 1rem;
+  line-height: 1.5;
+  border-radius: .25rem;
+  transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+}
+
+.btn-light-nohover {
+  color: #212529;
+  background-color: #f8f9fa;
+  border-color: #f8f9fa;
 }
 
 #header {
@@ -91,22 +136,11 @@
   background-color: #333;
 }
 
-#header-title {
-  line-height: 1.4;
-}
-
-.header-child {
-  color: white;
-  margin: 10px 0;
-  padding: 10px 20px;
-}
-
-.float-left {
-  float: left;
-}
-
-.float-right {
-  float: right;
+#header-text-container {
+  width: 1100px;
+  display: flex;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 #trips-container {
@@ -114,8 +148,29 @@
 }
 
 .card {
-  display: inline-block;
-  margin: 10px 15px 10px 0;
+  display: inline-flex;
+  width: 30%;
+  height: 400px;
+  margin: 15px 30px 15px 0px;
+  box-shadow: 0 5px 5px 0 rgba(0,0,0,0.2), 0 6px 15px 0 rgba(0,0,0,0.19);
+}
+
+.card-body {
+  line-height: 1.4;
+  text-align: center;
+}
+
+.card-img-top {
+  width: 100%;
+  height: 200px;
+}
+
+.card-footer {
+  text-align: center;
+}
+
+#card-create-new-trip {
+  height: auto;
 }
 
 .form-group {
@@ -134,10 +189,87 @@
   margin-top: 15px;
 }
 
-.card {
-  width: 15rem;
+@font-face {
+  font-family: 'maven-pro';
+  src: url('fonts/MavenPro-VariableFont_wght.ttf') format('truetype')
+}
+
+body {
+  font-family: 'maven-pro';
+}
+
+::placeholder {
+  font-size: 15px;
+}
+
+input[type=date] {
+  font-size: 15px;
+}
+
+#navbar-title {
+  font-size: 2em;
+  font-family: 'maven-pro';
+}
+
+.nav-item {
+  margin: 0 10px;
 }
 
 .trip-button {
   margin-right: 5px;
+}
+
+@media screen and (max-width: 1100px) {
+  #content, #header-text-container, #mapsContent {
+    width: auto !important;
+  }
+
+  #content {
+    margin: 0 20px;
+  }
+}
+
+.site-title {
+  margin: 10px 0;
+}
+
+.site-description {
+  margin: 10px 0;
+}
+
+#startTripForm {
+  display: inline-block;
+  width: 100%;
+  margin: 10px 0px;
+  padding: 20px 20px;
+  border-radius: 5px;
+  box-shadow: 0 1px 5px 0 rgba(0, 0, 0, 0.15);
+  transition: all 1s;
+}
+
+#startTripForm:hover {
+  box-shadow: 0 1px 6px 0 rgba(0, 0, 0, 0.2);
+}
+
+#button-group-nav {
+  text-align: center;
+  margin: 30px 0px;
+}
+
+/**
+ * Extra large button extensions. Extends `.btn`.
+ */
+.btn-xlarge {
+  margin: 0px 10px;
+  padding: 18px 28px;
+  font-size: 22px;
+  line-height: normal;
+  -webkit-border-radius: 8px;
+  -moz-border-radius: 8px;
+  border-radius: 8px;
+}
+
+#map {
+  height: 250px;
+  width: 100%;
 }
