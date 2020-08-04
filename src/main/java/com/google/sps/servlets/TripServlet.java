@@ -144,26 +144,20 @@ public class TripServlet extends HttpServlet {
     Entity tripEntity = storeTripEntity(response, this.tripName, this.destinationName, 
       this.tripDayOfTravel, this.tripEndDate, this.photoSrc, datastore);
 
-    //do post for maps
+    // Calculate optimal ordering for all POIs.
     DirectionsApiRequest dirRequest = generateDirectionsRequest(this.tripDestination, this.tripDestination, poiStrings, this.context);
     DirectionsResult dirResult = getDirectionsResult(dirRequest);
     List<Integer> travelTimes = getTravelTimes(dirResult);
     List<String> orderedLocationStrings = getOrderedWaypoints(dirResult, poiStrings);
 
+    // Calculate numDays in trip.
     int numDays = Trip.calcNumDays(LocalDate.parse(this.tripDayOfTravel), LocalDate.parse(this.tripEndDate));
 
+    // Split ordered POIs across multiple days.
     String[][] poiSplit = multiDaySplitPois(orderedLocationStrings, numDays);
 
+    // Store information for each of these TripDays in Datastore.
     multiDayStorage(poiSplit, this.tripDestination, this.datastore, this.tripDayOfTravel, tripEntity.getKey(), this.context);
-
-    // // put TripDay entity into datastore
-    // Entity tripDayEntity = putTripDayInDatastore(this.tripDestination, datastore, LocalDate.parse(tripDayOfTravel), tripEntity.getKey());
-
-    // List<Entity> locationEntities = TripDay.locationsToEntities(orderedLocationStrings, tripDayEntity.getKey());
-    // TripDay.storeLocationsInDatastore(locationEntities, this.datastore);
-    
-    // // put Event entities in datastore
-    // putEventsInDatastore(tripDayEntity, LocalDate.parse(tripDayOfTravel), datastore, orderedLocationStrings, travelTimes);
 
     // Redirect to the Maps page of this trip to show the trip that was added.
     String tripKeyString = KeyFactory.keyToString(tripEntity.getKey());
@@ -174,17 +168,17 @@ public class TripServlet extends HttpServlet {
     int numPois = orderedLocationStrings.size();
     int poisPerDay = numPois / numDays;
     int startIndex = 0;
-    int i = 0;
+    int dayIndex = 0;
     String[] orderedLocationArray = new String[numPois];
     orderedLocationArray = orderedLocationStrings.toArray(orderedLocationArray);
     String[][] poiSplit = new String[numDays][];
-    while (i < numDays - 1) {
-      poiSplit[i] = new String[poisPerDay];
-      poiSplit[i] = Arrays.copyOfRange(orderedLocationArray, startIndex, startIndex + poisPerDay);
+    while (dayIndex < numDays - 1) {
+      poiSplit[dayIndex] = new String[poisPerDay];
+      poiSplit[dayIndex] = Arrays.copyOfRange(orderedLocationArray, startIndex, startIndex + poisPerDay);
       startIndex += poisPerDay;
-      i++;
+      dayIndex++;
     }
-    poiSplit[i] = Arrays.copyOfRange(orderedLocationArray, startIndex, numPois);
+    poiSplit[dayIndex] = Arrays.copyOfRange(orderedLocationArray, startIndex, numPois);
     return poiSplit;
   }
 
