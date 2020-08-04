@@ -65,10 +65,15 @@ public class CalendarServlet extends HttpServlet {
       response.sendRedirect("/");
     } else { 
       String stringTripKey = request.getParameter("tripKey");
-      Key tripKey = KeyFactory.stringToKey(stringTripKey);
+      try {
+        Key tripKey = KeyFactory.stringToKey(stringTripKey);
 
-      // gets the events from datastore and writes them to .../get-calendar
-      doGetEvents(response, datastore, userEntity, tripKey);
+        // gets the events from datastore and writes them to .../get-calendar
+        doGetEvents(response, datastore, userEntity, tripKey);
+      } catch (IllegalArgumentException e) {
+        // If String cannot be converted to Key, redirect to Trips page.
+        response.sendRedirect("/trips/");
+      }
     }
   }
 
@@ -85,6 +90,12 @@ public class CalendarServlet extends HttpServlet {
 
     PreparedQuery tripResults = datastore.prepare(tripQuery);
     Entity tripEntity = tripResults.asSingleEntity();
+
+    // If no Trip is in the datastore under that key and user, redirect to Trips page.
+    if (tripEntity == null) {
+      response.sendRedirect("/trips/");
+      return;
+    }
 
     Query tripDayQuery = new Query(TripDay.QUERY_STRING, tripEntity.getKey());
     PreparedQuery tripDayResults = datastore.prepare(tripDayQuery);

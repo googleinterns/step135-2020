@@ -60,7 +60,14 @@ function getEvents(calendar) {
   const tripKey = urlParams.get('tripKey');
   const tripKeyQuery = (tripKey != null && tripKey != '') ? '?tripKey=' + tripKey : '';
 
-  fetch('/get-calendar' + tripKeyQuery).then(response => response.json()).then((events) => {
+  fetch('/get-calendar' + tripKeyQuery).then(response => {
+    if (response.redirected) {
+      // Redirect to new page; causes an error, but this disappears as the new page refreshes.
+      window.location.href = response.url;
+    } else {
+      return response.json();
+    }
+  }).then(events => {
     events.forEach((event) => {
       calendar.addEvent({     
         title: event.name,
@@ -76,6 +83,8 @@ function getEvents(calendar) {
         }
       });
     });
+  }).catch(error => {
+    console.error(error);
   });
 }
 

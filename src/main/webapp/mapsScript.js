@@ -57,8 +57,17 @@ function displayRouteOnMap() {
   const tripKey = urlParams.get('tripKey');
   const tripKeyQuery = (tripKey != null && tripKey != '') ? '?tripKey=' + tripKey : '';
   
-  fetch('/get-map' + tripKeyQuery).then(response => response.json()).then((locations) => {
+  fetch('/get-map' + tripKeyQuery).then(response => {
+    if (response.redirected) {
+      // Redirect to new page; causes an error, but this disappears as the new page refreshes.
+      window.location.href = response.url;
+    } else {
+      return response.json();
+    }
+  }).then(locations => {
     showDirections(locations);
+  }).catch(error => {
+    console.error(error);
   });
 }
 

@@ -71,11 +71,16 @@ public class MapServlet extends HttpServlet {
       response.getWriter().println("No current User");
       response.sendRedirect("/");
     } else { 
-      Key tripKey = KeyFactory.stringToKey(stringTripKey);
+      try {
+        Key tripKey = KeyFactory.stringToKey(stringTripKey);
 
-      // Gets the locations from datastore and writes them to .../get-map
-      String result = doGetMap(response, datastore, userEntity, tripKey);
-      response.getWriter().println(result);
+        // Gets the locations from datastore and writes them to .../get-map
+        String result = doGetMap(response, datastore, userEntity, tripKey);
+        response.getWriter().println(result);
+      } catch (IllegalArgumentException e) {
+        // If String cannot be converted to Key, redirect to Trips page.
+        response.sendRedirect("/trips/");
+      }
     }
   }
 
@@ -94,9 +99,9 @@ public class MapServlet extends HttpServlet {
     PreparedQuery tripResults = datastore.prepare(tripQuery);
     Entity tripEntity = tripResults.asSingleEntity();
 
-    // If no trip is found then redirect home
+    // If no trip is found then redirect to the Trips page.
     if (tripEntity == null) {
-      response.sendRedirect("/");
+      response.sendRedirect("/trips/");
       return "No trip found";
     } 
 
