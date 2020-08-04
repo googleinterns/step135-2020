@@ -268,3 +268,8 @@ input[type=date] {
   -moz-border-radius: 8px;
   border-radius: 8px;
 }
+
+#map {
+  height: 250px;
+  width: 100%;
+}
