@@ -29,7 +29,8 @@ window.initEditScript = () => {
 }
 
 function populateEditPage() {
-  let editObjectContent = {
+  // Hard-coded edit content, as no servlet is set up yet.
+  let editContent = {
     "trip":{
         "tripName":"My Favorite Trip",
         "destinationName":"Hotel Seattle",
@@ -218,8 +219,34 @@ function populateEditPage() {
     }
   };
 
-  console.log(editObjectContent);
-  console.log(editObjectContent.trip);
+  // Set the trip title element text and width.
+  const tripTitleInput = document.getElementById('edit-trip-title-input');
+  const tripTitleSpan = document.getElementById('edit-trip-title-span');
+  tripTitleInput.value = editContent.trip.tripName;
+  tripTitleSpan.value = editContent.trip.tripName;
+
+  // Set the trip day of travel, and add '0' to the month and day if needed.
+  const tripDayOfTravelInput = document.getElementById('inputDayOfTravel');
+  editContent.trip.startDate.month = (editContent.trip.startDate.month < 10) ?
+    '0' + editContent.trip.startDate.month : editContent.trip.startDate.month;
+  editContent.trip.startDate.day = (editContent.trip.startDate.day < 10) ?
+    '0' + editContent.trip.startDate.day : editContent.trip.startDate.day;
+  tripDayOfTravelInput.value = editContent.trip.startDate.year + '-' + 
+    editContent.trip.startDate.month + '-' + editContent.trip.startDate.day;
+
+  // Add the trip content to the body of the edit page.
+  const editPageBody = document.getElementById('edit-page-left-column');
+  for (date in editContent.dateEventMap) {
+    const dateHeaderElement = document.createElement('h1');
+    dateHeaderElement.innerText = date;
+    editPageBody.appendChild(dateHeaderElement);
+
+    // Add the edit cards to the body of the edit page.
+    editContent.dateEventMap[date].forEach(event => {
+      editPageBody.appendChild(buildEditCard(event));
+    });
+    editPageBody.appendChild(document.createElement('br'));
+  }
 }
 
 // Add text input POI Google Places autofill.
@@ -255,17 +282,100 @@ function autoscaleTextInputWidth() {
     const autoscaleText = $(autoscaleTextEls[i]);
 
     // Set the initial width of the text input.
-    autoscaleHideSpan.text(autoscaleText.val());
-    autoscaleText.width(autoscaleHideSpan.width());
+    setTextInputWidth(autoscaleHideSpan, autoscaleText);
 
     // Readjust text input width upon edit.
     autoscaleText.on('input', () => {
-      autoscaleHideSpan.text(autoscaleText.val());
-      autoscaleText.width(autoscaleHideSpan.width());
+      setTextInputWidth(autoscaleHideSpan, autoscaleText);
     });
   }
 }
 
+// Set the text input width based on the content.
+function setTextInputWidth(autoscaleHideSpan, autoscaleText) {
+  autoscaleHideSpan.text(autoscaleText.val());
+  autoscaleText.width(autoscaleHideSpan.width());
+}
+
+// Build and return an edit event card.
+function buildEditCard(event) {
+  // Create the container of the edit card.
+  const editCardContainer = document.createElement('div');
+  editCardContainer.className = 'card edit-card';
+
+  // Create the inner container for the edit card and add it to editCardContainer.
+  const editCardInnerContainer = document.createElement('div');
+  editCardInnerContainer.className = 'row no-gutters edit-card-height';
+  editCardContainer.appendChild(editCardInnerContainer);
+
+  // Create image column container and add it to editCardInnerContainer.
+  const imageCardContainer = document.createElement('div');
+  imageCardContainer.className = 'col-sm-4 edit-card-height';
+  editCardInnerContainer.appendChild(imageCardContainer);
+
+  // Create the img HTML object and add it to the image column container.
+  const imageElement = document.createElement('img');
+  imageElement.className = 'card-img edit-card-height';
+  // TODO(chris): Set up event image titles through datastore and servlets.
+  imageElement.src = '../images/placeholder_image.png';
+  imageElement.alt = 'Image of ' + event.name;
+  imageCardContainer.appendChild(imageElement);
+
+  // Craete text body column container and add it to editCardInnerContainer.
+  const textBodyContainer = document.createElement('div');
+  textBodyContainer.className = 'col-sm-8';
+  editCardInnerContainer.appendChild(textBodyContainer);
+
+  // Create a card text body inner div and add it to textBodyContainer.
+  const textBodyInnerContainer = document.createElement('div');
+  textBodyInnerContainer.className = 'card-body edit-card-align';
+  textBodyContainer.appendChild(textBodyInnerContainer);
+
+  // Create a span element for the input and add it to textBodyInnerContainer.
+  const spanTitleElement = document.createElement('span');
+  spanTitleElement.className = 'autoscale-hide-span edit-card-title-size';
+  spanTitleElement.innerText = event.name;
+  textBodyInnerContainer.appendChild(spanTitleElement);
+
+  // Create an input element and add it to textBodyInnerContainer.
+  const inputTitleElement = document.createElement('input');
+  inputTitleElement.className = 'autoscale-text edit-card-title-size';
+  inputTitleElement.type = 'text';
+  inputTitleElement.value = event.name;
+  textBodyInnerContainer.appendChild(inputTitleElement);
+
+  // Create an edit icon and add it to textBodyInnerContainer.
+  const editTitleIcon = document.createElement('i');
+  editTitleIcon.className = 'fa fa-edit edit-card-icon';
+  textBodyInnerContainer.appendChild(editTitleIcon);
+
+  // Create an address paragraph element and add it to textBodyInnerContainer.
+  const addressElement = document.createElement('p');
+  addressElement.className = 'edit-card-text';
+  addressElement.innerText = event.address;
+  textBodyInnerContainer.appendChild(addressElement);
+
+  // Create an time paragraph element and add it to textBodyInnerContainer.
+  const timeElement = document.createElement('p');
+  timeElement.className = 'edit-card-text';
+  timeElement.innerText = createTimeStringFromEvent(event);
+  textBodyInnerContainer.appendChild(timeElement);
+
+  // Create the trash icon and add it to textBodyContainer.
+  const trashIcon = document.createElement('i');
+  trashIcon.className = 'fa fa-trash edit-card-delete';
+  textBodyContainer.appendChild(trashIcon);
+
+  // Return the newly-created edit card.
+  return editCardContainer;
+}
+
+// Create a time string from an event.
+function createTimeStringFromEvent(event) {
+  let timeString = event.strStartTime.substring(event.strStartTime.indexOf('T') + 1) +
+    event.strEndTime.substring(event.strEndTime.indexOf('T') + 1);
+  return timeString;
+}
 
 // Append the 'script' element to the document head.
 document.head.appendChild(script);
