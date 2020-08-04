@@ -49,31 +49,33 @@ public class TspSolver {
   private GeoApiContext context;
 
   // variables to create before alg
-  // DISTANCE SHOULD PROBS BE AN AMOUNT OF TIME RIGHT? YES ANSWER TO MY OWN Q
   int[][] timeMatrix;
   HashMap<Integer, String> placeIdToInt;
   HashMap<Integer, OpeningHours.Period> openHours;
-  // Sunday is 0, Saturday is 6
-  int intOfWeek;
+  int intOfWeek; // Sunday is 0, Saturday is 6
 
   // var to output
   Tuple finalAnswer;
  
   /**
-   * Initializes and solves the TSP-TW problem, sets final answer so in order to access
-   * must call getFinalAnswer()
+   * Initializes context and intOfWeek, must call solver then getFinalAnswer(). Done for testing purposes
    * 
-   * @param center central location
-   * @param pois list of pois to visit
    * @param context geoContext from TripServlet
    * @param intOfWeek day of week as an int (Sunday:0 through Saturday:6) from TripDay
    */
-  public TspSolver(String center, List<String> pois, GeoApiContext context, int intOfWeek) 
-      throws IOException {
+  public TspSolver(GeoApiContext context, int intOfWeek) {
     // set class constants from TripServlet
     this.context = context;
     this.intOfWeek = intOfWeek;
+  }
 
+  /**
+   * Solves the problem, initializes various variables needed to solve, sets finalAnswer
+   * 
+   * @param center central location
+   * @param pois list of pois to visit
+   */
+  public void solver(String center, List<String> pois) throws IOException {
     // variables used for tracking
     int currPos = START_POS;
     int numNodes = pois.size() + 1; // total nodes: #locations & center
@@ -89,10 +91,10 @@ public class TspSolver {
 
     
     visited[0] = true;
-    this.finalAnswer = solver(currPos, numNodes, currentTime, count, cost, ans, visited);
+    this.finalAnswer = solverHelper(currPos, numNodes, currentTime, count, cost, ans, visited);
   }
 
-  private Tuple solver(int currPos, int numNodes, LocalTime currentTime, 
+  private Tuple solverHelper(int currPos, int numNodes, LocalTime currentTime, 
       int count, int cost, Tuple ans, boolean[] visited) {
     /**
      * If last node is reached and shares an edge w/ start node
@@ -120,7 +122,7 @@ public class TspSolver {
         visited[i] = true;
         currentTime.plusHours((long) 1); // ADD TRAVELTIME, SHOULD DIST MATRIX BE TIME??
         currentTime.plusMinutes((long) timeMatrix[currPos][i]);
-        ans = solver(i, numNodes, currentTime, count + 1, 
+        ans = solverHelper(i, numNodes, currentTime, count + 1, 
             cost + timeMatrix[currPos][i], ans, visited);
         visited[i] = false;
       }
@@ -149,6 +151,7 @@ public class TspSolver {
     allPois.add(center);
     allPois.addAll(pois);
 
+    timeMatrix = new int[allPois.size()][allPois.size()];
     // fill timeMatrix diagonal with 0's
     for (int i = 0; i < allPois.size(); i++) {
       timeMatrix[i][i] = 0;
