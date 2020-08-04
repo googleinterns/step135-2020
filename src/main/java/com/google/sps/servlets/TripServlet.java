@@ -136,6 +136,11 @@ public class TripServlet extends HttpServlet {
   @Override
   public void doPost(HttpServletRequest request, HttpServletResponse response) 
       throws IOException {
+
+        //ADDED
+    test();
+    //ADDED
+    
     response.setContentType("application/json;");
 
     // Retrieve form inputs to define the Trip object.
@@ -165,10 +170,6 @@ public class TripServlet extends HttpServlet {
     
     // put Event entities in datastore
     putEventsInDatastore(tripDayEntity, LocalDate.parse(tripDayOfTravel), datastore, orderedLocationStrings, travelTimes);
-
-    //ADDED
-    test();
-    //ADDED
 
     // Redirect to the "/trips/" page to show the trip that was added.
     response.sendRedirect("/trips/");

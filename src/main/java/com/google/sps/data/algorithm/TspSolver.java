@@ -121,9 +121,13 @@ public class TspSolver {
       } else {
         isOpen = true;
       }
+      System.err.println("Open: " + isOpen);
+      System.err.println("visited node: " + visited[i]);
+      System.err.println("currPos: " + currPos + " i " + i + " timeMat: " + timeMatrix[currPos][i]);
 
       // if node is unvisited and greater than 0, i.e. not the same node
       if (!visited[i] && timeMatrix[currPos][i] > 0 && isOpen) {
+        System.err.println("in Here");
         visited[i] = true;
         currentTime.plusHours((long) 1); // ADD TRAVELTIME, SHOULD DIST MATRIX BE TIME??
         currentTime.plusMinutes((long) timeMatrix[currPos][i]);
@@ -199,13 +203,12 @@ public class TspSolver {
   private void setOpenHours(int index, String placeId) throws IOException {
     PlaceDetails placeDetails = TripServlet.getPlaceDetailsFromPlaceId(this.context, placeId);
 
-    System.err.println(placeDetails.openingHours.periods.length);
-    System.err.println(placeDetails.openingHours.periods == null);
-    // if there are open hours put them in, otherwise null
-    if (placeDetails.openingHours.periods.length != 1) {
-      this.openHours.put(index, placeDetails.openingHours.periods[this.intOfWeek]);
-    } else {
+    if (placeDetails.openingHours == null) { 
+      this.openHours.put(index, null);    
+    } else if (placeDetails.openingHours.periods.length != 7) {
       this.openHours.put(index, null);
+    } else {
+      this.openHours.put(index, placeDetails.openingHours.periods[this.intOfWeek]);
     } 
   }
 
