@@ -201,7 +201,7 @@ function getImageFromPlaceId(placeId) {
       placeId: placeId
     };
     service.getDetails(request, (place, status) => {
-      if (status == google.maps.places.PlacesServiceStatus.OK && place.photos.length > 0) {
+      if (status == google.maps.places.PlacesServiceStatus.OK && place.photos != null) {
         resolve(place.photos[0].getUrl());
       } else {
         resolve('../images/placeholder_image.png');
