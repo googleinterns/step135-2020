@@ -37,7 +37,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import javax.servlet.annotation.WebServlet;
@@ -112,7 +112,7 @@ public class EditServlet extends HttpServlet {
     }
 
     // Get the events, and put them in a map relating the date to the Event list.
-    Map<String, List<Event>> dateEventMap = new HashMap<>();
+    Map<String, List<Event>> dateEventMap = new LinkedHashMap<>();
     for (Entity tripDay : tripDayList) {
       List<Event> eventList = getEventsFromTripDay(tripDay.getKey(), datastore);
 
@@ -174,7 +174,6 @@ public class EditServlet extends HttpServlet {
     // Construct Query to get all TripDays with the Trip ancestor.
     Query tripDayQuery = new Query(TripDay.QUERY_STRING, tripKey);
     PreparedQuery tripDayResults = datastore.prepare(tripDayQuery);
-    
 
     // Return the list of TripDay Entity objects under the provided Trip.
     List<Entity> tripDayList = 
