@@ -47,26 +47,28 @@
 
 #routeMap {
   border: thin solid black;
-  height: 500px;
-  width: 700px;
-  display: inline-block;
+  height: 600px;
+  width: 800px;
+  margin-top: 25px;
+  float: right;
 }
 
 #rightPanel {
   /* font-family: 'maven-pro'; */
   line-height: 30px;
   padding-left: 10px;
-  height: 500px;
-  width: 300px;
-  display: inline-block;
+  height: 575px;
+  width: 800px;
   margin-left: auto;
   margin-right: auto;
   overflow: auto;
-
+  text-align: center;
+  float: right;
 }
 
 #rightPanel select, #rightPanel input {
   font-size: 15px;
+  width: 100%;
 }
 
 #rightPanel select {
@@ -75,6 +77,13 @@
 
 #rightPanel i {
   font-size: 12px;
+  text-align: center;
+  display: inline-block;
+  width: 100%;
+}
+
+table {
+  width: 800px;
 }
 
 #mapsContent {
@@ -94,6 +103,12 @@
 
 #dateInput {
   width: 100%;
+}
+
+#mapCalendar {
+  height: 625px;
+  width: 250px;
+  float: left;
 }
 
 #mapsTitle {

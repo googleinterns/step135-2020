@@ -63,13 +63,19 @@ window.initMod = function() {
 function getEvents(calendar) {
   const tripKeyQuery = getTripKeyQuery();
   var first = true;
+  var initialDate;
 
   fetch('/get-calendar' + tripKeyQuery).then(response => response.json()).then((events) => {
     events.forEach((event) => {
       if (first) {
-        var initialDate = event.strStartTime.split('T')[0];
+        initialDate = event.strStartTime.split('T')[0];
         calendar.gotoDate(initialDate);
         first = false;
+        createInitialEvent(calendar, initialDate);
+      }
+      let newDate = event.strStartTime.split('T')[0];
+      if (newDate != initialDate) {
+        initialDate = newDate;
         createInitialEvent(calendar, initialDate);
       }
       calendar.addEvent({     
