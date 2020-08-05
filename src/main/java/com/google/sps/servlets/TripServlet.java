@@ -75,13 +75,11 @@ import javax.servlet.http.HttpServletResponse;
 public class TripServlet extends HttpServlet {
 
   //ADDED
-  private static final int MONDAY_INT = 1;
-  private static final String GEARY_HOTEL_ID = "ChIJb-VpERaHhYARLSiOPmNcZzE";
-  private static final String DUTCH_WINDMILL_ID =  "ChIJyzM7ebmHhYARKXUIhJF_VOI";
-  private static final String MANDARIN_REST_ID = "ChIJI8kEiXp9j4ARByCiwa0PF-Q";
-  private static final String CITY_COLLEGE_ID = "ChIJ32IQ69R9j4ARubnrNf2KXk8";
-  private static final String BILLY_HILL_ID = "ChIJKfERrm9-j4AROcxSCHx2gE0";
-  private static final String FABLE_REST_ID = "ChIJ369T0Rp-j4ARftWt7DRMdo4";
+  private static final int TUESDAY_INT = 2;
+  private static final String HOSTEL_ID = "ChIJN2S4EI2AhYAR9J4Qeh1U8Aw";
+  private static final String UNI_ID = "ChIJgeLABbB9j4AR00VqlJ98eqU";
+  private static final String CAFE_ID = "ChIJgSqBnZaHhYARhZdyjXrqU-E";
+  private static final String LOUNGE_ID = "ChIJy6k6HhGHhYAR5moxQxcAv-w";
   //ADDED
 
   // Constant for picking route
@@ -431,15 +429,15 @@ public class TripServlet extends HttpServlet {
   private void test() 
       throws IOException {
     List<String> pois = new ArrayList<>();
-    //pois.add(FABLE_REST_ID);
-    pois.add(CITY_COLLEGE_ID);
-    pois.add(BILLY_HILL_ID);
-    pois.add(DUTCH_WINDMILL_ID);
+    pois.add(CAFE_ID);
+    pois.add(LOUNGE_ID);
+    pois.add(UNI_ID);
     //pois.add(MANDARIN_REST_ID);
-    TspSolver tsp = new TspSolver(this.context, MONDAY_INT);
-    tsp.solver(GEARY_HOTEL_ID, pois);
+    TspSolver tsp = new TspSolver(this.context, TUESDAY_INT);
+    tsp.solver(HOSTEL_ID, pois);
     Tuple ans = tsp.getFinalAnswer();
     System.err.println(ans.toString());
+    System.err.println(tsp.getOpenHours());
   }
   //Added
 }

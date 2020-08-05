@@ -38,6 +38,10 @@ import java.util.Map;
  */
 public class TspSolver {
 
+  // static list of weekdays
+  private static final String[] WEEKDAYS = {"Monday", "Tuesday", "Wednesday", 
+      "Thursday", "Friday", "Saturday", "Sunday"};
+
   // class constants
   private static final int START_POS = 0;
   private static final int START_COUNT = 0;
@@ -50,7 +54,7 @@ public class TspSolver {
 
   // variables to create before alg
   int[][] timeMatrix;
-  HashMap<Integer, String> placeIdToInt;
+  HashMap<Integer, String> intToPlaceId;
   HashMap<Integer, OpeningHours.Period> openHours;
   int intOfWeek; // Sunday is 0, Saturday is 6
 
@@ -67,6 +71,7 @@ public class TspSolver {
     // set class constants from TripServlet
     this.context = context;
     this.intOfWeek = intOfWeek;
+    System.out.println(intOfWeek);
   }
 
   /**
@@ -134,7 +139,7 @@ public class TspSolver {
       System.err.println("Open: " + isOpen);
       System.err.println("visited node: " + visited[i]);
       System.err.println("currPos: " + currPos + " i: " + i + " timeMat: " + timeMatrix[currPos][i]);
-      System.err.println("placeId: " + placeIdToInt.get(i));
+      System.err.println("placeId: " + intToPlaceId.get(i));
       System.err.println("CurrentTime: " + currentTime.toString());
       System.err.println("openHours: " + openHours.get(i) + "\n");
 
@@ -203,14 +208,15 @@ public class TspSolver {
   private void populateIntMapAndOpenHours(String center, 
       List<String> pois) throws IOException{
     this.openHours = new HashMap<>();
-    this.placeIdToInt = new HashMap<>();
-    this.placeIdToInt.put(0, center);
+    this.intToPlaceId = new HashMap<>();
+    this.intToPlaceId.put(0, center);
     setOpenHours(0, center);
 
     for (int i = 0; i < pois.size(); i++) {
-      this.placeIdToInt.put(i+1, pois.get(i));
+      this.intToPlaceId.put(i+1, pois.get(i));
       setOpenHours(i+1, pois.get(i));
     }
+    System.out.println("after populate: " + openHours.toString());
   }
 
   /**
@@ -225,10 +231,40 @@ public class TspSolver {
     if (placeDetails.openingHours == null) { 
       this.openHours.put(index, null);    
     } else if (placeDetails.openingHours.periods.length != 7) {
-      this.openHours.put(index, null);
+      checkDayIsPresentInHours(placeDetails.openingHours, index);
     } else {
       this.openHours.put(index, placeDetails.openingHours.periods[this.intOfWeek]);
     } 
+  }
+
+  /**
+   * if day in openingHours array is the same as the day searched for 
+   * check if open and close time are not null
+   */
+  private void checkDayIsPresentInHours(OpeningHours openingHours, int index) {
+      int adjustedWeekIndex;
+      // periods is numbered Sunday - Saturday, WeekdayText is Monday - Sunday
+      if (intOfWeek == 0) {
+        adjustedWeekIndex = 6;
+      } else {
+        adjustedWeekIndex = intOfWeek - 1;
+      }
+      // string representation of day searched
+      String desiredDayString = WEEKDAYS[adjustedWeekIndex];
+      for (int i = 0; i < openingHours.periods.length; i++) {
+        // get the day that the ith index in opening hours corresponds to
+        String day = openingHours.weekdayText[i].split(":")[0];
+
+        // check neither open nor closing time are null
+        boolean open = openingHours.periods[i].open != null;
+        boolean close = openingHours.periods[i].close != null;
+
+        if (day.equals(desiredDayString) && open && close) {
+          this.openHours.put(index, openingHours.periods[i]);
+          return;
+        } 
+      }
+    this.openHours.put(index, null);
   }
 
     /**
@@ -261,7 +297,7 @@ public class TspSolver {
   }
 
   public HashMap<Integer, String> getPlaceIdToInt() {
-    return this.placeIdToInt;
+    return this.intToPlaceId;
   }
 
   public HashMap<Integer, OpeningHours.Period> getOpenHours() {
@@ -270,5 +306,17 @@ public class TspSolver {
 
   public Tuple getFinalAnswer() {
     return this.finalAnswer;
+  }
+
+  /**
+   * these functions are exclusively used for testing the recursive part of 
+   * the algorithm
+   */
+  public void setTimeMatrix(int[][] timeMatrix) {
+    this.timeMatrix = timeMatrix;
+  }
+
+  public void setOpenHours(HashMap<Integer, OpeningHours.Period> openHours) {
+    this.openHours = openHours;
   }
 }
