@@ -54,29 +54,62 @@ public final class TspSolverTest {
   private static final String CAFE_ID = "ChIJgSqBnZaHhYARhZdyjXrqU-E";
   private static final String LOUNGE_ID = "ChIJy6k6HhGHhYAR5moxQxcAv-w";
 
-  private static final String DUTCH_WINDMILL_ID =  "ChIJyzM7ebmHhYARKXUIhJF_VOI";
-  private static final String MANDARIN_REST_ID = "ChIJI8kEiXp9j4ARByCiwa0PF-Q";
-  private static final String CITY_COLLEGE_ID = "ChIJ32IQ69R9j4ARubnrNf2KXk8";
-  private static final String BILLY_HILL_ID = "ChIJKfERrm9-j4AROcxSCHx2gE0";
-  private static final String FABLE_REST_ID = "ChIJ369T0Rp-j4ARftWt7DRMdo4";
+  // private static final String DUTCH_WINDMILL_ID =  "ChIJyzM7ebmHhYARKXUIhJF_VOI";
+  // private static final String MANDARIN_REST_ID = "ChIJI8kEiXp9j4ARByCiwa0PF-Q";
+  // private static final String CITY_COLLEGE_ID = "ChIJ32IQ69R9j4ARubnrNf2KXk8";
+  // private static final String BILLY_HILL_ID = "ChIJKfERrm9-j4AROcxSCHx2gE0";
+  // private static final String FABLE_REST_ID = "ChIJ369T0Rp-j4ARftWt7DRMdo4";
+
+  // class constants for recursive setup
+  private static final int START_POS = 0;
+  private static final int START_COUNT = 0;
+  private static final int START_COST = 0;
+  private static final int START_ANS = Integer.MAX_VALUE;
+  private static final LocalTime START_TIME = LocalTime.of(10, 0);
+  private static final int HOUR = 60;
+
   
   private static List<String> pois;
 
   @Test
-  public void testPopulateIntMap() throws IOException {
+  public void testBasicRecursiveAlgorithmSolver() throws IOException {
     GeoApiContext mockGeoApiContext = mock(GeoApiContext.class);
     TspSolver tsp = new TspSolver(mockGeoApiContext, MONDAY_INT);
+    constructPoisListHostel();
 
-    pois = constructPoisList();
+    // set global class variables
+    tsp.setTimeMatrix(createTimeMatrixHostel());
+    tsp.setOpenHours(createRealOpenHoursHostel());
+    tsp.setIntToPlaceId(createIntToPlaceIdHostel());
 
-    //tsp.solver(GEARY_HOTEL_ID, pois);
+    //set variables needed for recursive tracking
+    int currPos = START_POS;
+    int numNodes = pois.size() + 1; // total nodes: #locations & center
+    LocalTime currentTime = START_TIME;
+    int count = START_COUNT;
+    Tuple cost = new Tuple(START_COST, new ArrayList<>());
+    Tuple ans = new Tuple(START_ANS, new ArrayList<>());
+    boolean[] visited = new boolean[numNodes]; // sets values to "false"  
+
+    visited[0] = true;
+
+    Tuple finalAnswer = tsp.solverHelper(currPos, numNodes, currentTime, count, cost, ans, visited);
+    
+    int expectedCost = 58;
+    List<Integer> expectedPath = new ArrayList<>();
+    expectedPath.add(3);
+    expectedPath.add(2);
+    expectedPath.add(1);
+    
+    Assert.assertEquals(expectedCost, finalAnswer.getCurrAns());
+    Assert.assertEquals(expectedPath, finalAnswer.getCurrPath());
   }
 
   /**
    * Construct the pois list used for all testing
    */
-  private List<String> constructPoisList() {
-    pois = new ArrayList<>();
+  private List<String> constructPoisListHostel() {
+    this.pois = new ArrayList<>();
     pois.add(CAFE_ID);
     pois.add(LOUNGE_ID);
     pois.add(UNI_ID);
@@ -101,7 +134,7 @@ public final class TspSolverTest {
 
     // hostel to university
     int hostelToUni = 17;
-    timeMatrix = setIndices(2, 0, hostelToUni, timeMatrix);
+    timeMatrix = setIndices(3, 0, hostelToUni, timeMatrix);
 
     // cafe to lounge
     int cafeToLounge = 10;
@@ -125,8 +158,8 @@ public final class TspSolverTest {
     return timeMatrix;
   }
 
-  private Map<Integer, String> createIntToPlaceIdHostel() {
-    Map<Integer, String> intToPlaceId = new HashMap<>();
+  private HashMap<Integer, String> createIntToPlaceIdHostel() {
+    HashMap<Integer, String> intToPlaceId = new HashMap<>();
     intToPlaceId.put(0, HOSTEL_ID);
     intToPlaceId.put(1, CAFE_ID);
     intToPlaceId.put(2, LOUNGE_ID);
@@ -134,29 +167,42 @@ public final class TspSolverTest {
     return intToPlaceId;
   }
 
-  private HashMap<Integer, OpeningHours.Period> createOpenHours() {
+  private HashMap<Integer, OpeningHours.Period> createRealOpenHoursHostel() {
     HashMap<Integer, OpeningHours.Period> openHours = new HashMap<>();
 
     // set hostel hours
-    OpeningHours.Period hostelHours = null;
+    OpeningHours.Period hostelHours = new OpeningHours.Period();
+    hostelHours.open = new OpeningHours.Period.OpenClose();
+    hostelHours.open.time = LocalTime.of(0, 0);
+    hostelHours.close = new OpeningHours.Period.OpenClose();
+    hostelHours.close.time = LocalTime.of(23, 59);
     openHours.put(0, hostelHours);
 
     // set cafe hours
-    OpeningHours.Period cafeHours = new new OpeningHours.Period();
+    OpeningHours.Period cafeHours = new OpeningHours.Period();
+    cafeHours.open = new OpeningHours.Period.OpenClose();
     cafeHours.open.time = LocalTime.of(7, 0);
+    cafeHours.close = new OpeningHours.Period.OpenClose();
     cafeHours.close.time = LocalTime.of(17, 0);
     openHours.put(1, cafeHours);
 
     // set lounge hours
-    OpeningHours.Period loungeHours = new new OpeningHours.Period();
+    OpeningHours.Period loungeHours = new OpeningHours.Period();
+    loungeHours.open = new OpeningHours.Period.OpenClose();
     loungeHours.open.time = LocalTime.of(11, 0);
+    loungeHours.close = new OpeningHours.Period.OpenClose();
     loungeHours.close.time = LocalTime.of(19, 30);
     openHours.put(2, loungeHours);
 
     // set university hours
-    OpeningHours.Period uniHours = null;
+    OpeningHours.Period uniHours = new OpeningHours.Period();
+    uniHours.open = new OpeningHours.Period.OpenClose();
+    uniHours.open.time = LocalTime.of(0, 0);
+    uniHours.close = new OpeningHours.Period.OpenClose();
+    uniHours.close.time = LocalTime.of(23, 59);
     openHours.put(3, uniHours);
 
     return openHours;
   }
+
 }

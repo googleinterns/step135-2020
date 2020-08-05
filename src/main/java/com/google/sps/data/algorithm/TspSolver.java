@@ -27,6 +27,7 @@ import com.google.sps.data.algorithm.Tuple;
 import com.google.sps.servlets.TripServlet;
 import java.io.IOException;
 import java.time.LocalTime;
+import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.ArrayList; 
 import java.util.List;
@@ -99,7 +100,7 @@ public class TspSolver {
     this.finalAnswer = solverHelper(currPos, numNodes, currentTime, count, cost, ans, visited);
   }
 
-  private Tuple solverHelper(int currPos, int numNodes, LocalTime currentTime, 
+  public Tuple solverHelper(int currPos, int numNodes, LocalTime currentTime, 
       int count, Tuple cost, Tuple ans, boolean[] visited) {
     System.out.println("\n" + "currCost: " + cost.toString() + " currCount: " + count);
     /**
@@ -107,7 +108,6 @@ public class TspSolver {
      * Calculate min of cost and currAns
      * return and keep traversing the graph/matrix
      */
-    // QUESTION: DO I ADD THE CENTER TO THE PATH AS WELL? CHECK W/ EHIKA
     if ((count == numNodes-1) && timeMatrix[currPos][0] > 0) {
       System.out.println("in return statement");
       if (ans.getCurrAns() < cost.getCurrAns() + timeMatrix[currPos][0]) {
@@ -119,23 +119,12 @@ public class TspSolver {
     }
 
     for (int i = 0; i < numNodes; i++) {
-      boolean isOpen;
-      if (openHours.get(i) != null) {
-        LocalTime open = openHours.get(i).open.time;
-        LocalTime close = openHours.get(i).close.time;
-        
-        // edge case where close time is next day at 0:00
-        if (close.compareTo(LocalTime.parse("00:00")) == 0) {
-          close = LocalTime.of(23, 59);
-        } else {
-          close.minusMinutes(HOUR);
-        }  
-        // check if location is open at currentTime along path
-        isOpen = (currentTime.compareTo(open) >= 0) && 
-            (currentTime.compareTo(close) <= 0);
-      } else {
-        isOpen = true;
-      }
+
+      boolean isOpen = (boolean) checkIsOpenSetTime(currentTime, i,
+          currPos).get(0);
+      int timeToAdd = (int) checkIsOpenSetTime(currentTime, i,
+          currPos).get(1);
+      
       System.err.println("Open: " + isOpen);
       System.err.println("visited node: " + visited[i]);
       System.err.println("currPos: " + currPos + " i: " + i + " timeMat: " + timeMatrix[currPos][i]);
@@ -147,14 +136,14 @@ public class TspSolver {
       if (!visited[i] && timeMatrix[currPos][i] > 0 && isOpen) {
         System.err.println("in Here");
         visited[i] = true;
-        LocalTime timePostUpdate = currentTime.plusMinutes((long) 
-            (timeMatrix[currPos][i] + HOUR));
+        LocalTime timePostUpdate = currentTime.plusMinutes((long) timeToAdd);
         //System.err.println("currenTime: in if statement " + timePostUpdate);
         List<Integer> costPath = cost.getCurrPath();
         List<Integer> updatePath = new ArrayList<>();
         updatePath.addAll(costPath);
         updatePath.add(i);
-        Tuple updateTuple = new Tuple(cost.getCurrAns() + timeMatrix[currPos][i], updatePath);
+        int newTupleCost = cost.getCurrAns() + timeToAdd - HOUR;
+        Tuple updateTuple = new Tuple(newTupleCost, updatePath);
         System.out.println("recursive call next");
         ans = solverHelper(i, numNodes, timePostUpdate, count + 1, 
             updateTuple, ans, visited);
@@ -166,7 +155,64 @@ public class TspSolver {
   }
 
   /**
-   * Create time Matrix using DistanceMatrixAPI
+   * Check if a location is open when traveled there. Options are:
+   * 1. Arrival before open time: 
+   * 2. Arrival during open hours
+   * 3. Arrival after closed 
+   * 4. Open Hours are not available
+   * 
+   * @return List<Object> at index 0 will return a boolean, index 1
+   * will return the amount of time to add to current time. 
+   * 1. If before open time then add the amount of time till it opens
+   *   plus time spent (one hour).
+   * 2. If during opening hours or open hours are not available return 
+   *  travel time plus one hour
+   * 2. If arrival after closed return [false, 0]
+   */
+  private List<Object> checkIsOpenSetTime(LocalTime currentTime, int i,
+      int currPos) {
+    List<Object> output = new ArrayList<>();
+    boolean isOpen;
+      if (openHours.get(i) != null) {
+        LocalTime open = openHours.get(i).open.time;
+        LocalTime close = openHours.get(i).close.time;
+        
+        // edge case where close time is next day at 0:00
+        if (close.compareTo(LocalTime.parse("00:00")) == 0) {
+          close = LocalTime.of(23, 59);
+        } else {
+          close.minusMinutes(HOUR);
+        }  
+
+        // set time after travelTime
+        LocalTime afterDrive = currentTime.plusMinutes(timeMatrix[currPos][i]);
+
+        /**
+         * check if arrival time is before open time, during,
+         * or after closing time
+         */ 
+        if (afterDrive.compareTo(open) < 0) {
+          int timeTillOpen = (int) afterDrive.until(open, ChronoUnit.MINUTES);
+          output.add(true);
+          output.add(timeTillOpen + timeMatrix[currPos][i] + HOUR);
+        } else if (isOpen = (afterDrive.compareTo(open) >= 0) && 
+            (afterDrive.compareTo(close) <= 0)) {
+          output.add(true);
+          output.add(timeMatrix[currPos][i] + HOUR);
+        } else {
+          output.add(false);
+          output.add(0);
+        }
+      } else {
+        output.add(true);
+        output.add(timeMatrix[currPos][i] + HOUR);
+      }
+
+      return output;
+  }
+
+  /**
+   * Create time Matrix using DirectionsRequest
    * 
    * @param center central location
    * @param pois list of pois other than central location
@@ -216,11 +262,12 @@ public class TspSolver {
       this.intToPlaceId.put(i+1, pois.get(i));
       setOpenHours(i+1, pois.get(i));
     }
-    System.out.println("after populate: " + openHours.toString());
   }
 
   /**
    * Sets the openHours for each placeId (as int), as an OpeningHours.Period[]
+   * If can't find opening hours set to be null (this is handled as all day by 
+   * solver)
    * 
    * @param placeId placeId to search openHours for
    * @param index index to put the openHours in the HashMap
@@ -318,5 +365,9 @@ public class TspSolver {
 
   public void setOpenHours(HashMap<Integer, OpeningHours.Period> openHours) {
     this.openHours = openHours;
+  }
+
+  public void setIntToPlaceId(HashMap<Integer, String> intToPlaceId) {
+    this.intToPlaceId = intToPlaceId;
   }
 }

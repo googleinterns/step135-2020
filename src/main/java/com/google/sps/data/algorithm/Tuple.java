@@ -47,13 +47,6 @@ public class Tuple {
     this.currAns += inc;
   }
 
-  public void setCurrAns(int ans) {
-    if (ans < ZERO) {
-        throw new IllegalArgumentException("cannot increment by less than " + ZERO);
-    }
-    this.currAns = ans;  
-  }
-
   /**
    * add int (represents string) to the current path
    */

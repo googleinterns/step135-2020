@@ -27,7 +27,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
-/** */
+/** 
+ * Tuple class to store the answer in the TspSolver
+*/
 @RunWith(JUnit4.class)
 public final class TupleTest {
 
