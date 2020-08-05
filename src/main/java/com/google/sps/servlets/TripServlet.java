@@ -156,8 +156,9 @@ public class TripServlet extends HttpServlet {
     // put Event entities in datastore
     putEventsInDatastore(tripDayEntity, LocalDate.parse(tripDayOfTravel), datastore, orderedLocationStrings, travelTimes);
 
-    // Redirect to the "/trips/" page to show the trip that was added.
-    response.sendRedirect("/trips/");
+    // Redirect to the Maps page of this trip to show the trip that was added.
+    String tripKeyString = KeyFactory.keyToString(tripEntity.getKey());
+    response.sendRedirect("/maps.html?tripKey=" + tripKeyString);
   }
 
   /**

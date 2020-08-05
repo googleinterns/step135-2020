@@ -26,15 +26,20 @@ window.initMod = function() {
   const calendarEl = document.getElementById('calendar');
   const calendar = new FullCalendar.Calendar(calendarEl, {
     headerToolbar: {
-      left: 'prev,next today',
+      start: 'prev,next today',
       center: 'title',
-      right: 'dayGridMonth, timeGridWeek, timeGridDay, listWeek'
+      end: 'dayGridMonth timeGridWeek timeGridDay listWeek'
     },
     initialView: 'timeGridWeek',
     navLinks: true,
     dayMaxEvents: true, //alow "more" link when too many events on one day
     eventClick: function(info) {
       const eventObj = info.event;
+
+      // No popup is shown for the first event.
+      if (eventObj.title === 'Depart Hotel') {
+        return;
+      }
 
       // title of pop-up
       const modalLabel = document.getElementById('exampleModalLabel');
@@ -56,9 +61,8 @@ window.initMod = function() {
  * retrives the events from /calculate-trip url and dynamically adds the events
  */
 function getEvents(calendar) {
-  const urlParams = new URLSearchParams(window.location.search);
-  const tripKey = urlParams.get('tripKey');
-  const tripKeyQuery = (tripKey != null && tripKey != '') ? '?tripKey=' + tripKey : '';
+  const tripKeyQuery = getTripKeyQuery();
+  var first = true;
 
   fetch('/get-calendar' + tripKeyQuery).then(response => {
     if (response.redirected) {
@@ -69,6 +73,12 @@ function getEvents(calendar) {
     }
   }).then(events => {
     events.forEach((event) => {
+      if (first) {
+        var initialDate = event.strStartTime.split('T')[0];
+        calendar.gotoDate(initialDate);
+        first = false;
+        createInitialEvent(calendar, initialDate);
+      }
       calendar.addEvent({     
         title: event.name,
         start: event.strStartTime,
@@ -85,6 +95,18 @@ function getEvents(calendar) {
     });
   }).catch(error => {
     console.error(error);
+  });
+}
+
+/**
+ * Create the initial event of leaving the hotel
+ */
+function createInitialEvent(calendar, initialDate) {
+  calendar.addEvent({
+    title: 'Depart Hotel',
+    start: initialDate + 'T09:30:00',
+    end: initialDate + 'T10:00:00',
+    allDay: false
   });
 }
 

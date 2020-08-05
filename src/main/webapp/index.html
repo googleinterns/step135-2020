@@ -4,23 +4,40 @@
     <meta charset="UTF-8">
     <title>TravIS: Travel Information System</title>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <!-- Add icon library -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" 
       integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="style.css">
     <script src="config.js"></script>
     <script src="script.js"></script>
   </head>
   <body>
-    <div id="content">
-      <div id="header">
-        <a href="/"><h3 class="header-child float-left" id="header-title">TravIS</h3></a>
-        <div class="header-child float-right">
-          <a class="btn btn-primary" id="sign-out-link">Sign out</a>
-        </div>
-        <div class="header-child float-right">
-          <a class="btn btn-primary" href="/trips/">Trips</a>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark" id="header">
+      <div id="header-text-container">
+        <a class="navbar-brand" href="/" id="navbar-title">TravIS</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarText">
+          <ul class="nav navbar-nav navbar-right ml-auto">
+            <li class="nav-item active">
+              <a class="nav-link" href="/">Create New Trip <span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/trips/">Trips</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" id="sign-out-link">Sign out</a>
+            </li>
+          </ul>
         </div>
       </div>
+    </nav>
+    <div id="content">
       <div id="index-registration-block">
         <h1 class="index-registration-block-child">TravIS: Travel Information System</h1>
         <p class="index-registration-block-child" id="index-registration-block-p">
@@ -30,15 +47,19 @@
         <a class="index-registration-block-child btn btn-primary" id="sign-in-link">Sign in</a>
       </div>
       <div id="index-start-trip-block">
+        <h2 class="site-title">Start a New Trip</h2>
+        <p class="site-description">
+          Create a specialized itinerary for your trip.
+        </p>
         <form action="/calculate-trip" method="POST" id="startTripForm">
           <div class="form-row">
-            <div class="form-group col-md-3">
+            <div class="form-group col-md-4">
               <label for="inputDestination">Name of Trip</label>
               <input type="text" placeholder="Add a trip name" class="form-control" 
                 name="inputTripName" id="inputTripName">
             </div>
-            <div class="form-group col-md-3">
-              <label for="inputDestination">Destination (Start Point)</label>
+            <div class="form-group col-md-4">
+              <label for="inputDestination">Hotel (Start Point)</label>
               <input type="text" placeholder="Where will you stay?" 
                 class="form-control" id="inputDestination"
                 name="inputDestination">
@@ -54,7 +75,10 @@
             </div>
           </div>
           <div class="form-row" id="add-pois-container">
-            <div class="form-group col-md-3">
+            <p class="site-description" id="add-pois-input-description">
+              Which locations do you want to visit on your trip? Add them all here.
+            </p>
+            <div class="form-group col-md-4">
               <input type="text" placeholder="Point of Interest" id="inputPoi"
                 class="form-control">
             </div>
@@ -69,7 +93,7 @@
             value="Calculate Trip">
         </form>
         <h3 id="suggested-location-block-header">Suggested Points of Interest</h3>
-        <div class="card-columns" id="suggested-location-block">
+        <div class="card-deck" id="suggested-location-block">
         </div>
       </div>
     </div>
