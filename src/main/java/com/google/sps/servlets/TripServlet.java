@@ -48,8 +48,6 @@ import com.google.maps.model.Unit;
 import com.google.gson.Gson;
 import com.google.sps.Trip;
 import com.google.sps.TripDay;
-import com.google.sps.data.algorithm.TspSolver;
-import com.google.sps.data.algorithm.Tuple;
 import com.google.sps.data.Config;
 import com.google.sps.data.Event;
 import com.google.sps.TripDay;
@@ -126,7 +124,6 @@ public class TripServlet extends HttpServlet {
   @Override
   public void doPost(HttpServletRequest request, HttpServletResponse response) 
       throws IOException {
-
     response.setContentType("application/json;");
 
     // Retrieve form inputs to define the Trip object.
@@ -247,7 +244,7 @@ public class TripServlet extends HttpServlet {
   /**
    * Get the PlaceDetails object from the place ID.
    */
-  public static PlaceDetails getPlaceDetailsFromPlaceId(GeoApiContext context, String placeId)
+  private PlaceDetails getPlaceDetailsFromPlaceId(GeoApiContext context, String placeId)
     throws IOException {
 
     PlaceDetailsRequest placeDetailsRequest = PlacesApi.placeDetails(context, 
