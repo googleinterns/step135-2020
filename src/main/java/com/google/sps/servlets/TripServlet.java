@@ -430,11 +430,11 @@ public class TripServlet extends HttpServlet {
   private void test() 
       throws IOException {
     List<String> pois = new ArrayList<>();
-    pois.add(FABLE_REST_ID);
+    //pois.add(FABLE_REST_ID);
     pois.add(CITY_COLLEGE_ID);
     pois.add(BILLY_HILL_ID);
     pois.add(DUTCH_WINDMILL_ID);
-    pois.add(MANDARIN_REST_ID);
+    //pois.add(MANDARIN_REST_ID);
     TspSolver tsp = new TspSolver(this.context, MONDAY_INT);
     tsp.solver(GEARY_HOTEL_ID, pois);
     Tuple ans = tsp.getFinalAnswer();

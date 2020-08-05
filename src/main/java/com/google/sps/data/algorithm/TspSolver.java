@@ -78,7 +78,7 @@ public class TspSolver {
   public void solver(String center, List<String> pois) throws IOException {
     // variables used for tracking
     int currPos = START_POS;
-    int numNodes = pois.size(); // total nodes: #locations & center
+    int numNodes = pois.size() + 1; // total nodes: #locations & center
     LocalTime currentTime = START_TIME;
     int count = START_COUNT;
     Tuple cost = new Tuple(START_COST, new ArrayList<>());
@@ -103,7 +103,7 @@ public class TspSolver {
      * return and keep traversing the graph/matrix
      */
     // QUESTION: DO I ADD THE CENTER TO THE PATH AS WELL? CHECK W/ EHIKA
-    if ((count == numNodes) && timeMatrix[currPos][0] > 0) {
+    if ((count == numNodes-1) && timeMatrix[currPos][0] > 0) {
       System.out.println("in return statement");
       if (ans.getCurrAns() < cost.getCurrAns() + timeMatrix[currPos][0]) {
         return ans;
@@ -140,18 +140,20 @@ public class TspSolver {
 
       // if node is unvisited and greater than 0, i.e. not the same node
       if (!visited[i] && timeMatrix[currPos][i] > 0 && isOpen) {
-        //System.err.println("in Here");
+        System.err.println("in Here");
         visited[i] = true;
         LocalTime timePostUpdate = currentTime.plusMinutes((long) 
             (timeMatrix[currPos][i] + HOUR));
         //System.err.println("currenTime: in if statement " + timePostUpdate);
         List<Integer> costPath = cost.getCurrPath();
-        List<Integer> updatePath = new Arraylist<>();
-        updatedPath.addAll(costPath);
-        updatedPath.add(i);
-        Tuple updateTuple = new Tuple(cost.getCurrAns() + timeMatrix[currPos][i], updatedPath);
+        List<Integer> updatePath = new ArrayList<>();
+        updatePath.addAll(costPath);
+        updatePath.add(i);
+        Tuple updateTuple = new Tuple(cost.getCurrAns() + timeMatrix[currPos][i], updatePath);
+        System.out.println("recursive call next");
         ans = solverHelper(i, numNodes, timePostUpdate, count + 1, 
             updateTuple, ans, visited);
+        System.out.println("moveing on");
         visited[i] = false;
       }
     }
