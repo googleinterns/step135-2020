@@ -49,32 +49,7 @@ function addTripCards(trips) {
 
   // If no trips are present, then add a "Create a New Trip" button card.
   if (trips.length === 0) {
-    // Create the card container.
-    const cardContainer = document.createElement('div');
-    cardContainer.id = 'card-create-new-trip';
-    cardContainer.className = 'card text-white bg-primary mb-3';
-    cardContainer.style = 'width: 18rem';
-
-    // Create a container for the card body.
-    const cardBodyContainer = document.createElement('div');
-    cardBodyContainer.className = 'card-body';
-
-    // Create the title for the card body.
-    const cardBodyTitle = document.createElement('h5');
-    cardBodyTitle.className = 'card-title';
-    cardBodyTitle.innerText = 'Create a New Trip';
-
-    // Create a stretched link so that the card links to the homepage.
-    const stretchedLinkSubheader = document.createElement('a');
-    stretchedLinkSubheader.href = '/';
-    stretchedLinkSubheader.className = 'stretched-link card-text text-white';
-    stretchedLinkSubheader.innerText = 'Add POIs and go!';
-
-    // Append all the different components, and add the card to the UI.
-    cardBodyContainer.appendChild(cardBodyTitle);
-    cardBodyContainer.appendChild(stretchedLinkSubheader);
-    cardContainer.appendChild(cardBodyContainer);
-    tripCardContainer.appendChild(cardContainer);
+    tripCardContainer.appendChild(buildCreateNewTripCard());
   }
 
   trips.forEach((trip) => {
@@ -83,6 +58,37 @@ function addTripCards(trips) {
       trip.imageSrc, trip.startDate, trip.endDate, trip.tripKey);
     tripCardContainer.appendChild(tripCard);
   });
+}
+
+// Build HTML "Create a New Trip" card.
+function buildCreateNewTripCard() {
+  // Create the card container.
+  const cardContainer = document.createElement('div');
+  cardContainer.id = 'card-create-new-trip';
+  cardContainer.className = 'card text-white bg-primary mb-3';
+  cardContainer.style = 'width: 18rem';
+
+  // Create a container for the card body.
+  const cardBodyContainer = document.createElement('div');
+  cardBodyContainer.className = 'card-body';
+
+  // Create the title for the card body.
+  const cardBodyTitle = document.createElement('h5');
+  cardBodyTitle.className = 'card-title';
+  cardBodyTitle.innerText = 'Create a New Trip';
+
+  // Create a stretched link so that the card links to the homepage.
+  const stretchedLinkSubheader = document.createElement('a');
+  stretchedLinkSubheader.href = '/';
+  stretchedLinkSubheader.className = 'stretched-link card-text text-white';
+  stretchedLinkSubheader.innerText = 'Add POIs and go!';
+
+  // Append all the different components, and add the card to the UI.
+  cardBodyContainer.appendChild(cardBodyTitle);
+  cardBodyContainer.appendChild(stretchedLinkSubheader);
+  cardContainer.appendChild(cardBodyContainer);
+
+  return cardContainer;
 }
 
 // Build HTML trip card to display.

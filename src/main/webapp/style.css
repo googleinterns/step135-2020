@@ -406,3 +406,7 @@ hr {
   border-color: #3c78d8ff;
 }
 
+#map {
+  height: 250px;
+  width: 100%;
+}
