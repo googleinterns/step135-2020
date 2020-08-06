@@ -79,7 +79,6 @@ public class TspSolver {
       throw new IllegalArgumentException("intOfWeek not in valid range (0-6)");
     }
 
-
     // set class constants from TripServlet
     this.context = context;
     this.intOfWeek = intOfWeek;
@@ -354,7 +353,7 @@ public class TspSolver {
     this.openHours.put(index, null);
   }
 
-    /**
+  /**
    * Get travel time in seconds between two locations
    * 
    * @param origin start location

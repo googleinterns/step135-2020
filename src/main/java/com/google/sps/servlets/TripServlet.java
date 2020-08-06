@@ -74,14 +74,6 @@ import javax.servlet.http.HttpServletResponse;
 @WebServlet("/calculate-trip")
 public class TripServlet extends HttpServlet {
 
-  //ADDED
-  private static final int TUESDAY_INT = 2;
-  private static final String HOSTEL_ID = "ChIJN2S4EI2AhYAR9J4Qeh1U8Aw";
-  private static final String UNI_ID = "ChIJgeLABbB9j4AR00VqlJ98eqU";
-  private static final String CAFE_ID = "ChIJgSqBnZaHhYARhZdyjXrqU-E";
-  private static final String LOUNGE_ID = "ChIJy6k6HhGHhYAR5moxQxcAv-w";
-  //ADDED
-
   // Constant for picking route
   public static final int ROUTE_INDEX = 0;
 
@@ -134,11 +126,6 @@ public class TripServlet extends HttpServlet {
   @Override
   public void doPost(HttpServletRequest request, HttpServletResponse response) 
       throws IOException {
-
-        //ADDED
-    test();
-    //ADDED
-    
     response.setContentType("application/json;");
 
     // Retrieve form inputs to define the Trip object.
@@ -424,20 +411,4 @@ public class TripServlet extends HttpServlet {
     String json = gson.toJson(events);
     return json;
   }
-
-  //ADDED
-  private void test() 
-      throws IOException {
-    List<String> pois = new ArrayList<>();
-    pois.add(CAFE_ID);
-    pois.add(LOUNGE_ID);
-    pois.add(UNI_ID);
-    //pois.add(MANDARIN_REST_ID);
-    TspSolver tsp = new TspSolver(this.context, TUESDAY_INT);
-    tsp.solver(HOSTEL_ID, pois);
-    Tuple ans = tsp.getFinalAnswer();
-    System.err.println(ans.toString());
-    System.err.println(tsp.getOpenHours());
-  }
-  //Added
 }
