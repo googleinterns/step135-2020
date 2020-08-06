@@ -88,6 +88,7 @@ public class TripServlet extends HttpServlet {
   private static final int ONE_HOUR = 60;
   public static final int SECONDS_IN_MIN = 60;
 
+
   // event fields for entity
   private static final String NAME = "name";
   private static final String ADDRESS = "end-time";

@@ -43,7 +43,6 @@ public final class TupleTest {
     path.add(4);
     path.add(3);
     path.add(7);
-
     Tuple tuple = new Tuple(CURR_ANS, path);
     Assert.assertEquals(tuple.getCurrAns(), CURR_ANS);
     Assert.assertEquals(tuple.getCurrPath(), path);
@@ -99,6 +98,7 @@ public final class TupleTest {
     List<Integer> expected = new ArrayList<>();
     expected.add(1);
     expected.add(2);
+
 
     tuple.addIntPoiToPath(1, TOTAL_POIS);
     tuple.addIntPoiToPath(2, TOTAL_POIS);
