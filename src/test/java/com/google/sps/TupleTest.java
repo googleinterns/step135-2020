@@ -91,7 +91,7 @@ public final class TupleTest {
     Tuple tuple = new Tuple(CURR_ANS, new ArrayList<>());
     tuple.addIntPoiToPath(6, TOTAL_POIS);
   }
-
+  
   // test add pois to path
   @Test
   public void testAddPoisToPath() {
