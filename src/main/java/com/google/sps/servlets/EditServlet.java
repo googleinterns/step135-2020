@@ -111,7 +111,10 @@ public class EditServlet extends HttpServlet {
       return;
     }
 
-    // Get the events, and put them in a map relating the date to the Event list.
+    /**
+     * Get the events, and put them in a map relating the date to the Event list.
+     * The LinkedHashMap is used to maintain the ordering of the TripDays.
+     */
     Map<String, List<Event>> dateEventMap = new LinkedHashMap<>();
     for (Entity tripDay : tripDayList) {
       List<Event> eventList = getEventsFromTripDay(tripDay.getKey(), datastore);
