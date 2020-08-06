@@ -19,7 +19,25 @@ Note: All of the features above require the user to sign in first.
 \* This feature was still a work in progress by the end of the internship, and is not implemented in the final version.
 
 ## TravIS Screenshots
-...
+### Sign In Page
+![Sign In Page](src/main/webapp/images/site_screenshots/sign_in_page.png)
+
+### Create a New Trip
+![Calendar a New Trip with Suggested and Added POIs](src/main/webapp/images/site_screenshots/start_new_trip_suggested_added_pois.png)
+
+### Maps Page
+![Maps Page](src/main/webapp/images/site_screenshots/maps_page.png)
+
+### Calendar Page
+![Calendar Page](src/main/webapp/images/site_screenshots/calendar_page.png)
+
+### Edit Page *
+![Edit Page](src/main/webapp/images/site_screenshots/calendar_page.png)
+
+### Trips Page
+![Trips Page](src/main/webapp/images/site_screenshots/trips_page.png)
+
+\* This screenshot of the Edit page is not accessible through the master branch (those changes were not merged).
 
 ## Tools and Languages Used
 TravIS was built with Java, JavaScript, and HTML/CSS with Bootstrap using the Google App Engine Platform.
