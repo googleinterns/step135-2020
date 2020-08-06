@@ -56,7 +56,7 @@ import static org.mockito.Mockito.*;
  * the `solver()` method.
  *    
  * Tests "Note" applies to: `testBasicRecursiveAlgorithmSolver()`,
- *    `testAlgorithmUniversityOpensLate()`, & `testAlgorithmReturnsEmpty()`
+ *    `testAlgorithmHoursDetermine()`, & `testAlgorithmReturnsEmpty()`
  */
 @RunWith(JUnit4.class)
 public final class TspSolverTest {
@@ -130,7 +130,7 @@ public final class TspSolverTest {
    *     `createHoursUniLateCafeShort()`
    */
   @Test
-  public void testAlgorithmUniversityOpensLate() throws IOException {
+  public void testAlgorithmHoursDetermine() throws IOException {
     GeoApiContext mockGeoApiContext = mock(GeoApiContext.class);
     TspSolver tsp = new TspSolver(mockGeoApiContext, MONDAY_INT);
     constructPoisListHostel();

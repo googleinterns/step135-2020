@@ -75,7 +75,7 @@ public class TspSolver {
   public TspSolver(GeoApiContext context, int intOfWeek) {
     if (context == null) {
       throw new IllegalArgumentException("GeoApiContext is null");
-    } else if (intOfWeek >= 0 && intOfWeek <= 6) {
+    } else if (intOfWeek < 0 || intOfWeek > 6) {
       throw new IllegalArgumentException("intOfWeek not in valid range (0-6)");
     }
 
@@ -98,7 +98,7 @@ public class TspSolver {
     } else if (center == null) {
       throw new IllegalArgumentException("center poi is null");
     } else if (center.isEmpty()) {
-      throw new IllegalArgumentException("center poi is empty string")
+      throw new IllegalArgumentException("center poi is empty string");
     }
 
     // variables used for tracking

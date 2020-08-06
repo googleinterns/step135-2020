@@ -48,8 +48,6 @@ import com.google.maps.model.Unit;
 import com.google.gson.Gson;
 import com.google.sps.Trip;
 import com.google.sps.TripDay;
-import com.google.sps.data.algorithm.TspSolver;
-import com.google.sps.data.algorithm.Tuple;
 import com.google.sps.data.Config;
 import com.google.sps.data.Event;
 import com.google.sps.TripDay;
