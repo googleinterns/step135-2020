@@ -517,6 +517,4 @@ public final class EditServletTest {
     List<Event> eventEntityList = new ArrayList<>();
     Assert.assertEquals(0, eventEntityReturn.size());
   }
-
-  // TODO (chris): Add integration tests to confirm the doGet(...) function.
 }

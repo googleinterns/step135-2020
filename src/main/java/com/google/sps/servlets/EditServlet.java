@@ -231,6 +231,8 @@ public class EditServlet extends HttpServlet {
 
   /**
    * A custom class used to hold the Trip and Event information.
+   * This class is used to create the custom JSON object to write through the
+   * response object.
    */
   private class EditTrip {
     private Trip trip;
