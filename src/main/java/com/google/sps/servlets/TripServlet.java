@@ -73,7 +73,7 @@ import javax.servlet.http.HttpServletResponse;
 public class TripServlet extends HttpServlet {
 
   // Constant for picking route
-  private static final int ROUTE_INDEX = 0;
+  public static final int ROUTE_INDEX = 0;
 
   private static final int PHOTO_SRC_SIZE = 400;
 
@@ -85,9 +85,7 @@ public class TripServlet extends HttpServlet {
   private String photoSrc;
 
   // time class constants
-  private static final int HALF_HOUR = 30;
   private static final int ONE_HOUR = 60;
-  private static final int NINETY_MINS = 90;
   private static final int SECONDS_IN_MIN = 60;
 
   // event fields for entity
