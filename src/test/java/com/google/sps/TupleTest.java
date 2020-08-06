@@ -11,9 +11,9 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-
+ 
 package com.google.sps;
-
+ 
 import com.google.sps.data.algorithm.Tuple;
 import java.time.LocalTime;
 import java.util.HashMap;
@@ -26,16 +26,16 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-
+ 
 /** 
  * Tuple class to store the answer in the TspSolver
 */
 @RunWith(JUnit4.class)
 public final class TupleTest {
-
+ 
   private static final int CURR_ANS = 1;
   private static final int TOTAL_POIS = 5;
-
+ 
   // test that constructor assigns vars properly
   @Test
   public void testConstructorNorm() {
@@ -77,7 +77,7 @@ public final class TupleTest {
     Tuple tuple = new Tuple(CURR_ANS, new ArrayList<>());
     tuple.incCurrAns(-1);
   }
-
+ 
   // test poi added not below 0
   @Test(expected = IllegalArgumentException.class)
   public void testAddPoiBelowZero() {
