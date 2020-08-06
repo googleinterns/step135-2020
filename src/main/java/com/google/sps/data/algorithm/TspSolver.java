@@ -128,10 +128,7 @@ public class TspSolver {
    * Recursive helper function that is used to solve computational part of
    * algorithm. Called in global `solver()` method
    *
-   * @param currPos represents the placeId of where the alg currently is
-   * @param numNodes total number of locations to visit (includes center)
    * @param currentTime time if path at this point were taken 
-   * @param count number of pois visited during this path
    * @param cost Tuple of current path (time cost, List of pois)
    * @param ans the current best solution found
    * @param array of which pois have been visited by this path
@@ -161,9 +158,9 @@ public class TspSolver {
      * count by 1 and update (int) and (List) value of cost
      */
     for (int i = 0; i < numNodes; i++) {
-      // set open boolean and time to add to currenTime
-      boolean isOpen = travelPlusWaitTime(currentTime, i, currPos) != -1;
+      // set ime to add to currentTime and isOpen boolean
       int timeToAdd = travelPlusWaitTime(currentTime, i, currPos);
+      boolean isOpen = timeToAdd != -1;
       
       // if node is unvisited and greater than 0, i.e. not the same node
       if (!visited[i] && timeMatrix[currPos][i] > 0 && isOpen) {
