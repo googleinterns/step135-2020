@@ -77,7 +77,7 @@ public final class TupleTest {
     Tuple tuple = new Tuple(CURR_ANS, new ArrayList<>());
     tuple.incCurrAns(-1);
   }
-
+  
   // test poi added not below 0
   @Test(expected = IllegalArgumentException.class)
   public void testAddPoiBelowZero() {
@@ -91,7 +91,7 @@ public final class TupleTest {
     Tuple tuple = new Tuple(CURR_ANS, new ArrayList<>());
     tuple.addIntPoiToPath(6, TOTAL_POIS);
   }
-  
+
   // test add pois to path
   @Test
   public void testAddPoisToPath() {
@@ -99,7 +99,7 @@ public final class TupleTest {
     List<Integer> expected = new ArrayList<>();
     expected.add(1);
     expected.add(2);
-
+  
     tuple.addIntPoiToPath(1, TOTAL_POIS);
     tuple.addIntPoiToPath(2, TOTAL_POIS);
 
