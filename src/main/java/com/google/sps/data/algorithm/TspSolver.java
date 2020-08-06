@@ -59,7 +59,7 @@ public class TspSolver {
 
   // variables to create before alg
   int[][] timeMatrix;
-  HashMap<Integer, String> intToPlaceId;
+  Map<Integer, String> intToPlaceId;
   HashMap<Integer, OpeningHours.Period> openHours;
   int intOfWeek; // Sunday is 0, Saturday is 6
 
@@ -85,7 +85,9 @@ public class TspSolver {
   }
 
   /**
-   * Solves the problem, initializes various variables needed to solve, sets finalAnswer
+   * Finds the optimal path respecting open hours for the given POIs. After 
+   * this method has returned the optimal path can be retrieved with 
+   * getFinalAnswer() method
    * 
    * @param center central location
    * @param pois list of pois to visit
@@ -102,13 +104,13 @@ public class TspSolver {
     }
 
     // variables used for tracking
-    int currPos = START_POS;
-    int numNodes = pois.size() + 1; // total nodes: #locations + center
     LocalTime currentTime = START_TIME;
-    int count = START_COUNT;
-    Tuple cost = new Tuple(START_COST, new ArrayList<>());
+    List<Integer> startList = new ArrayList<>();
+    startList.add(START_POS);
+    Tuple cost = new Tuple(START_COST, startList);
     Tuple ans = new Tuple(START_ANS, new ArrayList<>());
-    boolean[] visited = new boolean[numNodes]; // sets values to "false"  
+    // total nodes: #locations + center & sets values to "false"
+    boolean[] visited = new boolean[pois.size() + 1];
 
     // call function to set timeMatrix, intToPlaceId, & openHours
     createTimeMatrix(center, pois);
@@ -118,7 +120,7 @@ public class TspSolver {
     visited[0] = true;
 
     // call recursive helper fuction to get final Answer
-    this.finalAnswer = solverHelper(currPos, numNodes, currentTime, count, 
+    this.finalAnswer = solverHelper(currentTime, 
         cost, ans, visited);
   }
 
@@ -134,14 +136,18 @@ public class TspSolver {
    * @param ans the current best solution found
    * @param array of which pois have been visited by this path
    */
-  public Tuple solverHelper(int currPos, int numNodes, LocalTime currentTime, 
-      int count, Tuple cost, Tuple ans, boolean[] visited) {
+  public Tuple solverHelper( LocalTime currentTime, 
+      Tuple cost, Tuple ans, boolean[] visited) {
+
+    int count = cost.getCurrPath().size();
+    int currPos = cost.getCurrPath().get(count-1);
+    int numNodes = visited.length;
     /**
      * If last node is reached and shares an edge w/ start node
      * Calculate min of cost and currAns
      * return and keep traversing the graph/matrix
      */
-    if ((count == numNodes-1) && timeMatrix[currPos][0] > 0) {
+    if ((count == numNodes) && timeMatrix[currPos][0] > 0) {
       if (ans.getCurrAns() < cost.getCurrAns() + timeMatrix[currPos][0]) {
         return ans;
       } else {
@@ -156,10 +162,8 @@ public class TspSolver {
      */
     for (int i = 0; i < numNodes; i++) {
       // set open boolean and time to add to currenTime
-      boolean isOpen = (boolean) checkIsOpenSetTime(currentTime, i,
-          currPos).get(0);
-      int timeToAdd = (int) checkIsOpenSetTime(currentTime, i,
-          currPos).get(1);
+      boolean isOpen = travelPlusWaitTime(currentTime, i, currPos) != -1;
+      int timeToAdd = travelPlusWaitTime(currentTime, i, currPos);
       
       // if node is unvisited and greater than 0, i.e. not the same node
       if (!visited[i] && timeMatrix[currPos][i] > 0 && isOpen) {
@@ -176,7 +180,7 @@ public class TspSolver {
         Tuple updateTuple = new Tuple(newTupleCost, updatePath);
 
         // recursive call
-        ans = solverHelper(i, numNodes, timePostUpdate, count + 1, 
+        ans = solverHelper(timePostUpdate,
             updateTuple, ans, visited);
 
         // mark ith node as unvisited
@@ -193,26 +197,24 @@ public class TspSolver {
    * 3. Arrival after closed 
    * 4. Open Hours are not available
    * 
-   * @return List<Object> of length 2 
-   *     index 0: (boolean) -- cases 1, 2, 4: true
-   *                           case 3: false
-   *     index 1: (int) --     cases 1, 2, 4: amount of time added by action
-   *                           case 3: Integer.MAX_VALUE
+   * @return int of timeToAdd or (-1) if location is not open:
+   *      - cases 1, 2, 4: amount of time added by action
+   *      - case 3: -1
+   * 
    * Details per case:
-   * Case 1: add the amount of time till it opens plus time spent (one hour)
-   * Case 2 & 4: add travel time plus time spent (one hour)
-   * Case 3: add Integer.MAX_VALUE
+   * Case 1: the amount of time till it opens plus time spent (one hour)
+   * Case 2 & 4: travel time plus time spent (one hour)
+   * Case 3: (-1) to signify after closing
    */
-  private List<Object> checkIsOpenSetTime(LocalTime currentTime, int i,
-      int currPos) {
+  private int travelPlusWaitTime(LocalTime departureTime, int targetPoi,
+      int departPoi) {
     // list of length 2 to return
     List<Object> output = new ArrayList<>();
 
-    boolean isOpen; // boolean to be set and added at index 0
-    int timeAdded; // int to be set and added at index 1
-      if (openHours.get(i) != null) {
-        LocalTime open = openHours.get(i).open.time;
-        LocalTime close = openHours.get(i).close.time;
+    int timeAdded; // int to be set returned
+      if (openHours.get(targetPoi) != null) {
+        LocalTime open = openHours.get(targetPoi).open.time;
+        LocalTime close = openHours.get(targetPoi).close.time;
         
         // edge case where close time is next day at 0:00
         if (close.compareTo(LocalTime.parse("00:00")) == 0) {
@@ -222,33 +224,27 @@ public class TspSolver {
         }  
 
         // set time after travelTime
-        LocalTime afterDrive = currentTime.plusMinutes(timeMatrix[currPos][i]);
+        LocalTime afterDrive = departureTime.plusMinutes(timeMatrix[departPoi][targetPoi]);
 
         /**
          * check if arrival time is before open time, during,
          * or after closing time
          */ 
         if (afterDrive.compareTo(open) < 0) {
-          isOpen = true;
           timeAdded = (int) afterDrive.until(open, ChronoUnit.MINUTES) + 
-              timeMatrix[currPos][i] + HOUR;
+              timeMatrix[departPoi][targetPoi] + HOUR;
         } else if ((afterDrive.compareTo(open) >= 0) && 
             (afterDrive.compareTo(close) <= 0)) {
-          isOpen = true;
-          timeAdded = timeMatrix[currPos][i] + HOUR;
+          timeAdded = timeMatrix[departPoi][targetPoi] + HOUR;
         } else {
-          isOpen = false;
-          timeAdded = Integer.MAX_VALUE;
+          timeAdded = -1;
         }
       } else {
-        isOpen = true;
-        timeAdded = timeMatrix[currPos][i] + HOUR;
+        timeAdded = timeMatrix[departPoi][targetPoi] + HOUR;
       }
-
-      // add calculated values and return output
-      output.add(isOpen);
-      output.add(timeAdded);
-      return output;
+      
+      // return timeAdded
+      return timeAdded;
   }
 
   /**
@@ -328,13 +324,9 @@ public class TspSolver {
    * @param index index to put result in OpenHours Map
    */
   private void checkDayIsPresentInHours(OpeningHours openingHours, int index) {
-      int adjustedWeekIndex;
       // periods is numbered Sunday - Saturday, WeekdayText is Monday - Sunday
-      if (intOfWeek == 0) {
-        adjustedWeekIndex = 6;
-      } else {
-        adjustedWeekIndex = intOfWeek - 1;
-      }
+      int adjustedWeekIndex = (intOfWeek + 6) % 7;
+
       // string representation of day searched
       String desiredDayString = WEEKDAYS[adjustedWeekIndex];
       for (int i = 0; i < openingHours.periods.length; i++) {
@@ -378,13 +370,13 @@ public class TspSolver {
   }
 
   /**
-   * Getter functions
+   * Getter functions. All but `getFinalAnswer()` are used for testing
    */
   public int[][] getTimeMatrix() {
     return this.timeMatrix;
   }
 
-  public HashMap<Integer, String> getPlaceIdToInt() {
+  public Map<Integer, String> getPlaceIdToInt() {
     return this.intToPlaceId;
   }
 

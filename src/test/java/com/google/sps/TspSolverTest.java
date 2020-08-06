@@ -70,7 +70,6 @@ public final class TspSolverTest {
 
   // class constants for recursive setup
   private static final int START_POS = 0;
-  private static final int START_COUNT = 0;
   private static final int START_COST = 0;
   private static final int START_ANS = Integer.MAX_VALUE;
   private static final LocalTime START_TIME = LocalTime.of(10, 0);
@@ -95,22 +94,23 @@ public final class TspSolverTest {
     tsp.setOpenHours(createRealOpenHoursHostel());
     tsp.setIntToPlaceId(createIntToPlaceIdHostel());
 
-    //set variables needed for recursive tracking
-    int currPos = START_POS;
-    int numNodes = pois.size() + 1; // total nodes: #locations & center
+    // variables used for tracking
     LocalTime currentTime = START_TIME;
-    int count = START_COUNT;
-    Tuple cost = new Tuple(START_COST, new ArrayList<>());
+    List<Integer> startList = new ArrayList<>();
+    startList.add(START_POS);
+    Tuple cost = new Tuple(START_COST, startList);
     Tuple ans = new Tuple(START_ANS, new ArrayList<>());
-    boolean[] visited = new boolean[numNodes]; // sets values to "false"  
+    // total nodes: #locations + center & sets values to "false"
+    boolean[] visited = new boolean[pois.size() + 1]; 
 
     // set central visited node to true
     visited[0] = true;
-    Tuple finalAnswer = tsp.solverHelper(currPos, numNodes, currentTime, count, cost, ans, visited);
+    Tuple finalAnswer = tsp.solverHelper(currentTime, cost, ans, visited);
     
     // create expected variables
     int expectedCost = 58;
     List<Integer> expectedPath = new ArrayList<>();
+    expectedPath.add(0);
     expectedPath.add(3);
     expectedPath.add(2);
     expectedPath.add(1);
@@ -140,26 +140,26 @@ public final class TspSolverTest {
     tsp.setOpenHours(createHoursUniLateCafeShort());
     tsp.setIntToPlaceId(createIntToPlaceIdHostel());
 
-    //set variables needed for recursive tracking
-    int currPos = START_POS;
-    int numNodes = pois.size() + 1; // total nodes: #locations & center
+    // variables used for tracking
     LocalTime currentTime = START_TIME;
-    int count = START_COUNT;
-    Tuple cost = new Tuple(START_COST, new ArrayList<>());
+    List<Integer> startList = new ArrayList<>();
+    startList.add(START_POS);
+    Tuple cost = new Tuple(START_COST, startList);
     Tuple ans = new Tuple(START_ANS, new ArrayList<>());
-    boolean[] visited = new boolean[numNodes]; // sets values to "false"  
+    // total nodes: #locations + center & sets values to "false"
+    boolean[] visited = new boolean[pois.size() + 1]; 
 
     // set central visited node to true
     visited[0] = true;
-    Tuple finalAnswer = tsp.solverHelper(currPos, numNodes, currentTime, count, cost, ans, visited);
-    
+    Tuple finalAnswer = tsp.solverHelper(currentTime, cost, ans, visited);
+
     // create expected variables
     int expectedCost = 257;
     List<Integer> expectedPath = new ArrayList<>();
+    expectedPath.add(0);
     expectedPath.add(1);
     expectedPath.add(2);
     expectedPath.add(3);
-    System.out.println(finalAnswer.getCurrAns());
 
     Assert.assertEquals(expectedCost, finalAnswer.getCurrAns());
     Assert.assertEquals(expectedPath, finalAnswer.getCurrPath());
@@ -183,23 +183,22 @@ public final class TspSolverTest {
     tsp.setOpenHours(createImpossibleHours());
     tsp.setIntToPlaceId(createIntToPlaceIdHostel());
 
-    //set variables needed for recursive tracking
-    int currPos = START_POS;
-    int numNodes = pois.size() + 1; // total nodes: #locations & center
+    // variables used for tracking
     LocalTime currentTime = START_TIME;
-    int count = START_COUNT;
-    Tuple cost = new Tuple(START_COST, new ArrayList<>());
+    List<Integer> startList = new ArrayList<>();
+    startList.add(START_POS);
+    Tuple cost = new Tuple(START_COST, startList);
     Tuple ans = new Tuple(START_ANS, new ArrayList<>());
-    boolean[] visited = new boolean[numNodes]; // sets values to "false"  
+    // total nodes: #locations + center & sets values to "false"
+    boolean[] visited = new boolean[pois.size() + 1];
 
     // set central visited node to true
     visited[0] = true;
-    Tuple finalAnswer = tsp.solverHelper(currPos, numNodes, currentTime, count, cost, ans, visited);
+    Tuple finalAnswer = tsp.solverHelper(currentTime, cost, ans, visited);
     
     // create expected variables
     int expectedCost = Integer.MAX_VALUE;
     List<Integer> expectedPath = new ArrayList<>();
-    System.out.println(finalAnswer.getCurrAns());
 
     Assert.assertEquals(expectedCost, finalAnswer.getCurrAns());
     Assert.assertEquals(expectedPath, finalAnswer.getCurrPath());
