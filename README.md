@@ -32,7 +32,7 @@ Note: All of the features above require the user to sign in first.
 ![Calendar Page](src/main/webapp/images/site_screenshots/calendar_page.png)
 
 ### Edit Page *
-![Edit Page](src/main/webapp/images/site_screenshots/calendar_page.png)
+![Edit Page](src/main/webapp/images/site_screenshots/edit_page.png)
 
 ### Trips Page
 ![Trips Page](src/main/webapp/images/site_screenshots/trips_page.png)
