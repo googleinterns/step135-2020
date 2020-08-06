@@ -35,7 +35,11 @@ import java.util.Map;
 
 /**
  * Solves the traveling Salesman problem by backtracking using DFS
- * Checks opening hours for locations visited
+ * Ensures most efficient route taking into account Opening Hours.
+ * 
+ * Note: `setIntToPlaceId()`, `setOpenHours()`, & `setTimeMatrix()` are used
+ *    only for testing purposes and should be removed after mocking of Google 
+ *    API objects is implemented in TspSolverTest.java
  */
 public class TspSolver {
 
@@ -63,16 +67,22 @@ public class TspSolver {
   Tuple finalAnswer;
  
   /**
-   * Initializes context and intOfWeek, must call solver then getFinalAnswer(). Done for testing purposes
+   * Initializes context and intOfWeek, must call solver then getFinalAnswer(). 
    * 
    * @param context geoContext from TripServlet
-   * @param intOfWeek day of week as an int (Sunday:0 through Saturday:6) from TripDay
+   * @param intOfWeek day of week as an int (Sunday:0 - Saturday:6) from TripDay
    */
   public TspSolver(GeoApiContext context, int intOfWeek) {
+    if (context == null) {
+      throw new IllegalArgumentException("GeoApiContext is null");
+    } else if (intOfWeek >= 0 && intOfWeek <= 6) {
+      throw new IllegalArgumentException("intOfWeek not in valid range (0-6)");
+    }
+
+
     // set class constants from TripServlet
     this.context = context;
     this.intOfWeek = intOfWeek;
-    System.out.println(intOfWeek);
   }
 
   /**
@@ -82,34 +92,57 @@ public class TspSolver {
    * @param pois list of pois to visit
    */
   public void solver(String center, List<String> pois) throws IOException {
+    if (pois == null) {
+      throw new IllegalArgumentException("pois input list is null");
+    } else if (pois.isEmpty()) {
+      throw new IllegalArgumentException("pois input list is empty");
+    } else if (center == null) {
+      throw new IllegalArgumentException("center poi is null");
+    } else if (center.isEmpty()) {
+      throw new IllegalArgumentException("center poi is empty string")
+    }
+
     // variables used for tracking
     int currPos = START_POS;
-    int numNodes = pois.size() + 1; // total nodes: #locations & center
+    int numNodes = pois.size() + 1; // total nodes: #locations + center
     LocalTime currentTime = START_TIME;
     int count = START_COUNT;
     Tuple cost = new Tuple(START_COST, new ArrayList<>());
     Tuple ans = new Tuple(START_ANS, new ArrayList<>());
     boolean[] visited = new boolean[numNodes]; // sets values to "false"  
 
-    // TODO: call functions to set these values and the solver
+    // call function to set timeMatrix, intToPlaceId, & openHours
     createTimeMatrix(center, pois);
     populateIntMapAndOpenHours(center, pois);
 
-    
+    // set central visited node to visted
     visited[0] = true;
-    this.finalAnswer = solverHelper(currPos, numNodes, currentTime, count, cost, ans, visited);
+
+    // call recursive helper fuction to get final Answer
+    this.finalAnswer = solverHelper(currPos, numNodes, currentTime, count, 
+        cost, ans, visited);
   }
 
+  /**
+   * Recursive helper function that is used to solve computational part of
+   * algorithm. Called in global `solver()` method
+   *
+   * @param currPos represents the placeId of where the alg currently is
+   * @param numNodes total number of locations to visit (includes center)
+   * @param currentTime time if path at this point were taken 
+   * @param count number of pois visited during this path
+   * @param cost Tuple of current path (time cost, List of pois)
+   * @param ans the current best solution found
+   * @param array of which pois have been visited by this path
+   */
   public Tuple solverHelper(int currPos, int numNodes, LocalTime currentTime, 
       int count, Tuple cost, Tuple ans, boolean[] visited) {
-    System.out.println("\n" + "currCost: " + cost.toString() + " currCount: " + count);
     /**
      * If last node is reached and shares an edge w/ start node
      * Calculate min of cost and currAns
      * return and keep traversing the graph/matrix
      */
     if ((count == numNodes-1) && timeMatrix[currPos][0] > 0) {
-      System.out.println("in return statement");
       if (ans.getCurrAns() < cost.getCurrAns() + timeMatrix[currPos][0]) {
         return ans;
       } else {
@@ -118,36 +151,36 @@ public class TspSolver {
       }
     }
 
+    /**
+     * Backtracking Step: loop through the time Matrix from currPos, increase
+     * count by 1 and update (int) and (List) value of cost
+     */
     for (int i = 0; i < numNodes; i++) {
-
+      // set open boolean and time to add to currenTime
       boolean isOpen = (boolean) checkIsOpenSetTime(currentTime, i,
           currPos).get(0);
       int timeToAdd = (int) checkIsOpenSetTime(currentTime, i,
           currPos).get(1);
       
-      System.err.println("Open: " + isOpen);
-      System.err.println("visited node: " + visited[i]);
-      System.err.println("currPos: " + currPos + " i: " + i + " timeMat: " + timeMatrix[currPos][i]);
-      System.err.println("placeId: " + intToPlaceId.get(i));
-      System.err.println("CurrentTime: " + currentTime.toString());
-      System.err.println("openHours: " + openHours.get(i) + "\n");
-
       // if node is unvisited and greater than 0, i.e. not the same node
       if (!visited[i] && timeMatrix[currPos][i] > 0 && isOpen) {
-        System.err.println("in Here");
+        // mark ith node as visited
         visited[i] = true;
+
+        // update cost
         LocalTime timePostUpdate = currentTime.plusMinutes((long) timeToAdd);
-        //System.err.println("currenTime: in if statement " + timePostUpdate);
         List<Integer> costPath = cost.getCurrPath();
         List<Integer> updatePath = new ArrayList<>();
         updatePath.addAll(costPath);
         updatePath.add(i);
         int newTupleCost = cost.getCurrAns() + timeToAdd - HOUR;
         Tuple updateTuple = new Tuple(newTupleCost, updatePath);
-        System.out.println("recursive call next");
+
+        // recursive call
         ans = solverHelper(i, numNodes, timePostUpdate, count + 1, 
             updateTuple, ans, visited);
-        System.out.println("moveing on");
+
+        // mark ith node as unvisited
         visited[i] = false;
       }
     }
@@ -155,24 +188,29 @@ public class TspSolver {
   }
 
   /**
-   * Check if a location is open when traveled there. Options are:
-   * 1. Arrival before open time: 
+   * Check if a location is or will be open. Possibilities:
+   * 1. Arrival before open time 
    * 2. Arrival during open hours
    * 3. Arrival after closed 
    * 4. Open Hours are not available
    * 
-   * @return List<Object> at index 0 will return a boolean, index 1
-   * will return the amount of time to add to current time. 
-   * 1. If before open time then add the amount of time till it opens
-   *   plus time spent (one hour).
-   * 2. If during opening hours or open hours are not available return 
-   *  travel time plus one hour
-   * 2. If arrival after closed return [false, 0]
+   * @return List<Object> of length 2 
+   *     index 0: (boolean) -- cases 1, 2, 4: true
+   *                           case 3: false
+   *     index 1: (int) --     cases 1, 2, 4: amount of time added by action
+   *                           case 3: Integer.MAX_VALUE
+   * Details per case:
+   * Case 1: add the amount of time till it opens plus time spent (one hour)
+   * Case 2 & 4: add travel time plus time spent (one hour)
+   * Case 3: add Integer.MAX_VALUE
    */
   private List<Object> checkIsOpenSetTime(LocalTime currentTime, int i,
       int currPos) {
+    // list of length 2 to return
     List<Object> output = new ArrayList<>();
-    boolean isOpen;
+
+    boolean isOpen; // boolean to be set and added at index 0
+    int timeAdded; // int to be set and added at index 1
       if (openHours.get(i) != null) {
         LocalTime open = openHours.get(i).open.time;
         LocalTime close = openHours.get(i).close.time;
@@ -192,52 +230,49 @@ public class TspSolver {
          * or after closing time
          */ 
         if (afterDrive.compareTo(open) < 0) {
-          int timeTillOpen = (int) afterDrive.until(open, ChronoUnit.MINUTES);
-          output.add(true);
-          output.add(timeTillOpen + timeMatrix[currPos][i] + HOUR);
-        } else if (isOpen = (afterDrive.compareTo(open) >= 0) && 
+          isOpen = true;
+          timeAdded = (int) afterDrive.until(open, ChronoUnit.MINUTES) + 
+              timeMatrix[currPos][i] + HOUR;
+        } else if ((afterDrive.compareTo(open) >= 0) && 
             (afterDrive.compareTo(close) <= 0)) {
-          output.add(true);
-          output.add(timeMatrix[currPos][i] + HOUR);
+          isOpen = true;
+          timeAdded = timeMatrix[currPos][i] + HOUR;
         } else {
-          output.add(false);
-          output.add(0);
+          isOpen = false;
+          timeAdded = Integer.MAX_VALUE;
         }
       } else {
-        output.add(true);
-        output.add(timeMatrix[currPos][i] + HOUR);
+        isOpen = true;
+        timeAdded = timeMatrix[currPos][i] + HOUR;
       }
 
+      // add calculated values and return output
+      output.add(isOpen);
+      output.add(timeAdded);
       return output;
   }
 
   /**
-   * Create time Matrix using DirectionsRequest
+   * Create time Matrix using DirectionsRequests (DirectionsAPI)
    * 
    * @param center central location
    * @param pois list of pois other than central location
    */
   private void createTimeMatrix(String center, List<String> pois) 
       throws IOException {
-    if (pois == null) {
-      throw new IllegalArgumentException("Pois input list is null");
-    } else if (pois.isEmpty()) {
-      throw new IllegalArgumentException("Pois input list is empty");
-    } else if (center == null) {
-      throw new IllegalArgumentException("center poi is null");
-    }
-    // TODO
 
+    // create allPois to hold `center` and all other `pois`
     List<String> allPois = new ArrayList<>();
     allPois.add(center);
     allPois.addAll(pois);
 
+    // create timeMatrix and fill diagonal with 0's
     timeMatrix = new int[allPois.size()][allPois.size()];
-    // fill timeMatrix diagonal with 0's
     for (int i = 0; i < allPois.size(); i++) {
       timeMatrix[i][i] = 0;
     }
 
+    // fill (i, j) and (j, i) indices with travel time from i to j
     for (int i = 0; i < allPois.size(); i++) {
       for (int j = i; j < allPois.size(); j++) {
         int travelTime = getTravelTimeMins(allPois.get(i), allPois.get(j));
@@ -249,7 +284,9 @@ public class TspSolver {
 
   /**
    * Populate placeIdToInt and call setOpenHours for each placeId
-
+   *
+   * @param center central location
+   * @param pois list of pois to visit
    */ 
   private void populateIntMapAndOpenHours(String center, 
       List<String> pois) throws IOException{
@@ -265,9 +302,8 @@ public class TspSolver {
   }
 
   /**
-   * Sets the openHours for each placeId (as int), as an OpeningHours.Period[]
-   * If can't find opening hours set to be null (this is handled as all day by 
-   * solver)
+   * Sets the openHours for each placeId (as int), as an OpeningHours.Period
+   * If can't find opening hours set to be null (represents open all day)
    * 
    * @param placeId placeId to search openHours for
    * @param index index to put the openHours in the HashMap
@@ -285,8 +321,12 @@ public class TspSolver {
   }
 
   /**
-   * if day in openingHours array is the same as the day searched for 
-   * check if open and close time are not null
+   * If day in openingHours array is the same as the day searched for 
+   * check if open and close time are not null. If no hours found put null
+   * into openHours (represents open all day)
+   * 
+   * @param openingHours openHours for placeId on desired day
+   * @param index index to put result in OpenHours Map
    */
   private void checkDayIsPresentInHours(OpeningHours openingHours, int index) {
       int adjustedWeekIndex;
@@ -338,7 +378,9 @@ public class TspSolver {
     return travelTime;
   }
 
-  // getter functions
+  /**
+   * Getter functions
+   */
   public int[][] getTimeMatrix() {
     return this.timeMatrix;
   }
@@ -356,7 +398,7 @@ public class TspSolver {
   }
 
   /**
-   * these functions are exclusively used for testing the recursive part of 
+   * These functions are exclusively used for testing the recursive part of 
    * the algorithm
    */
   public void setTimeMatrix(int[][] timeMatrix) {
