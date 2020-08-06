@@ -57,10 +57,6 @@ public final class EditServletTest {
   public static final String EMAIL = "testemail@gmail.com";
 
   // Constants to represent different TripDay attributes.
-  private static final String INPUT_DESTINATION = 
-    "Space Needle, Broad Street, Seattle, WA, USA";
-  private static final String INPUT_DESTINATION_2 = 
-    "Woodland Park Zoo, Phinney Avenue North, Seattle, WA, USA";
   private static final String INPUT_DATE = "2020-08-22";
   private static final String INPUT_DATE_2 = "2020-08-23";
 
@@ -91,13 +87,9 @@ public final class EditServletTest {
       new LocalServiceTestHelper(new LocalDatastoreServiceTestConfig());
 
   @Before
-  public void initEditServlet() {
-    editServlet = new EditServlet();
-  }
-
-  @Before
   public void setUp() {
     helper.setUp();
+    editServlet = new EditServlet();
   }
 
   @After
@@ -302,9 +294,9 @@ public final class EditServletTest {
 
     // Add a two TripDays to Datastore, with the later date TripDay first.
     Entity tripDayEntity1 = createTripDayEntity(datastore, tripEntity, 
-      INPUT_DESTINATION, INPUT_DATE_2);
+      SPACE_NEEDLE_ADDRESS, INPUT_DATE_2);
     Entity tripDayEntity2 = createTripDayEntity(datastore, tripEntity, 
-      INPUT_DESTINATION_2, INPUT_DATE);
+      WOODLAND_ADDRESS, INPUT_DATE);
 
     /**
      * Run getTripDaysFromTrip(...), with the Trip and TripDay present in 
@@ -329,7 +321,7 @@ public final class EditServletTest {
 
     // Add a one TripDay to Datastore.
     Entity tripDayEntity1 = createTripDayEntity(datastore, tripEntity, 
-      INPUT_DESTINATION, INPUT_DATE_2);
+      SPACE_NEEDLE_ADDRESS, INPUT_DATE_2);
 
     /**
      * Run getTripDaysFromTrip(...), with the Trip and TripDay present in 
@@ -372,7 +364,7 @@ public final class EditServletTest {
 
     // Add a one TripDay to Datastore without the Trip Entity Key.
     Entity tripDayEntity1 = createTripDayEntityNoTripAncestor(datastore, 
-      INPUT_DESTINATION, INPUT_DATE_2);
+      SPACE_NEEDLE_ADDRESS, INPUT_DATE_2);
 
     /**
      * Run getTripDaysFromTrip(...), with the Trip and TripDay present in 
@@ -395,7 +387,7 @@ public final class EditServletTest {
 
     // Add a one TripDay to Datastore without the Trip Entity Key.
     Entity tripDayEntity1 = createTripDayEntityNoTripAncestor(datastore, 
-      INPUT_DESTINATION, INPUT_DATE_2);
+      SPACE_NEEDLE_ADDRESS, INPUT_DATE_2);
 
     /**
      * Run getTripDaysFromTrip(...), with the Trip and TripDay present in 
@@ -414,7 +406,7 @@ public final class EditServletTest {
     // Add a TripDay to Datastore.
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
     Entity tripDayEntity = createTripDayEntityNoTripAncestor(datastore, 
-      INPUT_DESTINATION, INPUT_DATE_2);
+      SPACE_NEEDLE_ADDRESS, INPUT_DATE_2);
 
     // Add two Events to Datastore, in backwards order.
     Event e1 = new Event(SPACE_NEEDLE, SPACE_NEEDLE_ADDRESS, SPACE_NEEDLE_PLACE_ID,
@@ -451,7 +443,7 @@ public final class EditServletTest {
     // Add a TripDay to Datastore.
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
     Entity tripDayEntity = createTripDayEntityNoTripAncestor(datastore, 
-      INPUT_DESTINATION, INPUT_DATE_2);
+      SPACE_NEEDLE_ADDRESS, INPUT_DATE_2);
 
     // Add one Event to Datastore.
     Event e1 = new Event(SPACE_NEEDLE, SPACE_NEEDLE_ADDRESS, SPACE_NEEDLE_PLACE_ID, 
@@ -479,7 +471,7 @@ public final class EditServletTest {
     // Add a TripDay to Datastore.
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
     Entity tripDayEntity = createTripDayEntityNoTripAncestor(datastore, 
-      INPUT_DESTINATION, INPUT_DATE_2);
+      SPACE_NEEDLE_ADDRESS, INPUT_DATE_2);
 
     /**
      * Run getEventsFromTripDay(...), with the TripDay and Events present in 
@@ -498,7 +490,7 @@ public final class EditServletTest {
     // Add a TripDay to Datastore.
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
     Entity tripDayEntity = createTripDayEntityNoTripAncestor(datastore, 
-      INPUT_DESTINATION, INPUT_DATE_2);
+      SPACE_NEEDLE_ADDRESS, INPUT_DATE_2);
 
     // Add one Event to Datastore.
     Event e1 = new Event(SPACE_NEEDLE, SPACE_NEEDLE_ADDRESS, SPACE_NEEDLE_PLACE_ID, 

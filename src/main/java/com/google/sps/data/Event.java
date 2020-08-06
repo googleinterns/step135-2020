@@ -177,6 +177,7 @@ public class Event implements Comparable<Event> {
 
   @Override
   public int compareTo(Event event) {
+    // Events are sorted by start time.
     return this.getStartTime().compareTo(event.getStartTime());
   }
 }

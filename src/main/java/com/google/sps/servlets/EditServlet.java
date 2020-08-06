@@ -119,7 +119,10 @@ public class EditServlet extends HttpServlet {
     for (Entity tripDay : tripDayList) {
       List<Event> eventList = getEventsFromTripDay(tripDay.getKey(), datastore);
 
-      // Create the dateString and add the event list.
+      /**
+       * Create the dateString and add the event list. The dateString is 
+       * formatted as "DAY_OF_WEEK, MONTH/DAY/YEAR".
+       */
       LocalDate localDate = LocalDate.parse((String) tripDay.getProperty(TripDay.DATE));
       String dateString = 
         CaseFormat.UPPER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, localDate.getDayOfWeek().toString())
@@ -167,7 +170,8 @@ public class EditServlet extends HttpServlet {
 
   /**
    * Get the TripDay Entity objects from datastore that are under the passed-in
-   * Trip Entity Key.
+   * Trip Entity Key. The returned list is guaranteed to be in ascending date
+   * order.
    * 
    * @param tripKey The Key of the trip used as an ancestor of the TripDay objects.
    * @param datastore The datastore object to use when searching for the TripDay objects.
