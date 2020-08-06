@@ -108,22 +108,138 @@ public final class EditServletTest {
     Assert.assertTrue(true);
   }
 
+  /**
+   * HELPER METHODS FOR TESTING.
+   */
+
+  /**
+   * Helper method to create a User Entity and add it to Datastore.
+   *
+   * @param datastore The Datastore object that places the User in Datastore.
+   * @param email The user email.
+   * @return The User Entity that was placed in Datastore.
+   */
+  public Entity createUserEntity(DatastoreService datastore, String email) {
+
+    Entity userEntity = new Entity(User.USER);
+    userEntity.setProperty(User.USER_EMAIL, email);
+    datastore.put(userEntity);
+    return userEntity;
+  }
+
+  /**
+   * Helper method to create a Trip Entity under the provided User Entity and
+   * add it to Datastore.
+   *
+   * @param datastore The Datastore object that places the Trip in Datastore.
+   * @param userEntity The User Entity that the Trip Entity will be stored under.
+   * @param tripName The name of the trip.
+   * @param destinationName The name of the trip destination.
+   * @param imageSrc The String URL of the image that represents the trip.
+   * @param tripStartDate The String start date of the trip. Must be in 
+      "yyyy-mm-dd" format.
+   * @param tripEndDate The String start end of the trip. Must be in 
+      "yyyy-mm-dd" format.
+   * @return The Trip Entity that was placed in Datastore.
+   */
+  public Entity createTripEntity(DatastoreService datastore, Entity userEntity, 
+    String tripName, String destinationName, String imageSrc, 
+    String tripStartDate, String tripEndDate) {
+
+    Entity tripEntity = new Entity(Trip.TRIP, userEntity.getKey());
+    tripEntity.setProperty(Trip.TRIP_NAME, tripName);
+    tripEntity.setProperty(Trip.DESTINATION_NAME, destinationName);
+    tripEntity.setProperty(Trip.IMAGE_SRC, imageSrc);
+    tripEntity.setProperty(Trip.START_DATE, tripStartDate);
+    tripEntity.setProperty(Trip.END_DATE, tripEndDate);
+    datastore.put(tripEntity);
+    return tripEntity;
+  }
+
+    /**
+   * Helper method to create a Trip Entity, NOT under any User Entity, and
+   * add it to Datastore.
+   *
+   * @param datastore The Datastore object that places the Trip in Datastore.
+   * @param tripName The name of the trip.
+   * @param destinationName The name of the trip destination.
+   * @param imageSrc The String URL of the image that represents the trip.
+   * @param tripStartDate The String start date of the trip. Must be in 
+      "yyyy-mm-dd" format.
+   * @param tripEndDate The String start end of the trip. Must be in 
+      "yyyy-mm-dd" format.
+   * @return The Trip Entity that was placed in Datastore.
+   */
+  public Entity createTripEntityNoUserAncestor(DatastoreService datastore, 
+    String tripName, String destinationName, String imageSrc, 
+    String tripStartDate, String tripEndDate) {
+
+    Entity tripEntity = new Entity(Trip.TRIP);
+    tripEntity.setProperty(Trip.TRIP_NAME, tripName);
+    tripEntity.setProperty(Trip.DESTINATION_NAME, destinationName);
+    tripEntity.setProperty(Trip.IMAGE_SRC, imageSrc);
+    tripEntity.setProperty(Trip.START_DATE, tripStartDate);
+    tripEntity.setProperty(Trip.END_DATE, tripEndDate);
+    datastore.put(tripEntity);
+    return tripEntity;
+  }
+
+  /**
+   * Helper method to create a TripDay Entity under the provided Trip Entity and
+   * add it to Datastore.
+   *
+   * @param datastore The Datastore object that places the TripDay in Datastore.
+   * @param tripEntity The Trip Entity that the TripDay Entity will be stored under.
+   * @param inputDestination The origin and destination for that TripDay.
+   * @param inputDate The String start date of the TripDay. Must be in 
+      "yyyy-mm-dd" format.
+   * @return The TripDay Entity that was placed in Datastore.
+   */
+  public Entity createTripDayEntity(DatastoreService datastore, Entity tripEntity, 
+    String inputDestination, String inputDate) {
+
+    Entity tripDayEntity = new Entity(TripDay.QUERY_STRING, tripEntity.getKey());
+    tripDayEntity.setProperty("origin", inputDestination);
+    tripDayEntity.setProperty("destination", inputDestination);
+    tripDayEntity.setProperty("date", inputDate);
+    datastore.put(tripDayEntity);
+    return tripDayEntity;
+  }
+
+  /**
+   * Helper method to create a TripDay Entity, NOT under any Trip Entity, and
+   * add it to Datastore.
+   *
+   * @param datastore The Datastore object that places the TripDay in Datastore.
+   * @param inputDestination The origin and destination for that TripDay.
+   * @param inputDate The String start date of the TripDay. Must be in 
+      "yyyy-mm-dd" format.
+   * @return The TripDay Entity that was placed in Datastore.
+   */
+  public Entity createTripDayEntityNoTripAncestor(DatastoreService datastore, 
+    String inputDestination, String inputDate) {
+
+    Entity tripDayEntity = new Entity(TripDay.QUERY_STRING);
+    tripDayEntity.setProperty("origin", inputDestination);
+    tripDayEntity.setProperty("destination", inputDestination);
+    tripDayEntity.setProperty("date", inputDate);
+    datastore.put(tripDayEntity);
+    return tripDayEntity;
+  }
+
+  /**
+   * TEST METHODS.
+   */
+
   @Test
   public void testGetTripFromTripKey() {
     // Add a User to the database.
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-    Entity userEntity = new Entity(User.USER);
-    userEntity.setProperty(User.USER_EMAIL, EMAIL);
-    datastore.put(userEntity);
+    Entity userEntity = createUserEntity(datastore, EMAIL);
 
     // Add a Trip to Datastore with the User Entity Key.
-    Entity tripEntity = new Entity(Trip.TRIP, userEntity.getKey());
-    tripEntity.setProperty(Trip.TRIP_NAME, TRIP_NAME);
-    tripEntity.setProperty(Trip.DESTINATION_NAME, DESTINATION_NAME);
-    tripEntity.setProperty(Trip.IMAGE_SRC, IMAGE_SRC);
-    tripEntity.setProperty(Trip.START_DATE, TRIP_START_DATE);
-    tripEntity.setProperty(Trip.END_DATE, TRIP_END_DATE);
-    datastore.put(tripEntity);
+    Entity tripEntity = createTripEntity(datastore, userEntity, TRIP_NAME, 
+      DESTINATION_NAME, IMAGE_SRC, TRIP_START_DATE, TRIP_END_DATE);
 
     // Run getTripFromTripKey(...), with the Trip and User present in datastore.
     Entity tripEntityReturn = 
@@ -137,18 +253,11 @@ public final class EditServletTest {
   public void testGetTripFromTripKeyNotUnderUserNull() {
     // Add a User to the database.
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-    Entity userEntity = new Entity(User.USER);
-    userEntity.setProperty(User.USER_EMAIL, EMAIL);
-    datastore.put(userEntity);
+    Entity userEntity = createUserEntity(datastore, EMAIL);
 
     // Add a Trip to Datastore without the User Entity Key.
-    Entity tripEntity = new Entity(Trip.TRIP);
-    tripEntity.setProperty(Trip.TRIP_NAME, TRIP_NAME);
-    tripEntity.setProperty(Trip.DESTINATION_NAME, DESTINATION_NAME);
-    tripEntity.setProperty(Trip.IMAGE_SRC, IMAGE_SRC);
-    tripEntity.setProperty(Trip.START_DATE, TRIP_START_DATE);
-    tripEntity.setProperty(Trip.END_DATE, TRIP_END_DATE);
-    datastore.put(tripEntity);
+    Entity tripEntity = createTripEntityNoUserAncestor(datastore, TRIP_NAME, 
+      DESTINATION_NAME, IMAGE_SRC, TRIP_START_DATE, TRIP_END_DATE);
 
     /**
      * Run getTripFromTripKey(...), with the Trip and User present in datastore,
@@ -165,18 +274,11 @@ public final class EditServletTest {
   public void testGetTripFromTripKeyInvalidTripKeyNull() {
     // Add a User to the database.
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-    Entity userEntity = new Entity(User.USER);
-    userEntity.setProperty(User.USER_EMAIL, EMAIL);
-    datastore.put(userEntity);
+    Entity userEntity = createUserEntity(datastore, EMAIL);
 
     // Add a Trip to Datastore with the User Entity Key.
-    Entity tripEntity = new Entity(Trip.TRIP, userEntity.getKey());
-    tripEntity.setProperty(Trip.TRIP_NAME, TRIP_NAME);
-    tripEntity.setProperty(Trip.DESTINATION_NAME, DESTINATION_NAME);
-    tripEntity.setProperty(Trip.IMAGE_SRC, IMAGE_SRC);
-    tripEntity.setProperty(Trip.START_DATE, TRIP_START_DATE);
-    tripEntity.setProperty(Trip.END_DATE, TRIP_END_DATE);
-    datastore.put(tripEntity);
+    Entity tripEntity = createTripEntity(datastore, userEntity, TRIP_NAME, 
+      DESTINATION_NAME, IMAGE_SRC, TRIP_START_DATE, TRIP_END_DATE);
 
     /**
      * Run getTripFromTripKey(...), with the Trip and User present in datastore,
@@ -193,26 +295,14 @@ public final class EditServletTest {
   public void testGetTripDaysFromTripMultipleBackwardOrder() throws Exception {
     // Add a single Trip to Datastore.
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-    Entity tripEntity = new Entity(Trip.TRIP);
-    tripEntity.setProperty(Trip.TRIP_NAME, TRIP_NAME);
-    tripEntity.setProperty(Trip.DESTINATION_NAME, DESTINATION_NAME);
-    tripEntity.setProperty(Trip.IMAGE_SRC, IMAGE_SRC);
-    tripEntity.setProperty(Trip.START_DATE, TRIP_START_DATE);
-    tripEntity.setProperty(Trip.END_DATE, TRIP_END_DATE);
-    datastore.put(tripEntity);
+    Entity tripEntity = createTripEntityNoUserAncestor(datastore, TRIP_NAME, 
+      DESTINATION_NAME, IMAGE_SRC, TRIP_START_DATE, TRIP_END_DATE);
 
     // Add a two TripDays to Datastore, with the later date TripDay first.
-    Entity tripDayEntity1 = new Entity(TripDay.QUERY_STRING, tripEntity.getKey());
-    tripDayEntity1.setProperty("origin", INPUT_DESTINATION);
-    tripDayEntity1.setProperty("destination", INPUT_DESTINATION);
-    tripDayEntity1.setProperty("date", INPUT_DATE_2);
-    datastore.put(tripDayEntity1);
-
-    Entity tripDayEntity2 = new Entity(TripDay.QUERY_STRING, tripEntity.getKey());
-    tripDayEntity2.setProperty("origin", INPUT_DESTINATION_2);
-    tripDayEntity2.setProperty("destination", INPUT_DESTINATION_2);
-    tripDayEntity2.setProperty("date", INPUT_DATE);
-    datastore.put(tripDayEntity2);
+    Entity tripDayEntity1 = createTripDayEntity(datastore, tripEntity, 
+      INPUT_DESTINATION, INPUT_DATE_2);
+    Entity tripDayEntity2 = createTripDayEntity(datastore, tripEntity, 
+      INPUT_DESTINATION_2, INPUT_DATE);
 
     /**
      * Run getTripDaysFromTrip(...), with the Trip and TripDay present in 
@@ -232,20 +322,12 @@ public final class EditServletTest {
   public void testGetTripDaysFromTripSingle() throws Exception {
     // Add a single Trip to Datastore.
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-    Entity tripEntity = new Entity(Trip.TRIP);
-    tripEntity.setProperty(Trip.TRIP_NAME, TRIP_NAME);
-    tripEntity.setProperty(Trip.DESTINATION_NAME, DESTINATION_NAME);
-    tripEntity.setProperty(Trip.IMAGE_SRC, IMAGE_SRC);
-    tripEntity.setProperty(Trip.START_DATE, TRIP_START_DATE);
-    tripEntity.setProperty(Trip.END_DATE, TRIP_END_DATE);
-    datastore.put(tripEntity);
+    Entity tripEntity = createTripEntityNoUserAncestor(datastore, TRIP_NAME, 
+      DESTINATION_NAME, IMAGE_SRC, TRIP_START_DATE, TRIP_END_DATE);
 
     // Add a one TripDay to Datastore.
-    Entity tripDayEntity1 = new Entity(TripDay.QUERY_STRING, tripEntity.getKey());
-    tripDayEntity1.setProperty("origin", INPUT_DESTINATION);
-    tripDayEntity1.setProperty("destination", INPUT_DESTINATION);
-    tripDayEntity1.setProperty("date", INPUT_DATE_2);
-    datastore.put(tripDayEntity1);
+    Entity tripDayEntity1 = createTripDayEntity(datastore, tripEntity, 
+      INPUT_DESTINATION, INPUT_DATE_2);
 
     /**
      * Run getTripDaysFromTrip(...), with the Trip and TripDay present in 
@@ -264,13 +346,8 @@ public final class EditServletTest {
   public void testGetTripDaysFromTripNonePresent() throws Exception {
     // Add a single Trip to Datastore.
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-    Entity tripEntity = new Entity(Trip.TRIP);
-    tripEntity.setProperty(Trip.TRIP_NAME, TRIP_NAME);
-    tripEntity.setProperty(Trip.DESTINATION_NAME, DESTINATION_NAME);
-    tripEntity.setProperty(Trip.IMAGE_SRC, IMAGE_SRC);
-    tripEntity.setProperty(Trip.START_DATE, TRIP_START_DATE);
-    tripEntity.setProperty(Trip.END_DATE, TRIP_END_DATE);
-    datastore.put(tripEntity);
+    Entity tripEntity = createTripEntityNoUserAncestor(datastore, TRIP_NAME, 
+      DESTINATION_NAME, IMAGE_SRC, TRIP_START_DATE, TRIP_END_DATE);
 
     /**
      * Run getTripDaysFromTrip(...), with the Trip and TripDay present in 
@@ -288,20 +365,12 @@ public final class EditServletTest {
   public void testGetTripDaysFromTripNotUnderTrip() throws Exception {
     // Add a single Trip to Datastore.
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-    Entity tripEntity = new Entity(Trip.TRIP);
-    tripEntity.setProperty(Trip.TRIP_NAME, TRIP_NAME);
-    tripEntity.setProperty(Trip.DESTINATION_NAME, DESTINATION_NAME);
-    tripEntity.setProperty(Trip.IMAGE_SRC, IMAGE_SRC);
-    tripEntity.setProperty(Trip.START_DATE, TRIP_START_DATE);
-    tripEntity.setProperty(Trip.END_DATE, TRIP_END_DATE);
-    datastore.put(tripEntity);
+    Entity tripEntity = createTripEntityNoUserAncestor(datastore, TRIP_NAME, 
+      DESTINATION_NAME, IMAGE_SRC, TRIP_START_DATE, TRIP_END_DATE);
 
     // Add a one TripDay to Datastore without the Trip Entity Key.
-    Entity tripDayEntity1 = new Entity(TripDay.QUERY_STRING);
-    tripDayEntity1.setProperty("origin", INPUT_DESTINATION);
-    tripDayEntity1.setProperty("destination", INPUT_DESTINATION);
-    tripDayEntity1.setProperty("date", INPUT_DATE_2);
-    datastore.put(tripDayEntity1);
+    Entity tripDayEntity1 = createTripDayEntityNoTripAncestor(datastore, 
+      INPUT_DESTINATION, INPUT_DATE_2);
 
     /**
      * Run getTripDaysFromTrip(...), with the Trip and TripDay present in 
@@ -319,20 +388,12 @@ public final class EditServletTest {
   public void testGetTripDaysFromTripInvalidKey() throws Exception {
     // Add a single Trip to Datastore.
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-    Entity tripEntity = new Entity(Trip.TRIP);
-    tripEntity.setProperty(Trip.TRIP_NAME, TRIP_NAME);
-    tripEntity.setProperty(Trip.DESTINATION_NAME, DESTINATION_NAME);
-    tripEntity.setProperty(Trip.IMAGE_SRC, IMAGE_SRC);
-    tripEntity.setProperty(Trip.START_DATE, TRIP_START_DATE);
-    tripEntity.setProperty(Trip.END_DATE, TRIP_END_DATE);
-    datastore.put(tripEntity);
+    Entity tripEntity = createTripEntityNoUserAncestor(datastore, TRIP_NAME, 
+      DESTINATION_NAME, IMAGE_SRC, TRIP_START_DATE, TRIP_END_DATE);
 
     // Add a one TripDay to Datastore without the Trip Entity Key.
-    Entity tripDayEntity1 = new Entity(TripDay.QUERY_STRING, tripEntity.getKey());
-    tripDayEntity1.setProperty("origin", INPUT_DESTINATION);
-    tripDayEntity1.setProperty("destination", INPUT_DESTINATION);
-    tripDayEntity1.setProperty("date", INPUT_DATE_2);
-    datastore.put(tripDayEntity1);
+    Entity tripDayEntity1 = createTripDayEntityNoTripAncestor(datastore, 
+      INPUT_DESTINATION, INPUT_DATE_2);
 
     /**
      * Run getTripDaysFromTrip(...), with the Trip and TripDay present in 
@@ -350,11 +411,8 @@ public final class EditServletTest {
   public void testGetEventsFromTripDayMultipleBackwardOrder() throws Exception {
     // Add a TripDay to Datastore.
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-    Entity tripDayEntity = new Entity(TripDay.QUERY_STRING);
-    tripDayEntity.setProperty("origin", INPUT_DESTINATION);
-    tripDayEntity.setProperty("destination", INPUT_DESTINATION);
-    tripDayEntity.setProperty("date", INPUT_DATE);
-    datastore.put(tripDayEntity);
+    Entity tripDayEntity = createTripDayEntityNoTripAncestor(datastore, 
+      INPUT_DESTINATION, INPUT_DATE_2);
 
     // Add two Events to Datastore, in backwards order.
     Event e1 = new Event(SPACE_NEEDLE, SPACE_NEEDLE_ADDRESS, SPACE_NEEDLE_START_TIME, HALF_HOUR);
@@ -388,11 +446,8 @@ public final class EditServletTest {
   public void testGetEventsFromTripDaySingle() throws Exception {
     // Add a TripDay to Datastore.
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-    Entity tripDayEntity = new Entity(TripDay.QUERY_STRING);
-    tripDayEntity.setProperty("origin", INPUT_DESTINATION);
-    tripDayEntity.setProperty("destination", INPUT_DESTINATION);
-    tripDayEntity.setProperty("date", INPUT_DATE);
-    datastore.put(tripDayEntity);
+    Entity tripDayEntity = createTripDayEntityNoTripAncestor(datastore, 
+      INPUT_DESTINATION, INPUT_DATE_2);
 
     // Add one Event to Datastore.
     Event e1 = new Event(SPACE_NEEDLE, SPACE_NEEDLE_ADDRESS, SPACE_NEEDLE_START_TIME, HALF_HOUR);
@@ -418,11 +473,8 @@ public final class EditServletTest {
   public void testGetEventsFromTripDayNonePresent() throws Exception {
     // Add a TripDay to Datastore.
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-    Entity tripDayEntity = new Entity(TripDay.QUERY_STRING);
-    tripDayEntity.setProperty("origin", INPUT_DESTINATION);
-    tripDayEntity.setProperty("destination", INPUT_DESTINATION);
-    tripDayEntity.setProperty("date", INPUT_DATE);
-    datastore.put(tripDayEntity);
+    Entity tripDayEntity = createTripDayEntityNoTripAncestor(datastore, 
+      INPUT_DESTINATION, INPUT_DATE_2);
 
     /**
      * Run getEventsFromTripDay(...), with the TripDay and Events present in 
@@ -440,11 +492,8 @@ public final class EditServletTest {
   public void testGetEventsFromTripDayInvalidKey() throws Exception {
     // Add a TripDay to Datastore.
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-    Entity tripDayEntity = new Entity(TripDay.QUERY_STRING);
-    tripDayEntity.setProperty("origin", INPUT_DESTINATION);
-    tripDayEntity.setProperty("destination", INPUT_DESTINATION);
-    tripDayEntity.setProperty("date", INPUT_DATE);
-    datastore.put(tripDayEntity);
+    Entity tripDayEntity = createTripDayEntityNoTripAncestor(datastore, 
+      INPUT_DESTINATION, INPUT_DATE_2);
 
     // Add one Event to Datastore.
     Event e1 = new Event(SPACE_NEEDLE, SPACE_NEEDLE_ADDRESS, SPACE_NEEDLE_START_TIME, HALF_HOUR);
