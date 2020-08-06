@@ -36,8 +36,7 @@ import javax.servlet.http.HttpServlet;
 /**
  * Class that creates an event specific to a POI 
  */
-public class Event {
-
+public class Event implements Comparable<Event> {
   // inputs
   private String name;
   private String address;
@@ -174,5 +173,11 @@ public class Event {
 
   public long getTravelTime() {
     return this.travelTime;
+  }
+
+  @Override
+  public int compareTo(Event event) {
+    // Events are sorted by start time.
+    return this.getStartTime().compareTo(event.getStartTime());
   }
 }
