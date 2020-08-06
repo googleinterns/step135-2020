@@ -11,10 +11,8 @@ Visit the website at http://offroad-pod-step-2020.appspot.com. (Note: This link 
     - TravIS will also provide suggested points of interest based on the user's destination.
 2. View the itinerary and route directions for each day through an embedded Google Maps widget on the Maps page.
     - TravIS reorders the POIs entered by the user and calculates a daily route that is optimized for travel time using the Maps API. This route starts and ends at the user's hotel and includes the user's desired POIs as stops along the way.
-3. See the overall trip schedule, different calendar views on the Calendar page.
-    - The event address, opening / closing hours, and an embedded map are available in the event pop-up.
+3. See the overall trip schedule, event address and opening / closing hours, and different calendar views on the Calendar page.
     - TravIS creates an itinerary that corresponds to the calculated route. This itinerary incorporates the travel times calculated by the Maps API.
-    - The current algorithm does not take into account opening hours of the locations. The new algorithm has been designed and implemented but not fully integrated into the code base as there was not enough time.
 4. Edit the trip details, including the trip name, event names, and adding or deleting POIs on the Edit page. *
 5. Access all of the trips under the current user, and the Maps, Calendar, and Edit pages, on the Trips page.
 
@@ -34,6 +32,9 @@ Note: All of the features above require the user to sign in first.
 
 ### Calendar Page
 ![Calendar Page](src/main/webapp/images/site_screenshots/calendar_page.png)
+
+### Calendar Page (Event Popup)
+![Calendar Page](src/main/webapp/images/site_screenshots/calendar_page_event_popup.png)
 
 ### Edit Page *
 ![Edit Page](src/main/webapp/images/site_screenshots/edit_page.png)
