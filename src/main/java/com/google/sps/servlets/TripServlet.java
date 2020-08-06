@@ -86,7 +86,7 @@ public class TripServlet extends HttpServlet {
 
   // time class constants
   private static final int ONE_HOUR = 60;
-  private static final int SECONDS_IN_MIN = 60;
+  public static final int SECONDS_IN_MIN = 60;
 
   // event fields for entity
   private static final String NAME = "name";
@@ -244,7 +244,7 @@ public class TripServlet extends HttpServlet {
   /**
    * Get the PlaceDetails object from the place ID.
    */
-  private PlaceDetails getPlaceDetailsFromPlaceId(GeoApiContext context, String placeId)
+  public static PlaceDetails getPlaceDetailsFromPlaceId(GeoApiContext context, String placeId)
     throws IOException {
 
     PlaceDetailsRequest placeDetailsRequest = PlacesApi.placeDetails(context, 
