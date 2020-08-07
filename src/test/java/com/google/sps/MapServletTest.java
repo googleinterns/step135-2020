@@ -203,7 +203,7 @@ public final class MapServletTest {
     datastore.put(yosemiteEntity);
 
     // run do Get
-    String result = mapServlet.doGetMap(response, datastore, userEntity, tripEntity.getKey());
+    String result = mapServlet.doGetMap(response, datastore, userEntity, tripEntity.getKey(), "");
 
     // even though DomeEntity is added first, its order property is 1 so it should appear 
     // after YosemiteEntity in the JSON.
