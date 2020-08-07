@@ -106,8 +106,7 @@ public class MapServlet extends HttpServlet {
       date = (String) tripEntity.getProperty(Trip.START_DATE);
     }
 
-    // Get TripDay associated with the Trip.
-    // TODO(eshika): change to select the desired tripDay for multiday trips.
+    // Get TripDay associated with the Trip and inputted date.
     Filter tripDayFilter =
       new FilterPredicate(TripDay.DATE, FilterOperator.EQUAL, date);
     Query tripDayQuery = new Query(TripDay.QUERY_STRING, tripEntity.getKey());
