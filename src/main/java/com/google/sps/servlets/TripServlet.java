@@ -81,6 +81,7 @@ public class TripServlet extends HttpServlet {
   private String tripName;
   private String tripDestination;
   private String tripDayOfTravel;
+  private String tripEndDate;
   private String destinationName;
   private String photoSrc;
 
@@ -101,6 +102,7 @@ public class TripServlet extends HttpServlet {
   private static final String INPUT_TRIP_NAME = "inputTripName";
   private static final String INPUT_DESTINATION = "inputDestination";
   private static final String INPUT_DAY_OF_TRAVEL = "inputDayOfTravel";
+  private static final String INPUT_END_DATE = "inputEndDate";
   private static final String INPUT_POI_LIST = "poiList";
 
   // Datastore and API context
@@ -132,6 +134,7 @@ public class TripServlet extends HttpServlet {
     this.tripName = request.getParameter(INPUT_TRIP_NAME);
     this.tripDestination = request.getParameter(INPUT_DESTINATION);
     this.tripDayOfTravel = request.getParameter(INPUT_DAY_OF_TRAVEL);
+    this.tripEndDate = request.getParameter(INPUT_END_DATE);
     String[] poiStrings = request.getParameterValues(INPUT_POI_LIST);
 
     // Populate the destinationName and photoSrc fields using Google Maps API.
@@ -139,7 +142,7 @@ public class TripServlet extends HttpServlet {
 
     // Store the Trip Entity in datastore with the User Entity as an ancestor.
     Entity tripEntity = storeTripEntity(response, this.tripName, this.destinationName, 
-      this.tripDayOfTravel, this.photoSrc, datastore);
+      this.tripDayOfTravel, this.tripEndDate, this.photoSrc, datastore);
 
     //do post for maps
     DirectionsApiRequest dirRequest = generateDirectionsRequest(this.tripDestination, this.tripDestination, poiStrings, this.context);
@@ -301,7 +304,8 @@ public class TripServlet extends HttpServlet {
    * name, but can also be the placeholder image source if no photo exists.
    */
   public Entity storeTripEntity(HttpServletResponse response, String tripName, 
-    String destinationName, String tripDayOfTravel, String photoSrc, DatastoreService datastore) throws IOException {
+    String destinationName, String tripDayOfTravel, String tripEndDate, String photoSrc, DatastoreService datastore) 
+    throws IOException {
     // Get User Entity. If user not logged in, redirect to homepage.
     Entity userEntity = AuthServlet.getCurrentUserEntity();
     if (userEntity == null) {
@@ -311,7 +315,7 @@ public class TripServlet extends HttpServlet {
 
     // Put Trip Entity into datastore.
     Entity tripEntity = Trip.buildEntity(tripName, destinationName, photoSrc,
-      tripDayOfTravel, tripDayOfTravel, userEntity.getKey());
+      tripDayOfTravel, tripEndDate, userEntity.getKey());
     datastore.put(tripEntity);
     return tripEntity;
   }
