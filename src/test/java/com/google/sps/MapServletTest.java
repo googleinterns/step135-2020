@@ -86,7 +86,7 @@ public final class MapServletTest {
   /* 
    * Integration test: Tests that doGet writes the correct JSON string containing locations in order
    */
-  //@Test
+  @Test
   public void testDoGet() throws Exception {
     HttpServletRequest request = mock(HttpServletRequest.class);       
     HttpServletResponse response = mock(HttpServletResponse.class);    
@@ -156,7 +156,7 @@ public final class MapServletTest {
   /* 
    * Tests that doGetMap constructs the expected JSON string containing locations in order
    */
-  //@Test
+  @Test
   public void testDoGetMap() throws Exception {
     HttpServletRequest request = mock(HttpServletRequest.class);       
     HttpServletResponse response = mock(HttpServletResponse.class);    
